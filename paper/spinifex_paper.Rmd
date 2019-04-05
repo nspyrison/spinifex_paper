@@ -118,63 +118,63 @@ array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
 
 ## Introduction
 
-<!-- <!-- Tours --> -->
-<!-- A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that perseveres continuity. -->
+<!-- Tours -->
+A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that perseveres continuity.
 
-<!-- <!-- Manual tour --> -->
-<!-- While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a select variable has in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projections structure is to these changes. This makes manual tours particularly useful once a feature of interest has been identified, for example, with the use of a guided tour [@cook_grand_1995]. The path of a guided tour is selected via projection pursuit, the optimization of an index function on the projection via a hill climbing algorithm. This allows guided tours to identify interesting projection features rapidly given the relatively large parameter-space. Once the given projection has been provided, it is time to define the path of rotation. -->
+<!-- Manual tour -->
+While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a select variable has in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projections structure is to these changes. This makes manual tours particularly useful once a feature of interest has been identified, for example, with the use of a guided tour [@cook_grand_1995]. The path of a guided tour is selected via projection pursuit, the optimization of an index function on the projection via a hill climbing algorithm. This allows guided tours to identify interesting projection features rapidly given the relatively large parameter-space. Once the given projection has been provided, it is time to define the path of rotation.
 
-<!-- <!-- Manual tour paths --> -->
-<!-- Ideally, the path would be intuitively user-generated from physical movement, be it through mouse or motion capture. Unfortunately, this type of dynamic control has proven difficult to capture for in R. Because of this, manual tours were not implemented in *tourr*. This research allows for the consumption, but not the generation, of such dynamic input. After the capture of an oblique user motion, the rotation needs to be applied to step 3 (rotation sequence) of the algorithm discussed below. In the section below we stick with a radial rotation where, $\theta$, the angle of in-projection-plane rotation is held constant. -->
+<!-- Manual tour paths -->
+Ideally, the path would be intuitively user-generated from physical movement, be it through mouse or motion capture. Unfortunately, this type of dynamic control has proven difficult to capture for in R. Because of this, manual tours were not implemented in *tourr*. This research allows for the consumption, but not the generation, of such dynamic input. After the capture of an oblique user motion, the rotation needs to be applied to step 3 (rotation sequence) of the algorithm discussed below. In the section below we stick with a radial rotation where, $\theta$, the angle of in-projection-plane rotation is held constant.
 
-<!-- <!-- Display --> -->
-<!-- Spinifex utilizes two new animation packages, *plotly* [@sievert_plotly_2018] and *gganimate* [@pedersen_gganimate:_2019], to display tours, manual or other saved tours. From a given projection, the user can choose which variable to control, and the animation sequence is generated to remove the variable from the projection, and then extend its contribution to be the sole variable in one direction. This allows the viewer to assess the change in structure induced in the projection by the variable's contribution. -->
+<!-- Display -->
+Spinifex utilizes two new animation packages, *plotly* [@sievert_plotly_2018] and *gganimate* [@pedersen_gganimate:_2019], to display tours, manual or other saved tours. From a given projection, the user can choose which variable to control, and the animation sequence is generated to remove the variable from the projection, and then extend its contribution to be the sole variable in one direction. This allows the viewer to assess the change in structure induced in the projection by the variable's contribution.
 
-<!-- <!-- Paper outline --> -->
-<!-- The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discussed the display of the animation after the path has been generated. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research. -->
-
-
-<!-- <!-- Algorithm outline --> -->
-<!-- ## Algorithm {#sec:algorithm} -->
-
-<!-- The section below describes the algorithm for performing a 2D radial manual tour: -->
-
-<!-- 1. Provided with a 2D projection, choose a variable to explore. This is called the "manip" variable. -->
-<!-- 2. Create a 3D manipulation space, where the manip variable has the full contribution. -->
-<!-- 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it. -->
-
-<!-- The steps are described in more detail below. The R functions used below mentioned briefly, but more complete code example can be found in section \ref{sec:usage} -->
-
-<!-- ### Notation -->
-
-<!-- This section describes the notation used in the algorithm for a 2D radial manual tour. -->
-
-<!-- <!-- remember mixing latex and rmarkdown bullets isn't trivial. --> -->
-<!-- \begin{itemize} -->
-<!--   \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions. -->
-<!--   \item $\textbf{B} = (B_1,~ B_2)$, any of orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions -->
-<!--   \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate. -->
-<!--   \item $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes.  -->
-<!--   \item $\phi$, the angle of out-of-projection-plane rotation, coming into the manipulation space. -->
-<!-- \end{itemize} -->
-
-<!-- The algorithm primarily operates on the projection basis and utilizes the data only when making a display. The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first 2 variables. -->
+<!-- Paper outline -->
+The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discussed the display of the animation after the path has been generated. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
 
 
-<!-- ### Toy data set -->
+<!-- Algorithm outline -->
+## Algorithm {#sec:algorithm}
 
-<!-- <!-- describe data. --> -->
-<!-- The flea data, originally from @lubischew_use_1962, available in the R package *tourr* [@wickham_tourr_2011] is used to illustrate the algorithm. The data contains 74 observations across 6 variables, physical measurements of the flea beetles. Each observation belonging to one of three species. -->
+The section below describes the algorithm for performing a 2D radial manual tour:
+
+1. Provided with a 2D projection, choose a variable to explore. This is called the "manip" variable.
+2. Create a 3D manipulation space, where the manip variable has the full contribution.
+3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
+
+The steps are described in more detail below. The R functions used below mentioned briefly, but more complete code example can be found in section \ref{sec:usage}
+
+### Notation
+
+This section describes the notation used in the algorithm for a 2D radial manual tour.
+
+<!-- remember mixing latex and rmarkdown bullets isn't trivial. -->
+\begin{itemize}
+  \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions.
+  \item $\textbf{B} = (B_1,~ B_2)$, any of orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
+  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate.
+  \item $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes.
+  \item $\phi$, the angle of out-of-projection-plane rotation, coming into the manipulation space.
+\end{itemize}
+
+The algorithm primarily operates on the projection basis and utilizes the data only when making a display. The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first 2 variables.
+
+
+### Toy data set
+
+<!-- describe data. -->
+The flea data, originally from @lubischew_use_1962, available in the R package *tourr* [@wickham_tourr_2011] is used to illustrate the algorithm. The data contains 74 observations across 6 variables, physical measurements of the flea beetles. Each observation belonging to one of three species.
 
 <!-- Projection basis -->
 The data is defined. A basis set (ideally that views an interesting feature) should be provided to explore the sensitivity of the variables to the structure. To identify a projection containing an interesting feature, apply
 a guided tour[@cook_interactive_2007] on the flea data. In a guided tour the projection sequence is selected by optimizing an index via hill-climbing. In this case, the holes index is selected. The holes index is maximized by when the projected observations are furthest from the center. Figure \@ref{fig:step0} shows a locally optimized projection for this data. The left plot displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributed to the projections. The right plot shows the projection of the data through the basis set described by the reference axes (left). Data points are colored and given point characters according to the species of the flea (the guided tour was unsupervised with this information).
 
-(ref:step0-cap) Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables `aede2` and `tars1` contribute mostly orthogonal to the other variables. We'll select `aede2` as our manipulation variable to see how the structure of the projection changes as we rotate `aede2` into and out of the projection.
+(ref:step0-cap) Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables `aede2` and `tars1` contribute mostly orthogonal to the other variables. Select `aede2` as the manipulation variable to see how the structure of the projection changes as `aede2` is  rotated into and out of the projection.
 
 
-```{r step0, echo=F, results='hide', out.width='95%', fig.cap = "\\label{fig:step0} and some caption"}
-
+```{r step0, echo=F, results='hide', out.width='95%', fig.cap = "(ref:step0-cap)"} 
+#"\\label{fig:step0} and some caption"}
 
 ## Flea holes tour
 f_dat  <- tourr::rescale(flea[,1:6])
@@ -210,7 +210,7 @@ In figure \@ref(fig:step0), above, the contributions of the variables `tars1` an
 Initialize a zero vector $e$ of $p$ elements. Because `aede2` is the fifth variable in the data, set the $k=5$-th element to one giving the manip var a full contribution in this dimension. Use the Gram-Schmidt process to orthonormalize the zero vector onto the basis yielding the 3D manipulation space, **M**.
 
 \begin{align*}
-  \textbf{e} &\leftarrow Orthonormalize_{GS}(\textbf{e}) w.r.t. Basis \\
+  \textbf{e} &\leftarrow Orthonormalize_{GS}(\textbf{e}) w.r.t. the basis \\
   &= \textbf{e} - \langle \textbf{e},\textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\
   \\
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e})
