@@ -305,7 +305,7 @@ Animations can be produced using the function `play_manual_tour()`. This functio
 ## Data in projection-space {#sec:display}
 
 <!-- the reminder of basis operation and now apply data -->
-In light of performance, the above operations are performed on the bases without the use of the larger datasets. After the bases are brought into the projection-space, however, it is helpful to observe them with data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
+In an appeal to performance, the above operations are performed on the bases without the use of the larger datasets. After the bases are brought into the projection-space, however, it is helpful to observe them with data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
 
 \begin{align}
   \textbf{P}_{[n,~3]}
@@ -332,12 +332,12 @@ For a 2D scatterplot, plot the first two variables from each frame statically as
 
 ### Rendering and sharing
 
-The **tourr** package utilizes R's base graphics for the display of tours. **spinifex** allows tours to be used in rendered in **plotly** @sievert_plotly_2018 as an HTML5 object or **gganimate** @pedersen_gganimate:_2019 as .gif or .mp4 objects. Both of which build off **ggplot2** objects in internal functions. Sharing of animations is not trivial especially in print and static formats such as .pdf. Even with the use of computers and dynamic file formats capturing the correct resolution, aspect, and display is challenging and many formats quickly bloat file sizes. Keep in mind hosting options and exporting functions from **plotly**, **gganimate** and **tourr**.
+The **tourr** package utilizes **base** graphics for the display of tours. **spinifex** allows tours to be used in rendered in **plotly** as an HTML5 object or **gganimate** as .gif or .mp4 objects. Both of which build off **ggplot2** objects in internal functions. Sharing of animations is not trivial especially in print and static file formats such as .pdf. Even with the use of computers and dynamic file formats capturing the correct resolution, aspect, and display is challenging and many formats quickly bloat file sizes. Keep in mind hosting options and exporting functions from **plotly**, **gganimate** and **tourr**.
 
 
 ### Storage
 
-Storing each data point for every frame of the animation is very inefficient. Just as operations are performed on the bases, so too should tour paths be stored as bases. Consider a radial manual tour, we can store the salient features in 3 bases, where $\phi$ is at its starting, minimum, and maximum values. The frames in between can be interpolated by supplying angular speed. With the use of the `tourr::save_history()` function, the target bases can be saved. From there geodesic interpolation can be used to populate the intermittent frames. This type of interpolation should not be used on manual tours, which have already been initialized into a 3D manipulation space where direct linear interpolation is appropriate.
+Storing each data point for every frame of the animation is redundant. Just as operations are performed on the bases, so too should tour paths be stored as bases and a single instance of the data. Consider a radial manual tour, we can store the salient features in 3 bases, where $\phi$ is at its starting, minimum, and maximum values. The frames in between can be interpolated by supplying angular speed. With the use of the `tourr::save_history()` function, the target bases can be saved. From there geodesic interpolation can be used to populate the intermittent frames. This type of interpolation should not be used on manual tours, which have already been initialized into a 3D manipulation space where direct linear interpolation is appropriate.
 
 
 ## Application {#sec:application}
@@ -345,17 +345,17 @@ Storing each data point for every frame of the animation is very inefficient. Ju
 <!-- Introduction of data and original paper  -->
 In a recent paper, @wang_mapping_2018, the authors aggregate and visualize the sensitivity of hadronic experiments to nucleon structure. The authors introduce a new tool, PDFSense, to aid in the visualization of Parton distribution functions (PDF). The parameter-space of these experiments lies in 56 dimensions, $\delta \in \mathbb{R}^{56}$, and are visualized as 3D subspaces of the 10 first principal components in linear (PCA) and non-linear (t-SNE) embeddings. 
 
-<!-- grand tours on the same data, summarize findings better -->
-Using the same data, another study, @cook_dynamical_2018, applies grand tours to the same subspaces. Grand tours are able to better resolve the distribution shape of clusters, intra-cluster detail, better outlier detection, and challenges a claim presented from TFEP (TensorFlow embedded projections). Table 1 of Cook *et al.* summarizes the key findings of observations made with PDFSense & TFEP and those from grand tours. 
+<!-- grand tours on the same data -->
+Using the same data, another study, @cook_dynamical_2018, applies grand tours to the same subspaces. Grand tours are dynamic subspace projections of high dimensional where frames and selected at random and linked with geodesically interpolation of the intermidiate frames. Grand tours are able to better resolve the distribution shape of clusters, intra-cluster detail, and better outlier detection than use of PDFSense & TFEP (TensorFlow embedded projections). Before applying manual tours let's discuss the structure of the data.
 
-<!-- is this the best place for this level of detail or is it suited better later on? -->
-Without getting too domain-specific the data has three primary groupings; `DIS`, `VBP`, and `jet`. Each group is a particular class of experiments and each with many experimental datasets which, in turn, have many observations. In the consideration of data density, we conduct manual tours on subsets of the `DIS` and `jet` clusters. This explores the sensitivity of the structure to each of the variables in turn and we present the subjectively best and worst variable to manipulate for identifying structure and outliers.
+<!-- Data structure -->
+The data has a hierachrical structure with top-level groupings; `DIS`, `VBP`, and `jet`. Each group is a particular class of experiments, each with many experimental datasets which, in turn, have many observations. In the consideration of data density, we conduct manual tours on subsets of the `DIS` and `jet` clusters. This explores the sensitivity of the structure to each of the variables in turn and we present the subjectively best and worst variable to manipulate for identifying dimensionality of the clusters and describing the span of the clusters.
 
 
 ### Jet cluster
 
 <!-- motivate jet cluster, explain dimensionality  -->
-The `jet` cluster is of interest as it contains the largest data sets and is found to be important in @wang_mapping_2018. The jet cluster resides in a smaller dimensionality than the full set of experiments with 4 principal components explaining 95% of the variation in the jet cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to `ATLAS7old` and `ATLAS7new` to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Below, we perform radial manual tours all four principal components within this scope. Visualizing PC3 and PC4 in figure \@ref(fig:JetClusterGood) (more structurally insightful) and figure \@ref(fig:JetClusterBad) (less structurally insightful) respectively, and list links to dynamic animation of all variables. 
+The `jet` cluster is of interest as it contains the largest data sets and is found to be important in @wang_mapping_2018. The jet cluster resides in a smaller dimensionality than the full set of experiments with 4 principal components explaining 95% of the variation in the jet cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to `ATLAS7old` and `ATLAS7new` to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \@ref(fig:JetClusterGood) and figure \@ref(fig:JetClusterBad) respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
 
 (ref:JetClusterGood-cap) `Jet` cluster, a radial manual tour of PC3. Colored by experiment type: `ATLAS7new` in green and `ATLAS7old` in orange. When PC3 fully contributes to the projection `ATLAS7new` (green) occupies unique space and several outliers are identifiable. Zeroing the contribution from PC3 to the projection hides the outliers and all observations with `ATLAS7new` are contained within the area spanned by `ATLAS7old` (orange). A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/.
 
