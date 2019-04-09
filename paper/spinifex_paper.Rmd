@@ -5,14 +5,12 @@ author:
   - name: Nicholas Spyrison
     affiliation: Monash University 
     address:
-    - School of Information Technology
-    - Monash University, Melbourne, VIC 3800, Australia
+    - Faculty of Information Technology
     email:  Nicholas.Spyrison@monash.edu
   - name: Dianne Cook
     affiliation: Monash University 
     address:
-    - School of Econometrics and Business Statistics
-    - Monash University, Melbourne, VIC 3800, Australia
+    - Department of Econometrics and Business Statistics
     email:  DiCook@monash.edu
 abstract: >
   The set of dynamic linear projections of multivariate data collectively known as **tours** provides an important tool for extending the dimensionality of visuals. The R package **tourr** offers a variety of path generators and geometric displays for conducting tours. This paper discusses an extension package, **spinifex**, that adds support for the path generation of manual tours and extends the display of tours to use with the animation packages, **plotly** and **gganimate**. Manual tours are used to explore the sensitivity of structure as the contributions of a manipulation variable are changed.
@@ -123,14 +121,14 @@ array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
 ## Introduction
 
 <!-- Tours -->
-A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that perseveres continuity. This is a crucial tool extending the dimensionality of visualization which is a large boon as datasets and models exist in increasing cardinality. The package **tourr** [@wickham_tourr_2011] builds a platform for generating tour paths and applying to a wide number of display geometrics in **base** graphics.
+A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that perseveres continuity. This is a crucial tool extending the dimensionality of visualization which is a large boon as datasets and models exist in increasing cardinality. The package \CRANpkg{tourr} [@wickham_tourr_2011] builds a platform for generating tour paths and applying to a wide number of display geometrics in **base** graphics.
 
 <!-- Manual tour -->
-While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a selected variable in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projections structure is to these changes. This makes manual tours particularly useful once a feature of interest has been identified, for example, with the use of a guided tour [@hurley_analyzing_1990]. Rather than exploring the large phase space of the data, a guided tour selects a very specific path via projection pursuit[@diaconis_asymptotics_1984], the optimization of an index function on the projection via a hill climbing algorithm. This allows guided tours to rapidly identify interesting projection features given the relatively large parameter-space. After a projection of interest is identified an analyst can then use the "finer brush" of the manual tour, by controlling the contributions of individual variables.
+While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a selected variable in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projections structure is to these changes. This makes manual tours particularly useful once a feature of interest has been identified, for example, with the use of a guided tour [@hurley_analyzing_1990]. Rather than exploring the large phase space of the data, a guided tour selects a very specific path via projection pursuit [@diaconis_asymptotics_1984], the optimization of an index function on the projection via a hill climbing algorithm. This allows guided tours to rapidly identify interesting projection features given the relatively large parameter-space. After a projection of interest is identified an analyst can then use the "finer brush" of the manual tour, by controlling the contributions of individual variables.
 
 
 <!-- Display -->
-Spinifex utilizes two new animation packages, **plotly** [@sievert_plotly_2018] and **gganimate** [@pedersen_gganimate:_2019], to display tours, manual or other saved tours. From a given projection, the user can choose which variable to control, and the animation sequence is generated to remove the variable from the projection, and then extend its contribution to be the sole variable in one direction. This allows the viewer to assess the change in structure induced in the projection by the variable's contribution.
+\CRANpkg{spinifex} utilizes two new animation packages, \CRANpkg{plotly} [@sievert_plotly_2018] and \CRANpkg{gganimate} [@pedersen_gganimate:_2019], to display tours, manual or other saved tours. From a given projection, the user can choose which variable to control, and the animation sequence is generated to remove the variable from the projection, and then extend its contribution to be the sole variable in one direction. This allows the viewer to assess the change in structure induced in the projection by the variable's contribution.
 
 <!-- Paper outline -->
 The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discussed the display of the animation after the path has been generated. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
@@ -173,7 +171,7 @@ The flea data, originally from @lubischew_use_1962, made available in **tourr** 
 The data is defined. A basis set (ideally orienting to an interesting feature) must be provided as an initial orientation. One way to identify a projection containing interesting features is to apply a guided tour [@cook_interactive_2007]. In a guided tour the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributed to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species (while the guided tour was unsupervised with this information).
 
 
-```{r step0, echo=F, results='hide', out.width='60%',                             fig.cap = "Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables."}
+```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables."}
 ## Flea holes tour
 f_dat  <- tourr::rescale(flea[,1:6])
 f_cat  <- factor(flea$species)
@@ -192,7 +190,7 @@ view_basis(f_bas, labels = colnames(f_dat)) +
   theme(panel.border = element_rect(colour = "black", fill = NA))
 ```
 
-Call `view_basis()` on a basis to produce a **ggplot2** graphic similar to \ref{fig:step0). Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
+Call `view_basis()` on a basis to produce a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] graphic similar to \ref{fig:step0). Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
 
 <!-- step 0 disp code. -->
 ```{r step0CODEEXAMPLE, eval=F, echo=T}
@@ -200,8 +198,8 @@ Call `view_basis()` on a basis to produce a **ggplot2** graphic similar to \ref{
 install.package("spinifex")
 library("spinifex")
 
-# Also see vignette: 
-vignette("spinifex") # vignette ‘spinifex’ not found
+# Also see the vignette: 
+vignette("spinifex")
 
 f_data  <- tourr::rescale(flea[, 1:6])
 f_path  <- save_history(f_data, guided_tour(holes()))
@@ -236,7 +234,7 @@ Adding this new dimension to our projection space allows for the coefficients of
 
 
 
-```{r step2, echo=F, out.width='60%',                                           fig.cap = "Manipulation space for controlling the contribution of aede2 of standardized flea data. Basis selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin."}
+```{r step2, echo=F, out.width='70%',                                           fig.cap = "Manipulation space for controlling the contribution of aede2 of standardized flea data. Basis selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin."}
 
 view_manip_space(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
     theme(panel.border = element_rect(colour = "black", fill = NA))
@@ -304,13 +302,13 @@ Figure \ref{fig:step3} illustrates a sequence with 15 projected bases, showing t
 f_angle <- .26
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
-  paste0("!!!!! step3 n_slides != 15 !!!!! n_slides = ", dim(f_mtour)[3]))
+  paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
 
 #play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
 array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 ```
 
-Animations can be produced using the function `play_manual_tour()`. This function defaults to an HTML5 widget produced from **plotly**. The `render_type` argument can be changed to `render_gganimate` for exporting to .gif or .mp4 files. 
+Animations can be produced using the function `play_manual_tour()`. This function defaults to an HTML5 widget produced from **plotly**. The `render_type` argument can be changed to `render_gganimate` for exporting to GIF or MP4 files. 
 
 <!-- step 3 disp code. -->
 ```{r step3CODEEXAMPLE, eval=F, echo=T}
@@ -340,7 +338,7 @@ For a 2D scatterplot, plot the first two variables from each frame statically as
 
 ### Rendering and sharing
 
-The **tourr** package utilizes **base** graphics for the display of tours. **spinifex** allows tours to be used in rendered in **plotly** as an HTML5 object or **gganimate** as .gif or .mp4 objects. Both of which build off **ggplot2** objects in internal functions. Sharing of animations is not trivial especially in print and static file formats such as .pdf. Even with the use of computers and dynamic file formats capturing the correct resolution, aspect, and display is challenging and many formats quickly bloat file sizes. Keep in mind hosting options and exporting functions from **plotly**, **gganimate** and **tourr**.
+The **tourr** package utilizes **base** graphics for the display of tours. **spinifex** allows tours to be used in rendered in **plotly** as an HTML5 object or **gganimate** as GIF or MP4 files. Both of which build off **ggplot2** objects in internal functions. Sharing of animations is not trivial especially in print and static file formats such as PDF. Even with the use of computers and dynamic file formats capturing the correct resolution, aspect, and display is challenging and many formats quickly bloat file sizes. Keep in mind hosting options and exporting functions from **plotly**, **gganimate** and **tourr**.
 
 
 ### Storage
@@ -470,18 +468,18 @@ Radial manual tours were applied to a dataset across different experiments of ha
 Future research on the algorithm would include extending it for use in 3D projections. The addition of another dimension theoretically allows for improved perception. This could explore interactions in immersive virtual reality or mixed reality, which may further allow for a better perception of structure and aid in higher-dimensional function visualization. Functions with many parameters suffer from the same dimensionality problem as data while their possible values lie on a plane of values rather than discrete points. Occulation, or the closer surface blocking further surfaces, will likely be an issue that may be alleviated by the use of wire mesh, changing opacity, or looking at sections of the projections [@furnas_prosection_1994].
 
 <!-- geometric and graphics display -->
-The **tourr** package provides many other geometric displays with the `tourr::display_*()` family. These geometric options could be integrated into the **ggplot2** framework for display on **plotly** and **gganimate**. Additionally, the **animation** package @xie_animation:_2018 could be implemented for another graphics framework. However, **animation** builds from **base** graphs while **spinifex** utilizes **ggplot2** graphics.
+The **tourr** package provides many other geometric displays with the `tourr::display_*()` family. These geometric options could be integrated into the **ggplot2** framework for display on **plotly** and **gganimate**. Additionally, the \CRANpkg{animation} package @xie_animation:_2018 could be implemented for another graphics framework. However, **animation** builds from **base** graphs while **spinifex** utilizes **ggplot2** graphics.
 
 <!-- interpolation -->
 The Givens rotations and Householder reflections as outlined in @buja_computational_2005 could also be added. Currently, Gram-Schmidt is the only form of frame interpolation used (not used in manual tours). In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes and generate rotations.
 
 <!-- dynamic interaction/gui -->
-Having a script only interaction with tours causes a significant barrier to entry. To a lesser extent, **plotly** offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a **shiny** [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust interpolation step angle, or flag/save specific frame basis sets. 
+Having a script only interaction with tours causes a significant barrier to entry. To a lesser extent, **plotly** offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \CRANpkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust interpolation step angle, or flag/save specific frame basis sets. 
 
 
 ## Acknowledgments
 
-This article was created in R [@r_core_team_r:_2018], using **bookdown** [@xie_bookdown:_2016] and **rmarkdown** [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/confirmation/](https://github.com/nspyrison/confirmation/). The source code for the **spinifex** package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
+This article was created in R [@r_core_team_r:_2018], using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the **spinifex** package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
 ## Bibliography
