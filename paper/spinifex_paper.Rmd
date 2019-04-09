@@ -17,19 +17,20 @@ author:
 abstract: >
   The set of dynamic linear projections of multivariate data collectively known as **tours** provides an important tool for extending the dimensionality of visuals. The R package **tourr** offers a variety of path generators and geometric displays for conducting tours. This paper discusses an extension package, **spinifex**, that adds support for the path generation of manual tours and extends the display of tours to use with the animation packages, **plotly** and **gganimate**. Manual tours are used to explore the sensitivity of structure as the contributions of a manipulation variable are changed.
   
-  A recent paper {@wang_mapping_2018} visualizes the sensitivity of the hadronic experiments to nucleon structure. Sensitivity was characterized in non-linear 3D embeddings of the first 10 principal components. This research applies manual tours to this data showing that manual tours resolve information about cluster structure and identify outliers, information that is orthogonal to the original static viewing plane.
+  A recent paper [@wang_mapping_2018] visualizes the sensitivity of the hadronic experiments to nucleon structure. Sensitivity was characterized in non-linear 3D embeddings of the first 10 principal components. This research applies manual tours to this data showing that manual tours resolve information about cluster structure and identify outliers, information that is orthogonal to the original static viewing plane.
 keywords: manual tour, guided tour, grand tour, projection pursuit, high dimensional data, multivariate data, data visualization, statistical graphics, data science
-output:
-  bookdown::pdf_book:
-    #base_format: rticles::rjournal_article #see sandbox for hard code solution.
-    fig_caption: yes
-    toc: false
-    includes:
-      in_header: preamble.tex
+preamble: >
+  % preamble packages
+link-citations: true
+fig_caption: yes
+toc: false
 bibliography: RJrefs.bib
+output: rticles::rjournal_article
+  #bookdown::pdf_book:
+   # base_format: rticles::rjournal_article #see sandbox for hard code solution.
 ---
 \bibliography{RJrefs}
-
+<!-- note that Di/Ursula have different setup and options. use static images.  -->
 ```{r setup_paper, include=FALSE}
 knitr::opts_chunk$set(
   fig.align = "center", echo = TRUE, collapse = TRUE,
@@ -39,6 +40,7 @@ knitr::opts_chunk$set(
 library(spinifex)
 library(ggplot2)
 ```
+
 ```{r localFunction, include=FALSE}
 ## FUNCTION FOR STATIC OUTPPUT, consider going to scalable facets.
 array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
@@ -143,7 +145,8 @@ The section below describes the algorithm for performing a 2D radial manual tour
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
-The steps are described in more detail below. The R functions used below mentioned briefly, but more complete code example can be found in section \ref{sec:usage}
+## FIX here
+The steps are described in more detail below. The R functions used below mentioned briefly, but more complete code examples are given with
 
 ### Notation
 
@@ -168,14 +171,10 @@ The algorithm primarily operates on projection bases and utilizes the data only 
 The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, physical measurements of the flea beetles. Each observation belonging to one of three species.
 
 <!-- Projection basis -->
-The data is defined. A basis set (ideally orienting to an interesting feature) must be provided as an initial orientation. One way to identify a projection containing interesting features is to apply a guided tour [@cook_interactive_2007]. In a guided tour the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \@ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributed to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species (while the guided tour was unsupervised with this information).
-
-(ref:step0-cap) Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables `aede2` and `tars1` contribute mostly orthogonal to the other variables.
+The data is defined. A basis set (ideally orienting to an interesting feature) must be provided as an initial orientation. One way to identify a projection containing interesting features is to apply a guided tour [@cook_interactive_2007]. In a guided tour the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributed to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species (while the guided tour was unsupervised with this information).
 
 
-```{r step0, echo=F, results='hide', out.width='60%', fig.cap = "(ref:step0-cap)"}
-#"\\label{fig:step0} and some caption"}
-
+```{r step0, echo=F, results='hide', out.width='60%',                             fig.cap = "Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables."}
 ## Flea holes tour
 f_dat  <- tourr::rescale(flea[,1:6])
 f_cat  <- factor(flea$species)
@@ -194,7 +193,7 @@ view_basis(f_bas, labels = colnames(f_dat)) +
   theme(panel.border = element_rect(colour = "black", fill = NA))
 ```
 
-Call `view_basis()` on a basis to produce a **ggplot2** graphic similar to \@ref(fig:step0). Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
+Call `view_basis()` on a basis to produce a **ggplot2** graphic similar to \ref{fig:step0). Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
 
 <!-- step 0 disp code. -->
 ```{r step0CODEEXAMPLE, eval=F, echo=T}
@@ -205,7 +204,7 @@ library("spinifex")
 # Also see vignette: 
 vignette("spinifex") # vignette ‘spinifex’ not found
 
-f_data  <- tourr::rescale(flea[,2:6])
+f_data  <- tourr::rescale(flea[, 1:6])
 f_path  <- save_history(f_data, guided_tour(holes()))
 f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
 f_cat   <- factor(flea$species)
@@ -218,7 +217,7 @@ view_basis(basis = f_basis,
 ### Step 1) Choose variable of interest
 
 <!-- select a manip var-->
-In figure \@ref(fig:step0) the contributions of the variables `tars1` and `aede2` are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple group from the rest of the sample. Select `aede2` as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable `aede2` is to the separation of the clusters.
+In figure \ref{fig:step0} the contributions of the variables `tars1` and `aede2` are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple group from the rest of the sample. Select `aede2` as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable `aede2` is to the separation of the clusters.
 
 
 ### Step 2) Create the manip space
@@ -227,28 +226,29 @@ In figure \@ref(fig:step0) the contributions of the variables `tars1` and `aede2
 Initialize a zero vector **e** of length *p*. Set the fifth element to one, as  `aede2` is the fifth variable in the data, giving the manip var a full contribution in this dimension. Use the Gram-Schmidt process to orthonormalize the zero vector onto the basis yielding the 3D manipulation space, **M**.
 
 \begin{align*}
-  \textbf{e} &\leftarrow Orthonormalize_{GS}(\textbf{e}) ~~~ w.r.t.~the~basis \\
-  &\leftarrow \textbf{e} - \langle \textbf{e},\textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\
+  \textbf{e_k} &\leftarrow 1 \\
+  \textbf{e}   &\leftarrow \textbf{e} - \langle \textbf{e},\textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\
   \\
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e})
 \end{align*}
 
 <!-- What the manip space facilitates -->
-Adding this new dimension to our projection space allows for the coefficients of the manip var to be changed via rotation about the origin. For example, the ability to lift a piece of paper, rather than being constrained to a 2D plane. Orthonormalizing rescales the new vector while the projection down to 2D remains the original basis. Place the plane horizontally, with the new dimension extending vertically, with axes projecting back onto the reference axes. Figure \@ref(fig:step2) illustrates this 3D manipulation space with the manip var highlighted (height of the other variables are not depicted.) 
+Adding this new dimension to our projection space allows for the coefficients of the manip var to be changed via rotation about the origin. For example, the ability to lift a piece of paper, rather than being constrained to a 2D plane. Orthonormalizing rescales the new vector while the projection down to 2D remains the original basis. Place the plane horizontally, with the new dimension extending vertically, with axes projecting back onto the reference axes. Figure \ref{fig:step2} illustrates this 3D manipulation space with the manip var highlighted (height of the other variables are not depicted.) 
 
-(ref:step2-cap) Manipulation space for controlling the contribution of `aede2` of standardized flea data. Basis selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin.
 
-```{r step2, echo=F, out.width='60%', fig.cap = "(ref:step2-cap)"}
+
+```{r step2, echo=F, out.width='60%',                                           fig.cap = "Manipulation space for controlling the contribution of aede2 of standardized flea data. Basis selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin."}
+
 view_manip_space(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
     theme(panel.border = element_rect(colour = "black", fill = NA))
 ```
 
-The representation in figure \@ref(fig:step2) can be produced by calling the function `view_manip_space()`.
+The representation in figure \ref{fig:step2} can be produced by calling the function `view_manip_space()`.
 
 <!-- step 2 disp code. -->
 ```{r step2CODEEXAMPLE, eval=F, echo=T}
 view_manip_space(basis = f_basis, 
-                 manip_var = 4, 
+                 manip_var = 5, 
                  labels = colnames(f_data))
 ```
 
@@ -277,12 +277,7 @@ then
 \begin{align*}
   \textbf{RM}_{[p,~3,~i]}
   &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} \\
-  &= \begin{bmatrix}
-    M_{1,~1} & M_{1,~2} & M_{1,~3} \\
-    M_{2,~1} & M_{2,~2} & M_{2,~3} \\
-    \vdots   & \vdots   \\
-    M_{p,~1} & M_{p,~2} & M_{p,~3}
-  \end{bmatrix}_{[p,~3]}
+  &= \textbf{M}_{[p,~3]}
     ~*~
   \begin{bmatrix}
     c_\theta^2 c_\phi s_\theta^2 &
@@ -301,12 +296,12 @@ then
 A note on application: $\phi$ is the angle relative to the initial value of $\phi$, we find the transformation $\phi_i$ - $\phi_1$ useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of pi. If the manip variable doesn't move as expected these are the first places to check.
 
 <!-- description of slides, on the technical side we haven't gone back to data space yet. -->
-Figure \@ref(fig:step3) illustrates a sequence with 15 projected bases, showing the reference axes on top the corresponding projected data points on the below. As a result, we can see that changes in the manip var controlled the distance between the purple cluster and the remaining sample, `aede2` is crucial in distinguishing this species. Tours are typically viewed as an animation such a dynamic version of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. 
+Figure \ref{fig:step3} illustrates a sequence with 15 projected bases, showing the reference axes on top the corresponding projected data points on the below. As a result, we can see that changes in the manip var controlled the distance between the purple cluster and the remaining sample, `aede2` is crucial in distinguishing this species. Tours are typically viewed as an animation such a dynamic version of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. 
 
 <!-- step3 caption -->
-(ref:step3-cap) Radial manual tour manipulating `aede2` of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. The change in the projected data shows that `aede2` is important for distinguishing the purple species. An animated version can be viewed at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/.
 
-```{r step3, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in', fig.cap = "(ref:step3-cap)"}
+
+```{r step3, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                                                fig.cap = "Radial manual tour manipulating aede2 of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. The change in the projected data shows that aede2 is important for distinguishing the purple species. An animated version can be viewed at  https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
 f_angle <- .26
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
@@ -336,24 +331,9 @@ play_manual_tour(data = f_data,
 <!-- the reminder of basis operation and now apply data -->
 In an appeal to performance, the above operations are performed on the bases without the use of the larger datasets. After the bases are brought into the projection-space, however, it is helpful to observe them with data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
 
-\begin{align}
-  \textbf{P}_{[n,~3]}
-    &= \textbf{X}_{[n,~p]} ~*~ \textbf{RM}_{[p,~3]} \\
-    &=
-      \begin{bmatrix}
-          X_{1,~1} & \dots & X_{1,~p} \\
-          X_{2,~1} & \dots & X_{2,~p} \\
-          \vdots   & \vdots & \vdots  \\
-          X_{n,~1} & \dots & X_{n,~p}
-      \end{bmatrix}_{[n,~p]}
-      ~*~
-      \begin{bmatrix}
-        RM_{1,~1} & RM_{1,~2} & RM_{1,~3} \\
-        RM_{2,~1} & RM_{2,~2} & RM_{2,~3} \\
-        \vdots     & \vdots     & \vdots  \\
-        RM_{p,~1} & RM_{p,~2} & RM_{p,~3}
-      \end{bmatrix}_{[p,~3]}
-\end{align}
+\begin{align*}
+  \textbf{P}_{[n,~3]} &= \textbf{X}_{[n,~p]} ~*~ \textbf{RM}_{[p,~3]}
+\end{align*}
 
 <!-- plot 2 var in seq for animation -->
 For a 2D scatterplot, plot the first two variables from each frame statically as in the previous figure, or in sequence, producing an animated scatterplot. The remaining variable is sometimes linked to a data point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.
@@ -384,16 +364,15 @@ The data has a hierarchical structure with top-level clusters; `DIS`, `VBP`, and
 ### Jet cluster
 
 <!-- jet cluster, explain dimensionality  -->
-The `jet` cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to `ATLAS7old` and `ATLAS7new` to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \@ref(fig:JetClusterGood) and figure \@ref(fig:JetClusterBad) respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
+The `jet` cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to `ATLAS7old` and `ATLAS7new` to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \ref{fig:JetClusterGood} and figure \ref{fig:JetClusterBad} respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
 
 <!-- discussion of findings and which is more insightful -->
 When manipulating PC4, there is a clear difference in the parameter space spanned by the experiment types `ATLAS7new` and `ATLAS7old`. Yet, when PC3 is manipulated there is no indication that the different experiments probe different parameter space. Performing a radial manual tour on PC4 is more insightful than for PC3.
 
 Radial manual tours manipulating each of the principal components in the `jet` cluster can be viewed by following the links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/).
 
-(ref:JetClusterGood-cap) A radial manual tour of PC4 within the `jet` cluster. Colored by experiment type: `ATLAS7new` in green and `ATLAS7old` in orange. When PC4 fully/negligibly contributes to the projection `ATLAS7new` (green) spans the same space as the orange points. During the intermediate frames, the `ATLAS7new` is compressed in the direction radial to PC4. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/.
 
-```{r JetClusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in', fig.cap="(ref:JetClusterGood-cap)"}
+```{r JetClusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                            fig.cap="A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. When PC4 fully/negligibly contributes to the projection ATLAS7new (green) spans the same space as the orange points. During the intermediate frames, the ATLAS7new is compressed in the direction radial to PC4. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
 # Jet cluster, Fig 7 of cook_dynamical_2018, subset to ATLAS7old and ATLAS7new
 load("./data/JetCluster_sub.rda")
 load("./data/JetCluster_basis.rda")
@@ -433,7 +412,7 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 ### DIS cluster
 
 <!-- introduce DIS cluster -->
-A different space is used to explore the `DIS` cluster; specifically the first six principal components, which explain 48% of the variation contained within the aggregated data[@cook_dynamical_2018]. Radial manual tours are performed on PC6 and PC2 in figure \@ref(fig:DISclusterGood) and figure \@ref(fig:DISclusterBad) respectively.
+A different space is used to explore the `DIS` cluster; specifically the first six principal components, which explain 48% of the variation contained within the aggregated data[@cook_dynamical_2018]. Radial manual tours are performed on PC6 and PC2 in figure \ref{fig:DISclusterGood} and figure \ref{fig:DISclusterBad} respectively.
 
 <!-- comparison of the DIS cluster -->
 The selection of the manip variable is important as the manipulation spaces convey substantially different information. The manual tour of PC6 offers information about the dimensionality, shape, and orientations of the different experiment classes. whereas manipulating the contributions of PC2 only shows a subset of the dimensionality and shape information. Manipulating the contributions of PC6 turned out to be much more insightful than that of PC2. This result might seem counter-intuitive at first as PC2 should explain much more of the variation in the data. However, features and structure in the data regularly reside in finer detail that can be lost when looking only at static projections. 
@@ -441,9 +420,8 @@ The selection of the manip variable is important as the manipulation spaces conv
 `DIS` cluster manual tours manipulating each of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
 
 
-(ref:DISclusterGood-cap) A radial manual tour manipulating the contribution of  PC6 within the `DIS` cluster. Points are colored by experiment type: `DIS HERA1+2` in green, `dimuon SIDIS` in purple, and `charm SIDIS` in orange. The cluster `DIS HERA1+2` (green) is distributed in a cross-shaped plane, `charm SIDIS` (orange) occupies the center space of this cross, with the plane projecting into the field of view when the contribution of PC6 is max. Less evident is the linear `dimuon SIDIS` (purple) observations approaching the line of view for intermediate values of PC6. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/.
+```{r DISclusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                            fig.cap = "A radial manual tour manipulating the contribution of  PC6 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The cluster DIS HERA1+2 (green) is distributed in a cross-shaped plane, charm SIDIS (orange) occupies the center space of this cross, with the plane projecting into the field of view when the contribution of PC6 is max. Less evident is the linear dimuon SIDIS (purple) observations approaching the line of view for intermediate values of PC6. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
 
-```{r DISclusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in', fig.cap = "(ref:DISclusterGood-cap)"}
 ##DIS cluster, fig 8 of cook_dynamical_2018
 load("./data/grDIScenter.rda")
 load("./data/DIScluster_centered_basis.rda")
@@ -469,9 +447,7 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 ```
 
 
-(ref:DISclusterBad-cap) A radial manual tour manipulating the contribution of PC2 within the `DIS` cluster. Points are colored by experiment type: `DIS HERA1+2` in green, `dimuon SIDIS` in purple, and `charm SIDIS` in orange. The plane of cross distributed `DIS HERA` data (green) and a nearly orthogonal jet of `dimuon SIDIS` (purple) is present. This jet does extend more in the plane of view when the contribution of PC2 is full, giving insight to its orientation. However, less information about the shape of `DIS HERA` (green) and `charm SIDIS` (orange) is available. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/.
-
-```{r DISclusterBad, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in', fig.cap = "(ref:DISclusterBad-cap)"}
+```{r DISclusterBad, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                            fig.cap = "A radial manual tour manipulating the contribution of PC2 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The plane of cross distributed DIS HERA data (green) and a nearly orthogonal jet of dimuon SIDIS (purple) is present. This jet does extend more in the plane of view when the contribution of PC2 is full, giving insight to its orientation. However, less information about the shape of DIS HERA (green) and charm SIDIS (orange) is available. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
 ##DIS cluster, fig 8 of cook_dynamical_2018
 DIS_mvar  <- 2
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
