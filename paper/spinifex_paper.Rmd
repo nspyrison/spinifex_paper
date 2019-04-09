@@ -145,8 +145,7 @@ The section below describes the algorithm for performing a 2D radial manual tour
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
-## FIX here
-The steps are described in more detail below. The R functions used below mentioned briefly, but more complete code examples are given with
+The steps are described in more detail below with description, equations, figures, and their code usage.
 
 ### Notation
 
@@ -156,7 +155,7 @@ This section describes the notation used in the algorithm for a 2D radial manual
 \begin{itemize}
   \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions.
   \item $\textbf{B} = (B_1,~ B_2)$, any orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
-  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate.
+  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate, the manip var.
   \item $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes.
   \item $\phi$, the angle of out-of-projection-plane rotation, coming into the manipulation space.
 \end{itemize}
@@ -217,18 +216,18 @@ view_basis(basis = f_basis,
 ### Step 1) Choose variable of interest
 
 <!-- select a manip var-->
-In figure \ref{fig:step0} the contributions of the variables `tars1` and `aede2` are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple group from the rest of the sample. Select `aede2` as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable `aede2` is to the separation of the clusters.
+In figure \ref{fig:step0} the contributions of the variables tars1 and aede2 are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple group from the rest of the sample. Select aede2 as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable aede2 is to the separation of the clusters.
 
 
 ### Step 2) Create the manip space
 
 <!-- Zero Vect, manip sp -->
-Initialize a zero vector **e** of length *p*. Set the fifth element to one, as  `aede2` is the fifth variable in the data, giving the manip var a full contribution in this dimension. Use the Gram-Schmidt process to orthonormalize the zero vector onto the basis yielding the 3D manipulation space, **M**.
+Initialize a zero vector **e** of length *p*. Set the fifth element to one, as  aede2 is the fifth variable in the data, giving the manip var a full contribution in this dimension. Use the Gram-Schmidt process to orthonormalize the zero vector onto the basis yielding the 3D manipulation space, **M**.
 
 \begin{align*}
-  \textbf{e_k} &\leftarrow 1 \\
-  \textbf{e}   &\leftarrow \textbf{e} - \langle \textbf{e},\textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\
-  \\
+  \textbf{e}_k &\leftarrow 1 \\ 
+  \textbf{e}   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
+  &\\
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e})
 \end{align*}
 
@@ -258,7 +257,7 @@ view_manip_space(basis = f_basis,
 Imagine holding the manip var, the red axis, one end fixed to the origin. As it is controlled the manipulation space rotates about the origin, the projection onto the horizontal projection plane correspondingly moves. This is what happens in a manual tour. Generating a sequence of values for the horizontal and vertical, angles produces a path for the rotation of the manipulation space. This defines the (orthonormally-constrained) rotation on the coefficients of the variables.
 
 <!-- describe manip var path -->
-For a radial tour fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle coming out of the projection plane, $\phi$, bringing the initial `XY` contributions of the manip var to a maximum and then to zero before returning to the initial position. Dynamic capture of user manipulation is typically performed directly on the projection plane (without depiction of the manipulation space.)
+For a radial tour fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle coming out of the projection plane, $\phi$, bringing the initial $XY$ contributions of the manip var to a maximum and then to zero before returning to the initial position. Dynamic capture of user manipulation is typically performed directly on the projection plane (without depiction of the manipulation space.)
 
 **For ** $i$ **in 1 to n_slides:**
 <!-- don't mix rmd and latex... -->
@@ -296,7 +295,7 @@ then
 A note on application: $\phi$ is the angle relative to the initial value of $\phi$, we find the transformation $\phi_i$ - $\phi_1$ useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of pi. If the manip variable doesn't move as expected these are the first places to check.
 
 <!-- description of slides, on the technical side we haven't gone back to data space yet. -->
-Figure \ref{fig:step3} illustrates a sequence with 15 projected bases, showing the reference axes on top the corresponding projected data points on the below. As a result, we can see that changes in the manip var controlled the distance between the purple cluster and the remaining sample, `aede2` is crucial in distinguishing this species. Tours are typically viewed as an animation such a dynamic version of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. 
+Figure \ref{fig:step3} illustrates a sequence with 15 projected bases, showing the reference axes on top the corresponding projected data points on the below. As a result, we can see that changes in the manip var controlled the distance between the purple cluster and the remaining sample, aede2 is crucial in distinguishing this species. Tours are typically viewed as an animation such a dynamic version of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. 
 
 <!-- step3 caption -->
 
@@ -358,18 +357,18 @@ In a recent paper, @wang_mapping_2018, the authors aggregate and visualize the s
 Using the same data, another study, @cook_dynamical_2018, applies grand tours [@asimov_grand_1985] to the same subspaces. Grand tours are dynamic subspace projections of high dimensional where frames and selected at random and linked with geodesically interpolation of the intermediate frames. Grand tours are able to better resolve the distribution shape of clusters, intra-cluster detail, and better outlier detection than the use of PDFSense & TFEP (TensorFlow embedded projections). Before applying manual tours let's discuss the structure of the data.
 
 <!-- Data structure -->
-The data has a hierarchical structure with top-level clusters; `DIS`, `VBP`, and `jet`. Each cluster is a particular class of experiments, each with many experimental datasets which, in turn, have many observations. In the consideration of data density, we conduct manual tours on subsets of the `DIS` and `jet` clusters. This explores the sensitivity of the structure to each of the variables in turn and we present the subjectively best and worst variable to manipulate for identifying dimensionality of the clusters and describing the span of the clusters.
+The data has a hierarchical structure with top-level clusters; DIS, VBP, and jet. Each cluster is a particular class of experiments, each with many experimental datasets which, in turn, have many observations. In the consideration of data density, we conduct manual tours on subsets of the DIS and jet clusters. This explores the sensitivity of the structure to each of the variables in turn and we present the subjectively best and worst variable to manipulate for identifying dimensionality of the clusters and describing the span of the clusters.
 
 
 ### Jet cluster
 
 <!-- jet cluster, explain dimensionality  -->
-The `jet` cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to `ATLAS7old` and `ATLAS7new` to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \ref{fig:JetClusterGood} and figure \ref{fig:JetClusterBad} respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
+The jet cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to ATLAS7old and ATLAS7new to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \ref{fig:JetClusterGood} and figure \ref{fig:JetClusterBad} respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
 
 <!-- discussion of findings and which is more insightful -->
-When manipulating PC4, there is a clear difference in the parameter space spanned by the experiment types `ATLAS7new` and `ATLAS7old`. Yet, when PC3 is manipulated there is no indication that the different experiments probe different parameter space. Performing a radial manual tour on PC4 is more insightful than for PC3.
+When manipulating PC4, there is a clear difference in the parameter space spanned by the experiment types ATLAS7new and ATLAS7old. Yet, when PC3 is manipulated there is no indication that the different experiments probe different parameter space. Performing a radial manual tour on PC4 is more insightful than for PC3.
 
-Radial manual tours manipulating each of the principal components in the `jet` cluster can be viewed by following the links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/).
+Radial manual tours manipulating each of the principal components in the jet cluster can be viewed by following the links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/).
 
 
 ```{r JetClusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                            fig.cap="A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. When PC4 fully/negligibly contributes to the projection ATLAS7new (green) spans the same space as the orange points. During the intermediate frames, the ATLAS7new is compressed in the direction radial to PC4. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
@@ -397,7 +396,7 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 # 4, *best
 ```
 
-(ref:JetClusterBad-cap) A radial manual tour of PC4 within the `jet` cluster. Colored by experiment type: `ATLAS7new` in green and `ATLAS7old` in orange. Data from `ATLAS7new` (green) spans mostly the same space as `ALTLAS7old` (orange) with no evident difference in cluster structure across varying contributions of PC3. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/.
+(ref:JetClusterBad-cap) A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. Data from ATLAS7new (green) spans mostly the same space as ALTLAS7old (orange) with no evident difference in cluster structure across varying contributions of PC3. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/.
 
 ```{r JetClusterBad, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in', fig.cap = "(ref:JetClusterBad-cap)"}
 # Jet cluster, Fig 7 of cook_dynalical_2018, subset to ATLAS7old and ATLAS7new
@@ -412,12 +411,12 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 ### DIS cluster
 
 <!-- introduce DIS cluster -->
-A different space is used to explore the `DIS` cluster; specifically the first six principal components, which explain 48% of the variation contained within the aggregated data[@cook_dynamical_2018]. Radial manual tours are performed on PC6 and PC2 in figure \ref{fig:DISclusterGood} and figure \ref{fig:DISclusterBad} respectively.
+A different space is used to explore the DIS cluster; specifically the first six principal components, which explain 48% of the variation contained within the aggregated data[@cook_dynamical_2018]. Radial manual tours are performed on PC6 and PC2 in figure \ref{fig:DISclusterGood} and figure \ref{fig:DISclusterBad} respectively.
 
 <!-- comparison of the DIS cluster -->
 The selection of the manip variable is important as the manipulation spaces convey substantially different information. The manual tour of PC6 offers information about the dimensionality, shape, and orientations of the different experiment classes. whereas manipulating the contributions of PC2 only shows a subset of the dimensionality and shape information. Manipulating the contributions of PC6 turned out to be much more insightful than that of PC2. This result might seem counter-intuitive at first as PC2 should explain much more of the variation in the data. However, features and structure in the data regularly reside in finer detail that can be lost when looking only at static projections. 
 
-`DIS` cluster manual tours manipulating each of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
+DIS cluster manual tours manipulating each of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
 
 
 ```{r DISclusterGood, echo=F, warning=F, fig.height=7.2, fig.width=6, out.height='7.2in', out.width='6in',                                            fig.cap = "A radial manual tour manipulating the contribution of  PC6 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The cluster DIS HERA1+2 (green) is distributed in a cross-shaped plane, charm SIDIS (orange) occupies the center space of this cross, with the plane projecting into the field of view when the contribution of PC6 is max. Less evident is the linear dimuon SIDIS (purple) observations approaching the line of view for intermediate values of PC6. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
@@ -457,14 +456,15 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 ```
 
 
-## TODO:
 ### Summary
+
+<!-- summary and segue  -->
+Tours, the dynamic linear projection of multivariate data, play an important role in data visualization; they extending the dimensionality of visuals while data- and parameter-spaces become ever larger. This research has modified the algorithm producing manual tours and has made this functionality available in package **spinifex**. The package adds to **tourr**, extending the graphics offerings that can be used to display tours. 
+
+Radial manual tours were applied to a dataset across different experiments of hadronic collisions. The importance of selecting the correct variable to manipulate is demonstrated by comparing tours of varying quality. The manual tours convey a better picture of the structure of the clustering than static linear or non-linear projections are able to. Giving the full contribution of the manipulation space to the manip var enables analysts to explore the sensitivity of the structure with the selected variable. This information can be used by physicists to which experiments are probing which parameter spaces, which can be indispensable for smarter planning of effort and funding.
 
 
 ## Discussion {#sec:discussion}
-
-<!-- summary and segue  -->
-Tours, the dynamic linear projection of multivariate data, is an important aspect of data visualization extending the display of data-space as data dimensionality increases. This research has modified the algorithm producing manual tours, applied this functionality in R and offers extends the graphics offerings that can be used to display tours. The paragraphs below explore how this work might be extended.
 
 <!-- 3D and function vis -->
 Future research on the algorithm would include extending it for use in 3D projections. The addition of another dimension theoretically allows for improved perception. This could explore interactions in immersive virtual reality or mixed reality, which may further allow for a better perception of structure and aid in higher-dimensional function visualization. Functions with many parameters suffer from the same dimensionality problem as data while their possible values lie on a plane of values rather than discrete points. Occulation, or the closer surface blocking further surfaces, will likely be an issue that may be alleviated by the use of wire mesh, changing opacity, or looking at sections of the projections [@furnas_prosection_1994].
