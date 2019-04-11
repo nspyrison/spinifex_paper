@@ -16,13 +16,13 @@ of tours to use with the animation packages, \textbf{plotly} and
 \textbf{gganimate}. Manual tours are used to explore the sensitivity of
 structure as the contributions of a manipulation variable are changed. A
 recent paper (Wang et al.
-\protect\hyperlink{ref-wang_mapping_2018}{2018}) visualizes the
+\protect\hyperlink{ref-wang_mapping_2018}{2018}) visualized the
 sensitivity of the hadronic experiments to nucleon structure.
 Sensitivity was characterized in non-linear 3D embeddings of the first
 10 principal components. This research applies manual tours to this data
-showing that manual tours resolve information about cluster structure
-and identify outliers, information that is orthogonal to the original
-static viewing plane.
+showing that manual tours resolve information about the structure of
+cluster distribution by bringing to light information that is orthogonal
+to static viewing planes.
 }
 
 
@@ -35,10 +35,10 @@ A tour is a multivariate data analysis technique in which a sequence of
 linear (orthogonal) projections are viewed as an animation while the
 orientation of the projection basis is rotated across time. Each frame
 of the sequence corresponds to a small change in the projection for a
-smooth transition that perseveres continuity. This is a crucial tool
-extending the dimensionality of visualization which is a large boon as
-datasets and models exist in increasing cardinality. The package
-\CRANpkg{tourr} (Wickham et al.
+smooth transition that preserves continuity. Tours are a crucial tool
+extending the dimensionality of visualization which is increasingly
+important as datasets and models exist in increasing cardinality. The
+package \CRANpkg{tourr} (Wickham et al.
 \protect\hyperlink{ref-wickham_tourr_2011}{2011}) builds a platform for
 generating tour paths and applying to a wide number of display
 geometrics in \textbf{base} graphics.
@@ -48,33 +48,36 @@ focuses on the manual tour. The manual tour was described in Cook and
 Buja (\protect\hyperlink{ref-cook_manual_1997}{1997}) and allows a user
 to control the projection coefficients of a selected variable in a 2D
 projection. The manipulation of these coefficients allows the analyst to
-explore how sensitive the projections structure is to these changes.
-This makes manual tours particularly useful once a feature of interest
-has been identified, for example, with the use of a guided tour (Hurley
-and Buja \protect\hyperlink{ref-hurley_analyzing_1990}{1990}). Rather
-than exploring the large phase space of the data, a guided tour selects
-a very specific path via projection pursuit (Diaconis and Freedman
-\protect\hyperlink{ref-diaconis_asymptotics_1984}{1984}), the
-optimization of an index function on the projection via a hill climbing
-algorithm. This allows guided tours to rapidly identify interesting
-projection features given the relatively large parameter-space. After a
-projection of interest is identified an analyst can then use the ``finer
-brush'' of the manual tour, by controlling the contributions of
-individual variables.
+explore how sensitive the projection structure is to these
+manipulations. As manual tours operate on only one variable at a time,
+they particularly useful once a feature of interest has been identified.
+One way to identify ``interesting'' features is with the use of a guided
+tour (Hurley and Buja
+\protect\hyperlink{ref-hurley_analyzing_1990}{1990}). Guided tours
+select a very specific path, that which approachs a projection that
+optimizes an objective-function, similar to simulated annealing
+(Kirkpatrick, Gelatt, and Vecchi
+\protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
+optimization of a function allows guided tours to rapidly identify
+interesting projection features given the relatively large
+parameter-space. After a projection of interest is identified an analyst
+can then use the ``finer brush'' of the manual tour, by controlling the
+contributions of individual variables to explore the sensitivity they
+have to the projection structure.
 
-\CRANpkg{spinifex} utilizes two new animation packages, \CRANpkg{plotly}
+This paper offers an implementation of manual tours with the package
+\CRANpkg{spinifex}. This package also exends the graphics display of
+\textbf{tourr} to the animation frameworks offered by \CRANpkg{plotly}
 (Sievert \protect\hyperlink{ref-sievert_plotly_2018}{2018}) and
 \CRANpkg{gganimate} (Pedersen and Robinson
-\protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}), to display
-tours, manual or other saved tours. From a given projection, the user
-can choose which variable to control, and the animation sequence is
-generated to remove the variable from the projection, and then extend
-its contribution to be the sole variable in one direction. This allows
-the viewer to assess the change in structure induced in the projection
-by the variable's contribution.
+\protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}). The algorithm
+used to perform a radial manual tour is demonstrated on a toy data set.
+Followed by an application and disscussion of the radial manual tour on
+an aggregation of high energy physics experiments in a large
+multivariate space.
 
 The paper is organized as follows. Section \ref{sec:algorithm} explains
-the algorithm using a toy dataset. Section \ref{sec:display} discussed
+the algorithm using a toy dataset. Section \ref{sec:display} discusses
 the display of the animation after the path has been generated. Section
 \ref{sec:application} illustrates how this can be used for sensitivity
 analysis applied to contemporary high energy physics. The last section,
@@ -128,25 +131,23 @@ first two variables.
 The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
 \textbf{tourr} is used to illustrate the algorithm. The data contains 74
-observations across 6 variables, physical measurements of the flea
-beetles. Each observation belonging to one of three species.
+observations across 6 variables, which are physical measurements of the
+flea beetles. Each observation belong to one of three species.
 
 The data is defined. A basis set (ideally orienting to an interesting
 feature) must be provided as an initial orientation. One way to identify
-a projection containing interesting features is to apply a guided tour
-(Cook, Swayne, and Buja
-\protect\hyperlink{ref-cook_interactive_2007}{2007}). In a guided tour
-the projection sequence is selected by optimizing an index function via
-hill-climbing on the projection space. In this case, the holes index is
-selected and applied to standardized flea data. The holes index is
-maximized when the projected observations are furthest from the center.
-Figure \ref{fig:step0} shows a locally optimized projection of the data.
-The left panel displays the reference axes of the projection basis, a
-visual indication of the magnitude and direction each variable
-contributed to the projection. The right panel shows the data as
-projected through the basis set described by the reference axes (left).
-Data points are colored and given shape according to the species (while
-the guided tour was unsupervised with this information).
+a projection containing interesting features is to apply a guided tour.
+In a guided tour, the projection sequence is selected by optimizing an
+index function via hill-climbing on the projection space. In this case,
+the holes index is selected and applied to standardized flea data. The
+holes index is maximized when the projected observations are furthest
+from the center. Figure \ref{fig:step0} shows a locally optimized
+projection of the data. The left panel displays the reference axes of
+the projection basis, a visual indication of the magnitude and direction
+each variable contributed to the projection. The right panel shows the
+data as projected through the basis set described by the reference axes
+(left). Data points are colored and given shape according to the species
+(while the guided tour was unsupervised with this information).
 
 \begin{Schunk}
 \begin{figure}
@@ -155,7 +156,7 @@ the guided tour was unsupervised with this information).
 
 }
 
-\caption[Basis reference axes (left) and projected data (right) of standardized flea data]{Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. Basis identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables.}\label{fig:step0}
+\caption[Basis reference axes (left) and projected data (right) of standardized flea data]{Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. The basis was identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables.}\label{fig:step0}
 \end{figure}
 \end{Schunk}
 
@@ -469,13 +470,6 @@ and
 \end{figure}
 \end{Schunk}
 
-(ref:JetClusterBad-cap) A radial manual tour of PC4 within the jet
-cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in
-orange. Data from ATLAS7new (green) spans mostly the same space as
-ALTLAS7old (orange) with no evident difference in cluster structure
-across varying contributions of PC3. A dynamic version can be viewed at
-\url{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/}.
-
 \begin{Schunk}
 \begin{figure}
 
@@ -483,7 +477,7 @@ across varying contributions of PC3. A dynamic version can be viewed at
 
 }
 
-\caption[(ref:JetClusterBad-cap)]{(ref:JetClusterBad-cap)}\label{fig:JetClusterBad}
+\caption[A radial manual tour of PC4 within the jet cluster]{A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. Data from ATLAS7new (green) spans mostly the same space as ALTLAS7old (orange) with no evident difference in cluster structure across varying contributions of PC3. A dynamic version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc3/.}\label{fig:JetClusterBad}
 \end{figure}
 \end{Schunk}
 
@@ -491,8 +485,8 @@ across varying contributions of PC3. A dynamic version can be viewed at
 \subsubsection{DIS cluster}\label{dis-cluster}}
 
 A different space is used to explore the DIS cluster; specifically the
-first six principal components, which explain 48\% of the variation
-contained within the aggregated data(Cook, Laa, and Valencia
+first six principal components, which explains 48\% of the variation
+contained within the aggregated data (Cook, Laa, and Valencia
 \protect\hyperlink{ref-cook_dynamical_2018}{2018}). Radial manual tours
 are performed on PC6 and PC2 in figure \ref{fig:DISclusterGood} and
 figure \ref{fig:DISclusterBad} respectively.
@@ -500,7 +494,7 @@ figure \ref{fig:DISclusterBad} respectively.
 The selection of the manip variable is important as the manipulation
 spaces convey substantially different information. The manual tour of
 PC6 offers information about the dimensionality, shape, and orientations
-of the different experiment classes. whereas manipulating the
+of the different experiment classes. Whereas manipulating the
 contributions of PC2 only shows a subset of the dimensionality and shape
 information. Manipulating the contributions of PC6 turned out to be much
 more insightful than that of PC2. This result might seem
@@ -544,24 +538,25 @@ and
 \hypertarget{summary}{%
 \subsubsection{Summary}\label{summary}}
 
-Tours, the dynamic linear projection of multivariate data, play an
-important role in data visualization; they extending the dimensionality
-of visuals while data- and parameter-spaces become ever larger. This
-research has modified the algorithm producing manual tours and has made
-this functionality available in package \textbf{spinifex}. The package
-adds to \textbf{tourr}, extending the graphics offerings that can be
-used to display tours.
+Tours, which are dynamic linear projection of multivariate data, play an
+important role in data visualization; they extend the dimensionality of
+visuals while data- and parameter-spaces become ever larger. This
+research has modified the algorithm producing manual tours which and has
+made this functionality available in package \textbf{spinifex}. The
+package adds to \textbf{tourr}, extending the graphics offerings that
+can be used to display tours.
 
 Radial manual tours were applied to a dataset across different
 experiments of hadronic collisions. The importance of selecting the
 correct variable to manipulate is demonstrated by comparing tours of
 varying quality. The manual tours convey a better picture of the
-structure of the clustering than static linear or non-linear projections
-are able to. Giving the full contribution of the manipulation space to
+structure of the clustering than static linear or non-linear
+projections. Giving the full contribution of the manipulation space to
 the manip var enables analysts to explore the sensitivity of the
 structure with the selected variable. This information can be used by
-physicists to which experiments are probing which parameter spaces,
-which can be indispensable for smarter planning of effort and funding.
+physicists to identify which experiments are probing which parameter
+spaces, which can be indispensable for smarter planning of effort and
+funding.
 
 \hypertarget{sec:discussion}{%
 \subsection{Discussion}\label{sec:discussion}}
@@ -586,8 +581,8 @@ be integrated into the \textbf{ggplot2} framework for display on
 \CRANpkg{animation} package Xie et al.
 (\protect\hyperlink{ref-xie_animation:_2018}{2018}) could be implemented
 for another graphics framework. However, \textbf{animation} builds from
-\textbf{base} graphs while \textbf{spinifex} utilizes \textbf{ggplot2}
-graphics.
+\textbf{base} graphics while \textbf{spinifex} utilizes \textbf{ggplot2}
+graphics, a significant paradigm shift.
 
 The Givens rotations and Householder reflections as outlined in Buja et
 al. (\protect\hyperlink{ref-buja_computational_2005}{2005}) could also
@@ -656,15 +651,6 @@ Cook, Dianne, Ursula Laa, and German Valencia. 2018. ``Dynamical
 Projections for the Visualization of PDFSense Data.'' \emph{Eur. Phys.
 J. C} 78 (9): 742.
 
-\leavevmode\hypertarget{ref-cook_interactive_2007}{}%
-Cook, Dianne, Deborah F. Swayne, and A. Buja. 2007. \emph{Interactive
-and Dynamic Graphics for Data Analysis: With R and GGobi}. Springer
-Science \& Business Media.
-
-\leavevmode\hypertarget{ref-diaconis_asymptotics_1984}{}%
-Diaconis, Persi, and David Freedman. 1984. ``Asymptotics of Graphical
-Projection Pursuit.'' \emph{The Annals of Statistics} 12 (3): 793--815.
-
 \leavevmode\hypertarget{ref-furnas_prosection_1994}{}%
 Furnas, George W., and Andreas Buja. 1994. ``Prosection Views:
 Dimensional Inference Through Sections and Projections.'' \emph{Journal
@@ -675,6 +661,11 @@ of Computational and Graphical Statistics} 3 (4): 323--53.
 Hurley, C., and A. Buja. 1990. ``Analyzing High-Dimensional Data with
 Motion Graphics.'' \emph{SIAM Journal on Scientific and Statistical
 Computing} 11 (6): 1193--1211. \url{https://doi.org/10.1137/0911068}.
+
+\leavevmode\hypertarget{ref-kirkpatrick_optimization_1983}{}%
+Kirkpatrick, Scott, C. Daniel Gelatt, and Mario P. Vecchi. 1983.
+``Optimization by Simulated Annealing.'' \emph{Science} 220 (4598):
+671--80.
 
 \leavevmode\hypertarget{ref-lubischew_use_1962}{}%
 Lubischew, Alexander A. 1962. ``On the Use of Discriminant Functions in
