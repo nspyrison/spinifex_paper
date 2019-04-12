@@ -1,6 +1,6 @@
 ---
 title: > 
-  spinifex: manual control of dynamic linear projections of high-dimensional data
+  spinifex: A Package for Manual Control of Dynamic Linear Projections of Multivariate Data
 author:
   - name: Nicholas Spyrison
     affiliation: Monash University 
@@ -22,12 +22,12 @@ preamble: >
 link-citations: true
 fig_caption: yes
 toc: false
-bibliography: RJrefs.bib
+bibliography: spinifex_paper.bib
 output: rticles::rjournal_article
   #bookdown::pdf_book:
    # base_format: rticles::rjournal_article #see sandbox for hard code solution.
 ---
-\bibliography{RJrefs}
+\bibliography{spinifex_paper}
 <!-- note that Di/Ursula have different setup and options and use static images.  -->
 ```{r setup_paper, include=FALSE}
 knitr::opts_chunk$set(
@@ -118,7 +118,7 @@ array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
 ```
 
 
-## Introduction
+# Introduction
 
 <!-- Tours -->
 A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that preserves continuity. Tours are a crucial tool extending the dimensionality of visualization which is increasingly important as datasets and models exist in increasing cardinality. The package \CRANpkg{tourr} [@wickham_tourr_2011] builds a platform for generating tour paths and applying to a wide number of display geometrics in **base** graphics.
@@ -132,11 +132,11 @@ This paper offers an implementation of manual tours with the package
 \CRANpkg{spinifex}. This package also exends the graphics display of **tourr** to the animation frameworks offered by \CRANpkg{plotly} [@sievert_plotly_2018] and \CRANpkg{gganimate} [@pedersen_gganimate:_2019]. The algorithm used to perform a radial manual tour is demonstrated on a toy data set. Followed by an application and disscussion of the radial manual tour on an aggregation of high energy physics experiments in a large multivariate space.
 
 <!-- Paper outline -->
-The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discusses the display of the animation after the path has been generated. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
+The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discusses the display of the animation after the path has been generated. Section \ref{ref:usage} explains the though the code used in the algorithm section and discusses function structure for the rest of the package. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
 
 
 <!-- Algorithm outline -->
-## Algorithm {#sec:algorithm}
+# Algorithm {#sec:algorithm}
 
 The section below describes the algorithm for performing a 2D radial manual tour:
 
@@ -144,9 +144,9 @@ The section below describes the algorithm for performing a 2D radial manual tour
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
-The steps are described in more detail below with description, equations, figures, and their code usage.
+The steps are described in more detail below with description, equations, and figures. Function names are mentioned inline, but the code is aggregated in 
 
-### Notation
+## Notation
 
 This section describes the notation used in the algorithm for a 2D radial manual tour.
 
@@ -163,7 +163,7 @@ This section describes the notation used in the algorithm for a 2D radial manual
 The algorithm primarily operates on projection bases and utilizes the data only when making a display. The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first two variables.
 
 
-### Toy data set
+## Toy data set
 
 <!-- describe data. -->
 The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belong to one of three species.
@@ -193,32 +193,14 @@ view_basis(f_bas, labels = colnames(f_dat)) +
 
 Call `view_basis()` on a basis to produce a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] graphic similar to \ref{fig:step0). Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
 
-<!-- step 0 disp code. -->
-```{r step0CODEEXAMPLE, eval=F, echo=T}
-# devtools::install_github("nspyrison/spinifex") # Development version
-install.package("spinifex")
-library("spinifex")
 
-# Also see the vignette: 
-vignette("spinifex")
-
-f_data  <- tourr::rescale(flea[, 1:6])
-f_path  <- save_history(f_data, guided_tour(holes()))
-f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
-f_cat   <- factor(flea$species)
-
-view_basis(basis = f_basis, 
-           data = f_data,
-           labels = colnames(f_data))
-```
-
-### Step 1) Choose variable of interest
+## Step 1) Choose variable of interest
 
 <!-- select a manip var-->
 In figure \ref{fig:step0} the contributions of the variables tars1 and aede2 are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple group from the rest of the sample. Select aede2 as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable aede2 is to the separation of the clusters.
 
 
-### Step 2) Create the manip space
+## Step 2) Create the manip space
 
 <!-- Zero Vect, manip sp -->
 Initialize a zero vector **e** of length *p*. Set the fifth element to one, as  aede2 is the fifth variable in the data, giving the manip var a full contribution in this dimension. Use the Gram-Schmidt process to orthonormalize the zero vector onto the basis yielding the 3D manipulation space, **M**.
@@ -226,7 +208,6 @@ Initialize a zero vector **e** of length *p*. Set the fifth element to one, as  
 \begin{align*}
   \textbf{e}_k &\leftarrow 1 \\ 
   \textbf{e}   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
-  &\\
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e})
 \end{align*}
 
@@ -243,14 +224,8 @@ view_manip_space(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
 
 The representation in figure \ref{fig:step2} can be produced by calling the function `view_manip_space()`.
 
-<!-- step 2 disp code. -->
-```{r step2CODEEXAMPLE, eval=F, echo=T}
-view_manip_space(basis = f_basis, 
-                 manip_var = 5, 
-                 labels = colnames(f_data))
-```
 
-### Step 3) Generate rotation
+## Step 3) Generate rotation
 
 <!-- illustration of axis manip -->
 Imagine holding the manip var, the red axis, one end fixed to the origin. As it is controlled the manipulation space rotates about the origin, the projection onto the horizontal projection plane correspondingly moves. This is what happens in a manual tour. Generating a sequence of values for the horizontal and vertical, angles produces a path for the rotation of the manipulation space. This defines the (orthonormally-constrained) rotation on the coefficients of the variables.
@@ -258,10 +233,7 @@ Imagine holding the manip var, the red axis, one end fixed to the origin. As it 
 <!-- describe manip var path -->
 For a radial tour fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle coming out of the projection plane, $\phi$, bringing the initial $XY$ contributions of the manip var to a maximum and then to zero before returning to the initial position. Dynamic capture of user manipulation is typically performed directly on the projection plane (without depiction of the manipulation space.)
 
-**For ** $i$ **in 1 to n_slides:**
-<!-- don't mix rmd and latex... -->
-
-Post-multiply the manipulation space by the pre-defined rotation matrix producing **RM**, the rotated manip space.
+Post-multiply the manipulation space by the pre-defined rotation matrix producing **RM**, the rotated manip space. This is one frame of basis values, repeat this procress for each value in the sequences of $\theta$ and $\phi$ for the complete animation.
 
 Let:
 \begin{itemize}
@@ -271,7 +243,9 @@ Let:
   \item[$s_\phi$]   be the sine of   $\phi$
 \end{itemize}
 
-then
+**For each value of ** $i$ **:**
+<!-- don't mix rmd and latex... -->
+
 \begin{align*}
   \textbf{RM}_{[p,~3,~i]}
   &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} \\
@@ -311,20 +285,8 @@ array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 
 Animations can be produced using the function `play_manual_tour()`. This function defaults to an HTML5 widget produced from **plotly**. The `render_type` argument can be changed to `render_gganimate` for exporting to GIF or MP4 files. 
 
-<!-- step 3 disp code. -->
-```{r step3CODEEXAMPLE, eval=F, echo=T}
-angle_speed <- .26
 
-play_manual_tour(data = f_data,
-                 basis = f_basis, 
-                 manip_var = 5, 
-                 angle = angle_speed,
-                 col = f_cat,
-                 pch = f_cat)
-```
-
-
-## Data in projection-space {#sec:display}
+# Data in projection-space {#sec:display}
 
 <!-- the reminder of basis operation and now apply data -->
 In an appeal to performance, the above operations are performed on the bases without the use of the larger datasets. After the bases are brought into the projection-space, however, it is helpful to observe them with data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
@@ -336,18 +298,75 @@ In an appeal to performance, the above operations are performed on the bases wit
 <!-- plot 2 var in seq for animation -->
 For a 2D scatterplot, plot the first two variables from each frame statically as in the previous figure, or in sequence, producing an animated scatterplot. The remaining variable is sometimes linked to a data point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.
 
+# Package structure and functionality {#sec:usage}
 
-### Rendering and sharing
+## Installation
+
+<!-- step 0 disp code. -->
+```{r installCODEEXAMPLE, eval=F, echo=T}
+# remotes::install_github("nspyrison/spinifex") # Development version
+install.package("spinifex")
+library("spinifex")
+
+# Also see the vignette: 
+vignette("spinifex_vignette")
+```
+
+## Algorithm
+
+We'll start by initializing values including: standardizing our data set (numeric coulmns only), provide a basis, a categorical variable for point asthetics, and specifiy the manip var. Then we the references axes of the basis with `view_basis()`.
+
+<!-- setup -->
+```{r step0CODEEXAMPLE, eval=F, echo=T}
+f_data  <- tourr::rescale(flea[, 1:6])                    ## standardize data
+f_path  <- save_history(f_data, guided_tour(holes()))     ## produce guided tour
+f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## end of guided tour
+f_cat   <- factor(flea$species)                           ## categorical var
+
+view_basis(basis = f_basis, 
+           data = f_data,
+           labels = colnames(f_data))
+```
+
+After becoming familar with the space, select a 
+
+<!-- step 2 disp code. -->
+```{r step2CODEEXAMPLE, eval=F, echo=T}
+f_mvar  <- 5  ## manip var numebr
+
+view_manip_space(basis = f_basis, 
+                 manip_var = f_mvar, 
+                 labels = colnames(f_data))
+```
+
+<!-- step 3 disp code. -->
+```{r step3CODEEXAMPLE, eval=F, echo=T}
+angle_speed <- .26
+
+play_manual_tour(data = f_data,
+                 basis = f_basis, 
+                 manip_var = f_mvar, 
+                 angle = angle_speed,
+                 col = f_cat,
+                 pch = f_cat)
+```
+
+
+## Walk though package functions in terms of work flow.
+
+
+
+## Rendering and sharing
 
 The **tourr** package utilizes **base** graphics for the display of tours. **spinifex** allows tours to be used in rendered in **plotly** as an HTML5 object or **gganimate** as GIF or MP4 files. Both of which build off **ggplot2** objects in internal functions. Sharing of animations is not trivial especially in print and static file formats such as PDF. Even with the use of computers and dynamic file formats capturing the correct resolution, aspect, and display is challenging and many formats quickly bloat file sizes. Keep in mind hosting options and exporting functions from **plotly**, **gganimate** and **tourr**.
 
 
-### Storage
+## Storage
 
 Storing each data point for every frame of the animation is redundant. Just as operations are performed on the bases, so too should tour paths be stored as bases and a single instance of the data. Consider a radial manual tour, we can store the salient features in 3 bases, where $\phi$ is at its starting, minimum, and maximum values. The frames in between can be interpolated by supplying angular speed. With the use of the `tourr::save_history()` function, the target bases can be saved. From there geodesic interpolation can be used to populate the intermittent frames. This type of interpolation should not be used on manual tours, which have already been initialized into a 3D manipulation space where direct linear interpolation is appropriate.
 
 
-## Application {#sec:application}
+# Application {#sec:application}
 
 <!-- Introduction of data and original paper -->
 In a recent paper, @wang_mapping_2018, the authors aggregate and visualize the sensitivity of hadronic experiments to nucleon structure. The authors introduce a new tool, PDFSense, to aid in the visualization of Parton distribution functions (PDF). The parameter-space of these experiments lies in 56 dimensions, $\delta \in \mathbb{R}^{56}$, and are visualized as 3D subspaces of the 10 first principal components in linear (PCA) and non-linear (t-SNE) embeddings. 
@@ -359,7 +378,7 @@ Using the same data, another study, @cook_dynamical_2018, applies grand tours [@
 The data has a hierarchical structure with top-level clusters; DIS, VBP, and jet. Each cluster is a particular class of experiments, each with many experimental datasets which, in turn, have many observations. In the consideration of data density, we conduct manual tours on subsets of the DIS and jet clusters. This explores the sensitivity of the structure to each of the variables in turn and we present the subjectively best and worst variable to manipulate for identifying dimensionality of the clusters and describing the span of the clusters.
 
 
-### Jet cluster
+## Jet cluster
 
 <!-- jet cluster, explain dimensionality -->
 The jet cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is subset down to ATLAS7old and ATLAS7new to focus in on two groups with a reasonable number of observations that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in figure \ref{fig:JetClusterGood} and figure \ref{fig:JetClusterBad} respectively. These components are selected to contrast the difference of information conveyed by touring different variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided. 
@@ -406,7 +425,7 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 ```
 
 
-### DIS cluster
+## DIS cluster
 
 <!-- introduce DIS cluster -->
 A different space is used to explore the DIS cluster; specifically the first six principal components, which explains 48% of the variation contained within the aggregated data [@cook_dynamical_2018]. Radial manual tours are performed on PC6 and PC2 in figure \ref{fig:DISclusterGood} and figure \ref{fig:DISclusterBad} respectively.
@@ -454,7 +473,7 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 ```
 
 
-### Summary
+## Summary
 
 <!-- summary and segue  -->
 Tours, which are dynamic linear projection of multivariate data, play an important role in data visualization; they extend the dimensionality of visuals while data- and parameter-spaces become ever larger. This research has modified the algorithm producing manual tours which and has made this functionality available in package **spinifex**. The package adds to **tourr**, extending the graphics offerings that can be used to display tours.
@@ -462,7 +481,7 @@ Tours, which are dynamic linear projection of multivariate data, play an importa
 Radial manual tours were applied to a dataset across different experiments of hadronic collisions. The importance of selecting the correct variable to manipulate is demonstrated by comparing tours of varying quality. The manual tours convey a better picture of the structure of the clustering than static linear or non-linear projections. Giving the full contribution of the manipulation space to the manip var enables analysts to explore the sensitivity of the structure with the selected variable. This information can be used by physicists to identify which experiments are probing which parameter spaces, which can be indispensable for smarter planning of effort and funding.
 
 
-## Discussion {#sec:discussion}
+# Discussion {#sec:discussion}
 
 <!-- 3D and function vis -->
 Future research on the algorithm would include extending it for use in 3D projections. The addition of another dimension theoretically allows for improved perception. This could explore interactions in immersive virtual reality or mixed reality, which may further allow for a better perception of structure and aid in higher-dimensional function visualization. Functions with many parameters suffer from the same dimensionality problem as data while their possible values lie on a plane of values rather than discrete points. Occulation, or the closer surface blocking further surfaces, will likely be an issue that may be alleviated by the use of wire mesh, changing opacity, or looking at sections of the projections [@furnas_prosection_1994].
@@ -476,10 +495,10 @@ The Givens rotations and Householder reflections as outlined in @buja_computatio
 <!-- dynamic interaction/gui -->
 Having a script only interaction with tours causes a significant barrier to entry. To a lesser extent, **plotly** offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \CRANpkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust interpolation step angle, or flag/save specific frame basis sets. 
 
-## Acknowledgments
+# Acknowledgments
 
 This article was created in R [@r_core_team_r:_2018], using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the **spinifex** package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
-## Bibliography
+# Bibliography
 

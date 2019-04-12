@@ -1,6 +1,6 @@
 % !TeX root = RJwrapper.tex
-\title{spinifex: manual control of dynamic linear projections of
-high-dimensional data}
+\title{spinifex: A Package for Manual Control of Dynamic Linear Projections of
+Multivariate Data}
 \author{by Nicholas Spyrison, Dianne Cook}
 
 \maketitle
@@ -26,10 +26,10 @@ to static viewing planes.
 }
 
 
-\bibliography{RJrefs}
+\bibliography{spinifex_paper}
 
 \hypertarget{introduction}{%
-\subsection{Introduction}\label{introduction}}
+\section{Introduction}\label{introduction}}
 
 A tour is a multivariate data analysis technique in which a sequence of
 linear (orthogonal) projections are viewed as an animation while the
@@ -84,7 +84,7 @@ analysis applied to contemporary high energy physics. The last section,
 \ref{sec:discussion} summarizes the work and discusses future research.
 
 \hypertarget{sec:algorithm}{%
-\subsection{Algorithm}\label{sec:algorithm}}
+\section{Algorithm}\label{sec:algorithm}}
 
 The section below describes the algorithm for performing a 2D radial
 manual tour:
@@ -107,7 +107,7 @@ The steps are described in more detail below with description,
 equations, figures, and their code usage.
 
 \hypertarget{notation}{%
-\subsubsection{Notation}\label{notation}}
+\subsection{Notation}\label{notation}}
 
 This section describes the notation used in the algorithm for a 2D
 radial manual tour.
@@ -126,7 +126,7 @@ any point in the process by pre-multiplying the data and plotting the
 first two variables.
 
 \hypertarget{toy-data-set}{%
-\subsubsection{Toy data set}\label{toy-data-set}}
+\subsection{Toy data set}\label{toy-data-set}}
 
 The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
@@ -168,12 +168,12 @@ available for display via the matrix multiplication
 
 \begin{Schunk}
 \begin{Sinput}
-# devtools::install_github("nspyrison/spinifex") # Development version
+# remotes::install_github("nspyrison/spinifex") # Development version
 install.package("spinifex")
 library("spinifex")
 
 # Also see the vignette: 
-vignette("spinifex")
+vignette("spinifex_vignette")
 
 f_data  <- tourr::rescale(flea[, 1:6])
 f_path  <- save_history(f_data, guided_tour(holes()))
@@ -187,7 +187,7 @@ view_basis(basis = f_basis,
 \end{Schunk}
 
 \hypertarget{step-1-choose-variable-of-interest}{%
-\subsubsection{Step 1) Choose variable of
+\subsection{Step 1) Choose variable of
 interest}\label{step-1-choose-variable-of-interest}}
 
 In figure \ref{fig:step0} the contributions of the variables tars1 and
@@ -200,7 +200,7 @@ explored is how important the variable aede2 is to the separation of the
 clusters.
 
 \hypertarget{step-2-create-the-manip-space}{%
-\subsubsection{Step 2) Create the manip
+\subsection{Step 2) Create the manip
 space}\label{step-2-create-the-manip-space}}
 
 Initialize a zero vector \textbf{e} of length \emph{p}. Set the fifth
@@ -212,7 +212,6 @@ manipulation space, \textbf{M}.
 \begin{align*}
   \textbf{e}_k &\leftarrow 1 \\ 
   \textbf{e}   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
-  &\\
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e})
 \end{align*}
 
@@ -249,8 +248,7 @@ view_manip_space(basis = f_basis,
 \end{Schunk}
 
 \hypertarget{step-3-generate-rotation}{%
-\subsubsection{Step 3) Generate
-rotation}\label{step-3-generate-rotation}}
+\subsection{Step 3) Generate rotation}\label{step-3-generate-rotation}}
 
 Imagine holding the manip var, the red axis, one end fixed to the
 origin. As it is controlled the manipulation space rotates about the
@@ -269,10 +267,10 @@ returning to the initial position. Dynamic capture of user manipulation
 is typically performed directly on the projection plane (without
 depiction of the manipulation space.)
 
-\textbf{For } \(i\) \textbf{in 1 to n\_slides:}
-
 Post-multiply the manipulation space by the pre-defined rotation matrix
-producing \textbf{RM}, the rotated manip space.
+producing \textbf{RM}, the rotated manip space. This is one frame of
+basis values, repeat this procress for each value in the sequences of
+\(\theta\) and \(\phi\) for the complete animation.
 
 Let:
 
@@ -283,7 +281,9 @@ Let:
   \item[$s_\phi$]   be the sine of   $\phi$
 \end{itemize}
 
-then \begin{align*}
+\textbf{For each value of } \(i\) \textbf{:}
+
+\begin{align*}
   \textbf{RM}_{[p,~3,~i]}
   &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} \\
   &= \textbf{M}_{[p,~3]}
@@ -348,7 +348,7 @@ play_manual_tour(data = f_data,
 \end{Schunk}
 
 \hypertarget{sec:display}{%
-\subsection{Data in projection-space}\label{sec:display}}
+\section{Data in projection-space}\label{sec:display}}
 
 In an appeal to performance, the above operations are performed on the
 bases without the use of the larger datasets. After the bases are
@@ -366,8 +366,19 @@ animated scatterplot. The remaining variable is sometimes linked to a
 data point aesthetic (such as size or color) to produce depth cues used
 in conjunction with the \(XY\) scatterplot.
 
+\hypertarget{package-structure-and-functionality}{%
+\section{Package structure and
+functionality}\label{package-structure-and-functionality}}
+
+\hypertarget{installation}{%
+\subsection{Installation}\label{installation}}
+
+\hypertarget{walk-though-package-functions-in-terms-of-work-flow.}{%
+\subsection{Walk though package functions in terms of work
+flow.}\label{walk-though-package-functions-in-terms-of-work-flow.}}
+
 \hypertarget{rendering-and-sharing}{%
-\subsubsection{Rendering and sharing}\label{rendering-and-sharing}}
+\subsection{Rendering and sharing}\label{rendering-and-sharing}}
 
 The \textbf{tourr} package utilizes \textbf{base} graphics for the
 display of tours. \textbf{spinifex} allows tours to be used in rendered
@@ -381,7 +392,7 @@ in mind hosting options and exporting functions from \textbf{plotly},
 \textbf{gganimate} and \textbf{tourr}.
 
 \hypertarget{storage}{%
-\subsubsection{Storage}\label{storage}}
+\subsection{Storage}\label{storage}}
 
 Storing each data point for every frame of the animation is redundant.
 Just as operations are performed on the bases, so too should tour paths
@@ -396,7 +407,7 @@ manual tours, which have already been initialized into a 3D manipulation
 space where direct linear interpolation is appropriate.
 
 \hypertarget{sec:application}{%
-\subsection{Application}\label{sec:application}}
+\section{Application}\label{sec:application}}
 
 In a recent paper, Wang et al.
 (\protect\hyperlink{ref-wang_mapping_2018}{2018}), the authors aggregate
@@ -429,7 +440,7 @@ and worst variable to manipulate for identifying dimensionality of the
 clusters and describing the span of the clusters.
 
 \hypertarget{jet-cluster}{%
-\subsubsection{Jet cluster}\label{jet-cluster}}
+\subsection{Jet cluster}\label{jet-cluster}}
 
 The jet cluster resides in a smaller dimensionality than the full set of
 experiments with four principal components explaining 95\% of the
@@ -482,7 +493,7 @@ and
 \end{Schunk}
 
 \hypertarget{dis-cluster}{%
-\subsubsection{DIS cluster}\label{dis-cluster}}
+\subsection{DIS cluster}\label{dis-cluster}}
 
 A different space is used to explore the DIS cluster; specifically the
 first six principal components, which explains 48\% of the variation
@@ -536,7 +547,7 @@ and
 \end{Schunk}
 
 \hypertarget{summary}{%
-\subsubsection{Summary}\label{summary}}
+\subsection{Summary}\label{summary}}
 
 Tours, which are dynamic linear projection of multivariate data, play an
 important role in data visualization; they extend the dimensionality of
@@ -559,7 +570,7 @@ spaces, which can be indispensable for smarter planning of effort and
 funding.
 
 \hypertarget{sec:discussion}{%
-\subsection{Discussion}\label{sec:discussion}}
+\section{Discussion}\label{sec:discussion}}
 
 Future research on the algorithm would include extending it for use in
 3D projections. The addition of another dimension theoretically allows
@@ -607,7 +618,7 @@ variables to control, adjust interpolation step angle, or flag/save
 specific frame basis sets.
 
 \hypertarget{acknowledgments}{%
-\subsection{Acknowledgments}\label{acknowledgments}}
+\section{Acknowledgments}\label{acknowledgments}}
 
 This article was created in R (R Core Team
 \protect\hyperlink{ref-r_core_team_r:_2018}{2018}), using
@@ -620,14 +631,15 @@ The source code for the \textbf{spinifex} package can be found at
 \href{https://github.com/nspyrison/spinifex/}{github.com/nspyrison/spinifex/}.
 
 \hypertarget{bibliography}{%
-\subsection*{Bibliography}\label{bibliography}}
-\addcontentsline{toc}{subsection}{Bibliography}
+\section*{Bibliography}\label{bibliography}}
+\addcontentsline{toc}{section}{Bibliography}
 
 \hypertarget{refs}{}
 \leavevmode\hypertarget{ref-asimov_grand_1985}{}%
 Asimov, Daniel. 1985. ``The Grand Tour: A Tool for Viewing
 Multidimensional Data.'' \emph{SIAM Journal on Scientific and
 Statistical Computing} 6 (1): 128--43.
+\url{https://doi.org/https://doi.org/10.1137/0906011}.
 
 \leavevmode\hypertarget{ref-buja_computational_2005}{}%
 Buja, Andreas, Dianne Cook, Daniel Asimov, and Catherine Hurley. 2005.
@@ -649,7 +661,7 @@ Graphical Statistics} 6 (4): 464--80.
 \leavevmode\hypertarget{ref-cook_dynamical_2018}{}%
 Cook, Dianne, Ursula Laa, and German Valencia. 2018. ``Dynamical
 Projections for the Visualization of PDFSense Data.'' \emph{Eur. Phys.
-J. C} 78 (9): 742.
+J. C} 78 (9): 742. \url{https://doi.org/10.1140/epjc/s10052-018-6205-2}.
 
 \leavevmode\hypertarget{ref-furnas_prosection_1994}{}%
 Furnas, George W., and Andreas Buja. 1994. ``Prosection Views:
@@ -665,11 +677,12 @@ Computing} 11 (6): 1193--1211. \url{https://doi.org/10.1137/0911068}.
 \leavevmode\hypertarget{ref-kirkpatrick_optimization_1983}{}%
 Kirkpatrick, Scott, C. Daniel Gelatt, and Mario P. Vecchi. 1983.
 ``Optimization by Simulated Annealing.'' \emph{Science} 220 (4598):
-671--80.
+671--80. \url{https://doi.org/10.1126/science.220.4598.671}.
 
 \leavevmode\hypertarget{ref-lubischew_use_1962}{}%
 Lubischew, Alexander A. 1962. ``On the Use of Discriminant Functions in
 Taxonomy.'' \emph{Biometrics}, 455--77.
+\url{https://doi.org/10.2307/2527894}.
 
 \leavevmode\hypertarget{ref-pedersen_gganimate:_2019}{}%
 Pedersen, Thomas Lin, and David Robinson. 2019. \emph{Gganimate: A
@@ -689,7 +702,7 @@ Sievert, Carson. 2018. \emph{Plotly for R}.
 Wang, Bo-Ting, T. J. Hobbs, Sean Doyle, Jun Gao, Tie-Jiun Hou, Pavel M.
 Nadolsky, and Fredrick I. Olness. 2018. ``Mapping the Sensitivity of
 Hadronic Experiments to Nucleon Structure.'' \emph{Physical Review D} 98
-(9): 094030.
+(9): 094030. \url{https://doi.org/10.1103/PhysRevD.98.094030}.
 
 \leavevmode\hypertarget{ref-wickham_ggplot2:_2016}{}%
 Wickham, Hadley. 2016. \emph{Ggplot2: Elegant Graphics for Data
@@ -718,7 +731,7 @@ Xie, Yihui, Christian Mueller, Lijia Yu, and Weicheng Zhu. 2018.
 \emph{Animation: A Gallery of Animations in Statistics and Utilities to
 Create Animations}. \url{https://yihui.name/animation}.
 
-\bibliography{RJrefs.bib}
+\bibliography{spinifex\_paper.bib}
 
 \address{%
 Nicholas Spyrison\\
