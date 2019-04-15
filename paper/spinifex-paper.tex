@@ -54,7 +54,7 @@ they particularly useful once a feature of interest has been identified.
 One way to identify ``interesting'' features is with the use of a guided
 tour (Hurley and Buja
 \protect\hyperlink{ref-hurley_analyzing_1990}{1990}). Guided tours
-select a very specific path, that which approachs a projection that
+select a very specific path, that which approaches a projection that
 optimizes an objective-function, similar to simulated annealing
 (Kirkpatrick, Gelatt, and Vecchi
 \protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
@@ -66,19 +66,21 @@ contributions of individual variables to explore the sensitivity they
 have to the projection structure.
 
 This paper offers an implementation of manual tours with the package
-\CRANpkg{spinifex}. This package also exends the graphics display of
+\CRANpkg{spinifex}. This package also extends the graphics display of
 \textbf{tourr} to the animation frameworks offered by \CRANpkg{plotly}
 (Sievert \protect\hyperlink{ref-sievert_plotly_2018}{2018}) and
 \CRANpkg{gganimate} (Pedersen and Robinson
 \protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}). The algorithm
 used to perform a radial manual tour is demonstrated on a toy data set.
-Followed by an application and disscussion of the radial manual tour on
+Followed by an application and discussion of the radial manual tour on
 an aggregation of high energy physics experiments in a large
 multivariate space.
 
 The paper is organized as follows. Section \ref{sec:algorithm} explains
 the algorithm using a toy dataset. Section \ref{sec:display} discusses
 the display of the animation after the path has been generated. Section
+\ref{sec:usage} explains the package functionality and code usage
+following the order applied in the algorithm. Section
 \ref{sec:application} illustrates how this can be used for sensitivity
 analysis applied to contemporary high energy physics. The last section,
 \ref{sec:discussion} summarizes the work and discusses future research.
@@ -93,8 +95,8 @@ manual tour:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Provided with a 2D projection, choose a variable to explore. This is
-  called the ``manip'' variable.
+  Provided with a 2D projection, choose a variable to manipulate. This
+  is called the ``manip var''.
 \item
   Create a 3D manipulation space, where the manip variable has the full
   contribution.
@@ -103,8 +105,9 @@ manual tour:
   coefficient to 1 and zeros it.
 \end{enumerate}
 
-The steps are described in more detail below with description,
-equations, figures, and their code usage.
+The steps are described in more detail below with descriptions,
+equations, and figures are given inline. Function names are mentioned,
+but code usage is discussed in more detail in section \ref{sec:usage}.
 
 \hypertarget{notation}{%
 \subsection{Notation}\label{notation}}
@@ -132,7 +135,7 @@ The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
 \textbf{tourr} is used to illustrate the algorithm. The data contains 74
 observations across 6 variables, which are physical measurements of the
-flea beetles. Each observation belong to one of three species.
+flea beetles. Each observation belongs to one of three species.
 
 The data is defined. A basis set (ideally orienting to an interesting
 feature) must be provided as an initial orientation. One way to identify
@@ -165,26 +168,6 @@ Call \texttt{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
 similar to \textbackslash ref\{fig:step0). Projection space is always
 available for display via the matrix multiplication
 \(\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}\).
-
-\begin{Schunk}
-\begin{Sinput}
-# remotes::install_github("nspyrison/spinifex") # Development version
-install.package("spinifex")
-library("spinifex")
-
-# Also see the vignette: 
-vignette("spinifex_vignette")
-
-f_data  <- tourr::rescale(flea[, 1:6])
-f_path  <- save_history(f_data, guided_tour(holes()))
-f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
-f_cat   <- factor(flea$species)
-
-view_basis(basis = f_basis, 
-           data = f_data,
-           labels = colnames(f_data))
-\end{Sinput}
-\end{Schunk}
 
 \hypertarget{step-1-choose-variable-of-interest}{%
 \subsection{Step 1) Choose variable of
@@ -239,14 +222,6 @@ var highlighted (height of the other variables are not depicted.)
 The representation in figure \ref{fig:step2} can be produced by calling
 the function \texttt{view\_manip\_space()}.
 
-\begin{Schunk}
-\begin{Sinput}
-view_manip_space(basis = f_basis, 
-                 manip_var = 5, 
-                 labels = colnames(f_data))
-\end{Sinput}
-\end{Schunk}
-
 \hypertarget{step-3-generate-rotation}{%
 \subsection{Step 3) Generate rotation}\label{step-3-generate-rotation}}
 
@@ -269,7 +244,7 @@ depiction of the manipulation space.)
 
 Post-multiply the manipulation space by the pre-defined rotation matrix
 producing \textbf{RM}, the rotated manip space. This is one frame of
-basis values, repeat this procress for each value in the sequences of
+basis values, repeat this process for each value in the sequences of
 \(\theta\) and \(\phi\) for the complete animation.
 
 Let:
@@ -334,19 +309,6 @@ Animations can be produced using the function
 produced from \textbf{plotly}. The \texttt{render\_type} argument can be
 changed to \texttt{render\_gganimate} for exporting to GIF or MP4 files.
 
-\begin{Schunk}
-\begin{Sinput}
-angle_speed <- .26
-
-play_manual_tour(data = f_data,
-                 basis = f_basis, 
-                 manip_var = 5, 
-                 angle = angle_speed,
-                 col = f_cat,
-                 pch = f_cat)
-\end{Sinput}
-\end{Schunk}
-
 \hypertarget{sec:display}{%
 \section{Data in projection-space}\label{sec:display}}
 
@@ -366,16 +328,135 @@ animated scatterplot. The remaining variable is sometimes linked to a
 data point aesthetic (such as size or color) to produce depth cues used
 in conjunction with the \(XY\) scatterplot.
 
-\hypertarget{package-structure-and-functionality}{%
-\section{Package structure and
-functionality}\label{package-structure-and-functionality}}
+\hypertarget{sec:usage}{%
+\section{Package structure and functionality}\label{sec:usage}}
+
+This section discusses the functions and code usage of the package
+before delving into a domain-specific application of the manual tour.
 
 \hypertarget{installation}{%
 \subsection{Installation}\label{installation}}
 
-\hypertarget{walk-though-package-functions-in-terms-of-work-flow.}{%
-\subsection{Walk though package functions in terms of work
-flow.}\label{walk-though-package-functions-in-terms-of-work-flow.}}
+\begin{Schunk}
+\begin{Sinput}
+# remotes::install_github("nspyrison/spinifex") # Development version
+install.package("spinifex")
+library("spinifex")
+
+# Also see the vignette: 
+vignette("spinifex_vignette")
+\end{Sinput}
+\end{Schunk}
+
+\hypertarget{primary-package-functions}{%
+\subsection{Primary package functions}\label{primary-package-functions}}
+
+The primary functions that will aid users in performing their own manual
+tours are broken into the following groupings: tour preparation, tour
+animation, and utility.
+
+\begin{Schunk}
+\begin{table}[t]
+
+\caption{\label{tab:functionsTable}Primary functions}
+\centering
+\begin{tabular}{lll}
+\toprule
+Class & Function & Description\\
+\midrule
+tour preparation & view\_basis & displays the reference frame of the basis\\
+tour preparation & view\_manip\_space & displays the manipulation space\\
+tour animation & play\_tour\_path & animates given tour path\\
+tour animation & play\_manual\_tour & animates the manual tour algorithm\\
+utility & render\_gganimate & uses gganimate to render the animation\\
+\addlinespace
+utility & render\_plotly & uses plotly to render the animation\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{Schunk}
+
+In the following section describes and shows usage of the tour related
+functions in parallel with the algorithm. The utility functions are
+called by the tour animation functions, passed to the arguments
+\texttt{render\_type}. Usage is demonstrated below and in the example
+documentation.
+
+\hypertarget{algorithm-code}{%
+\subsection{Algorithm code}\label{algorithm-code}}
+
+We'll start by initializing values including a standardized data set
+(numeric columns only), a starting basis, a categorical variable for
+point aesthetics, and a manip var. To get bearings on the projection,
+start by observing the reference axes of the basis with
+\texttt{view\_basis()}.
+
+\begin{Schunk}
+\begin{Sinput}
+f_data  <- tourr::rescale(flea[, 1:6])                    ## standardize data
+f_path  <- save_history(f_data, guided_tour(holes()))     ## produce guided tour
+f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## end of guided tour
+f_cat   <- factor(flea$species)                           ## categorical var
+
+view_basis(basis = f_basis, 
+           data = f_data,
+           labels = colnames(f_data))
+\end{Sinput}
+\end{Schunk}
+
+After becoming familiar with this space, select a manip var, the
+variable to change the contributions of. Use
+\texttt{view\_manip\_space()} View the new space with a dimension
+orthogonal to the projection plane where the manip var has a full
+contribution. This illustrates how the manip var is manipulated in a
+high space not depicted in the manual tour.
+
+\begin{Schunk}
+\begin{Sinput}
+f_mvar  <- 5  ## manip var numebr
+
+view_manip_space(basis = f_basis, 
+                 manip_var = f_mvar, 
+                 labels = colnames(f_data))
+\end{Sinput}
+\end{Schunk}
+
+Now we are ready to perform a manual tour on the selected variable. Use
+\texttt{play\_manual\_tour()} to perform the algorithm as discussed
+above, in section \ref{sec:algorithm}. The argument
+\texttt{render\_type} can be changed to \texttt{render\_gganimate} for a
+respective animation.
+
+\begin{Schunk}
+\begin{Sinput}
+angle_speed <- .26
+
+play_manual_tour(data = f_data,
+                 basis = f_basis, 
+                 manip_var = f_mvar, 
+                 angle = angle_speed,
+                 col = f_cat,
+                 pch = f_cat)
+\end{Sinput}
+\end{Schunk}
+
+Aside from the code used in the algorithm section a previously generated
+tour path can also be animated via \texttt{play\_tour\_path()}. Utility
+functions can also be passed into arguments: for example animation
+format can be changed by setting
+\texttt{render\_type\ =\ render\_gganimate}. View the guided tour path
+as a gganimate function:
+
+\begin{Schunk}
+\begin{Sinput}
+play_tour_path(tour_path = f_path,
+               data = f_data,
+               render_type = render_gganimate, 
+               angle = angle_speed
+)
+\end{Sinput}
+\end{Schunk}
 
 \hypertarget{rendering-and-sharing}{%
 \subsection{Rendering and sharing}\label{rendering-and-sharing}}
@@ -549,9 +630,9 @@ and
 \hypertarget{summary}{%
 \subsection{Summary}\label{summary}}
 
-Tours, which are dynamic linear projection of multivariate data, play an
-important role in data visualization; they extend the dimensionality of
-visuals while data- and parameter-spaces become ever larger. This
+Tours, which are a dynamic linear projection of multivariate data, play
+an important role in data visualization; they extend the dimensionality
+of visuals while data- and parameter-spaces become ever larger. This
 research has modified the algorithm producing manual tours which and has
 made this functionality available in package \textbf{spinifex}. The
 package adds to \textbf{tourr}, extending the graphics offerings that

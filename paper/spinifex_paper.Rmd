@@ -124,15 +124,15 @@ array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
 A tour is a multivariate data analysis technique in which a sequence of linear (orthogonal) projections are viewed as an animation while the orientation of the projection basis is rotated across time. Each frame of the sequence corresponds to a small change in the projection for a smooth transition that preserves continuity. Tours are a crucial tool extending the dimensionality of visualization which is increasingly important as datasets and models exist in increasing cardinality. The package \CRANpkg{tourr} [@wickham_tourr_2011] builds a platform for generating tour paths and applying to a wide number of display geometrics in **base** graphics.
 
 <!-- Manual tour -->
-While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a selected variable in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projection structure is to these manipulations. As manual tours operate on only one variable at a time, they particularly useful once a feature of interest has been identified. One way to identify "interesting" features is with the use of a guided tour [@hurley_analyzing_1990]. Guided tours select a very specific path, that which approachs a projection that optimizes an objective-function, similar to simulated annealing [@kirkpatrick_optimization_1983]. The direct optimization of a function allows guided tours to rapidly identify interesting projection features given the relatively large parameter-space. After a projection of interest is identified an analyst can then use the "finer brush" of the manual tour, by controlling the contributions of individual variables to explore the sensitivity they have to the projection structure.
+While there are numerous methods that generate tour paths, this research focuses on the manual tour. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a selected variable in a 2D projection. The manipulation of these coefficients allows the analyst to explore how sensitive the projection structure is to these manipulations. As manual tours operate on only one variable at a time, they particularly useful once a feature of interest has been identified. One way to identify "interesting" features is with the use of a guided tour [@hurley_analyzing_1990]. Guided tours select a very specific path, that which approaches a projection that optimizes an objective-function, similar to simulated annealing [@kirkpatrick_optimization_1983]. The direct optimization of a function allows guided tours to rapidly identify interesting projection features given the relatively large parameter-space. After a projection of interest is identified an analyst can then use the "finer brush" of the manual tour, by controlling the contributions of individual variables to explore the sensitivity they have to the projection structure.
 
 
 <!-- Contributions -->
 This paper offers an implementation of manual tours with the package
-\CRANpkg{spinifex}. This package also exends the graphics display of **tourr** to the animation frameworks offered by \CRANpkg{plotly} [@sievert_plotly_2018] and \CRANpkg{gganimate} [@pedersen_gganimate:_2019]. The algorithm used to perform a radial manual tour is demonstrated on a toy data set. Followed by an application and disscussion of the radial manual tour on an aggregation of high energy physics experiments in a large multivariate space.
+\CRANpkg{spinifex}. This package also extends the graphics display of **tourr** to the animation frameworks offered by \CRANpkg{plotly} [@sievert_plotly_2018] and \CRANpkg{gganimate} [@pedersen_gganimate:_2019]. The algorithm used to perform a radial manual tour is demonstrated on a toy data set. Followed by an application and discussion of the radial manual tour on an aggregation of high energy physics experiments in a large multivariate space.
 
 <!-- Paper outline -->
-The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discusses the display of the animation after the path has been generated. Section \ref{ref:usage} explains the though the code used in the algorithm section and discusses function structure for the rest of the package. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
+The paper is organized as follows. Section \ref{sec:algorithm} explains the algorithm using a toy dataset. Section \ref{sec:display} discusses the display of the animation after the path has been generated. Section \ref{sec:usage} explains the package functionality and code usage following the order applied in the algorithm. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to contemporary high energy physics. The last section, \ref{sec:discussion} summarizes the work and discusses future research.
 
 
 <!-- Algorithm outline -->
@@ -140,11 +140,11 @@ The paper is organized as follows. Section \ref{sec:algorithm} explains the algo
 
 The section below describes the algorithm for performing a 2D radial manual tour:
 
-1. Provided with a 2D projection, choose a variable to explore. This is called the "manip" variable.
+1. Provided with a 2D projection, choose a variable to manipulate. This is called the "manip var".
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
-The steps are described in more detail below with description, equations, and figures. Function names are mentioned inline, but the code is aggregated in 
+The steps are described in more detail below with descriptions, equations, and figures are given inline. Function names are mentioned, but code usage is discussed in more detail in section \ref{sec:usage}.
 
 ## Notation
 
@@ -166,7 +166,7 @@ The algorithm primarily operates on projection bases and utilizes the data only 
 ## Toy data set
 
 <!-- describe data. -->
-The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belong to one of three species.
+The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
 The data is defined. A basis set (ideally orienting to an interesting feature) must be provided as an initial orientation. One way to identify a projection containing interesting features is to apply a guided tour. In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributed to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species (while the guided tour was unsupervised with this information).
@@ -233,7 +233,7 @@ Imagine holding the manip var, the red axis, one end fixed to the origin. As it 
 <!-- describe manip var path -->
 For a radial tour fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle coming out of the projection plane, $\phi$, bringing the initial $XY$ contributions of the manip var to a maximum and then to zero before returning to the initial position. Dynamic capture of user manipulation is typically performed directly on the projection plane (without depiction of the manipulation space.)
 
-Post-multiply the manipulation space by the pre-defined rotation matrix producing **RM**, the rotated manip space. This is one frame of basis values, repeat this procress for each value in the sequences of $\theta$ and $\phi$ for the complete animation.
+Post-multiply the manipulation space by the pre-defined rotation matrix producing **RM**, the rotated manip space. This is one frame of basis values, repeat this process for each value in the sequences of $\theta$ and $\phi$ for the complete animation.
 
 Let:
 \begin{itemize}
@@ -300,6 +300,8 @@ For a 2D scatterplot, plot the first two variables from each frame statically as
 
 # Package structure and functionality {#sec:usage}
 
+This section discusses the functions and code usage of the package before delving into a domain-specific application of the manual tour.
+
 ## Installation
 
 <!-- step 0 disp code. -->
@@ -312,9 +314,35 @@ library("spinifex")
 vignette("spinifex_vignette")
 ```
 
-## Algorithm
+## Primary package functions 
+<!-- in terms of work flow. -->
 
-We'll start by initializing values including: standardizing our data set (numeric coulmns only), provide a basis, a categorical variable for point asthetics, and specifiy the manip var. Then we the references axes of the basis with `view_basis()`.
+The primary functions that will aid users in performing their own manual tours are broken into the following groupings: tour preparation, tour animation, and utility.
+
+```{r functionsTable, echo=F}
+library(kableExtra)
+
+funcs <- rbind(
+  c("tour preparation", "view_basis", "displays the reference frame of the basis"),
+  c("tour preparation", "view_manip_space", "displays the manipulation space"),
+  c("tour animation", "play_tour_path", "animates given tour path"),
+  c("tour animation", "play_manual_tour", "animates the manual tour algorithm"),
+  # c("utility", "col_of", "maps a variable to the point color"),
+  # c("utility", "pch_of", "maps a variable to the point character (shape)"),
+  c("utility", "render_gganimate", "uses gganimate to render the animation"),
+  c("utility", "render_plotly", "uses plotly to render the animation")
+)
+colnames(funcs) <- c("Class", "Function", "Description")
+  
+kable(funcs, "latex", caption = "Primary functions", booktabs = T)
+```
+
+In the following section describes and shows usage of the tour related functions in parallel with the algorithm. The utility functions are called by the tour animation functions, passed to the arguments `render_type`. Usage is demonstrated below and in the example documentation.
+
+
+## Algorithm code
+
+We'll start by initializing values including a standardized data set (numeric columns only), a starting basis, a categorical variable for point aesthetics, and a manip var. To get bearings on the projection, start by observing the reference axes of the basis with `view_basis()`.
 
 <!-- setup -->
 ```{r step0CODEEXAMPLE, eval=F, echo=T}
@@ -328,7 +356,7 @@ view_basis(basis = f_basis,
            labels = colnames(f_data))
 ```
 
-After becoming familar with the space, select a 
+After becoming familiar with this space, select a manip var, the variable to change the contributions of. Use `view_manip_space()` View the new space with a dimension orthogonal to the projection plane where the manip var has a full contribution. This illustrates how the manip var is manipulated in a high space not depicted in the manual tour.
 
 <!-- step 2 disp code. -->
 ```{r step2CODEEXAMPLE, eval=F, echo=T}
@@ -338,6 +366,8 @@ view_manip_space(basis = f_basis,
                  manip_var = f_mvar, 
                  labels = colnames(f_data))
 ```
+
+Now we are ready to perform a manual tour on the selected variable. Use `play_manual_tour()` to perform the algorithm as discussed above, in section  \ref{sec:algorithm}. The argument `render_type` can be changed to `render_gganimate` for a respective animation.
 
 <!-- step 3 disp code. -->
 ```{r step3CODEEXAMPLE, eval=F, echo=T}
@@ -351,8 +381,15 @@ play_manual_tour(data = f_data,
                  pch = f_cat)
 ```
 
+Aside from the code used in the algorithm section a previously generated tour path can also be animated via `play_tour_path()`. Utility functions can also be passed into arguments: for example animation format can be changed by setting `render_type = render_gganimate`. View the guided tour path as a gganimate function:
 
-## Walk though package functions in terms of work flow.
+```{r guidedTourCODEEXAMPLE, eval=F, echo=T}
+play_tour_path(tour_path = f_path,
+               data = f_data,
+               render_type = render_gganimate, 
+               angle = angle_speed
+)
+```
 
 
 
@@ -476,7 +513,7 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 ## Summary
 
 <!-- summary and segue  -->
-Tours, which are dynamic linear projection of multivariate data, play an important role in data visualization; they extend the dimensionality of visuals while data- and parameter-spaces become ever larger. This research has modified the algorithm producing manual tours which and has made this functionality available in package **spinifex**. The package adds to **tourr**, extending the graphics offerings that can be used to display tours.
+Tours, which are a dynamic linear projection of multivariate data, play an important role in data visualization; they extend the dimensionality of visuals while data- and parameter-spaces become ever larger. This research has modified the algorithm producing manual tours which and has made this functionality available in package **spinifex**. The package adds to **tourr**, extending the graphics offerings that can be used to display tours.
 
 Radial manual tours were applied to a dataset across different experiments of hadronic collisions. The importance of selecting the correct variable to manipulate is demonstrated by comparing tours of varying quality. The manual tours convey a better picture of the structure of the clustering than static linear or non-linear projections. Giving the full contribution of the manipulation space to the manip var enables analysts to explore the sensitivity of the structure with the selected variable. This information can be used by physicists to identify which experiments are probing which parameter spaces, which can be indispensable for smarter planning of effort and funding.
 
