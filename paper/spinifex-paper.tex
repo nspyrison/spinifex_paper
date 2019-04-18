@@ -21,8 +21,8 @@ sensitivity of the hadronic experiments to nucleon structure.
 Sensitivity was characterized in non-linear 3D embeddings of the first
 10 principal components. This research applies manual tours to this data
 showing that manual tours resolve information about the structure of
-cluster distribution by bringing to light information that is orthogonal
-to static viewing planes.
+cluster distribution by bringing revealing information that is
+orthogonal to static viewing planes.
 }
 
 
@@ -31,14 +31,16 @@ to static viewing planes.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-A tour is a multivariate data analysis technique in which a sequence of
-linear (orthogonal) projections are viewed as an animation while the
-orientation of the projection basis is rotated across time. Each frame
-of the sequence corresponds to a small change in the projection for a
-smooth transition that preserves continuity. Tours are a crucial tool
-extending the dimensionality of visualization which is increasingly
-important as datasets and models exist in increasing cardinality. The
-package \CRANpkg{tourr} (Wickham et al.
+Exploring multivariate spaces is a challenging task and increasingly so
+as dimensionality increases. Traditionally, static projections display
+an embedding of multivariate data in two dimensions. Such static views
+cannot provide depth cues or convey the information of other
+orientations. Alternatively, tours are a class of dynamic linear
+projections viewed as an animation while the orientation of the
+projection is rotated. Tours are a crucial tool extending the
+dimensionality of visualization which is increasingly important as
+datasets and models exist in increasing cardinality. The package
+\CRANpkg{tourr} (Wickham et al.
 \protect\hyperlink{ref-wickham_tourr_2011}{2011}) builds a platform for
 generating tour paths and applying to a wide number of display
 geometrics in \textbf{base} graphics.
@@ -48,22 +50,21 @@ focuses on the manual tour. The manual tour was described in Cook and
 Buja (\protect\hyperlink{ref-cook_manual_1997}{1997}) and allows a user
 to control the projection coefficients of a selected variable in a 2D
 projection. The manipulation of these coefficients allows the analyst to
-explore how sensitive the projection structure is to these
-manipulations. As manual tours operate on only one variable at a time,
-they particularly useful once a feature of interest has been identified.
-One way to identify ``interesting'' features is with the use of a guided
-tour (Hurley and Buja
-\protect\hyperlink{ref-hurley_analyzing_1990}{1990}). Guided tours
-select a very specific path, that which approaches a projection that
-optimizes an objective-function, similar to simulated annealing
-(Kirkpatrick, Gelatt, and Vecchi
+explore their sensitivity to the structure within the projection. As
+manual tours operate on only one variable at a time, they particularly
+useful once a feature of interest has been identified. One way to
+identify ``interesting'' features is with the use of a guided tour
+(Hurley and Buja \protect\hyperlink{ref-hurley_analyzing_1990}{1990}).
+Guided tours select a very specific path, that which approaches a
+projection that optimizes an objective-function, in a manner similar to
+simulated annealing (Kirkpatrick, Gelatt, and Vecchi
 \protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
 optimization of a function allows guided tours to rapidly identify
 interesting projection features given the relatively large
 parameter-space. After a projection of interest is identified an analyst
 can then use the ``finer brush'' of the manual tour, by controlling the
 contributions of individual variables to explore the sensitivity they
-have to the projection structure.
+have on the structure within the projection.
 
 This paper offers an implementation of manual tours with the package
 \CRANpkg{spinifex}. This package also extends the graphics display of
@@ -78,12 +79,13 @@ multivariate space.
 
 The paper is organized as follows. Section \ref{sec:algorithm} explains
 the algorithm using a toy dataset. Section \ref{sec:display} discusses
-the display of the animation after the path has been generated. Section
-\ref{sec:usage} explains the package functionality and code usage
-following the order applied in the algorithm. Section
+the display of the animation after the path has been generated. Package
+functionality and code usage following the order applied in the
+algorithm follows in section \ref{sec:usage}. Section
 \ref{sec:application} illustrates how this can be used for sensitivity
-analysis applied to contemporary high energy physics. The last section,
-\ref{sec:discussion} summarizes the work and discusses future research.
+analysis applied to contemporary high energy physics. Then section
+\ref{sec:summary} summarizes this paper. Lastly, section
+\ref{sec:discussion} discusses possible future research.
 
 \hypertarget{sec:algorithm}{%
 \section{Algorithm}\label{sec:algorithm}}
@@ -105,9 +107,10 @@ manual tour:
   coefficient to 1 and zeros it.
 \end{enumerate}
 
-The steps are described in more detail below with descriptions,
-equations, and figures are given inline. Function names are mentioned,
-but code usage is discussed in more detail in section \ref{sec:usage}.
+These algorithm steps are described in more detail below with
+descriptions, equations, and figures are given inline. Function names
+are mentioned, but code usage is discussed in more detail in section
+\ref{sec:usage}.
 
 \hypertarget{notation}{%
 \subsection{Notation}\label{notation}}
@@ -116,11 +119,11 @@ This section describes the notation used in the algorithm for a 2D
 radial manual tour.
 
 \begin{itemize}
-  \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions.
+  \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions
   \item $\textbf{B} = (B_1,~ B_2)$, any orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
-  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate, the manip var.
-  \item $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes.
-  \item $\phi$, the angle of out-of-projection-plane rotation, coming into the manipulation space.
+  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate, the manip var
+  \item $\theta_i$, the sequence of angles of in-projection-plane rotation, for example, on the reference axes
+  \item $\phi_i$, the sequence of angles of out-of-projection-plane rotation, coming into the manipulation space
 \end{itemize}
 
 The algorithm primarily operates on projection bases and utilizes the
@@ -137,20 +140,20 @@ The flea data, originally from Lubischew
 observations across 6 variables, which are physical measurements of the
 flea beetles. Each observation belongs to one of three species.
 
-The data is defined. A basis set (ideally orienting to an interesting
-feature) must be provided as an initial orientation. One way to identify
-a projection containing interesting features is to apply a guided tour.
-In a guided tour, the projection sequence is selected by optimizing an
-index function via hill-climbing on the projection space. In this case,
-the holes index is selected and applied to standardized flea data. The
-holes index is maximized when the projected observations are furthest
-from the center. Figure \ref{fig:step0} shows a locally optimized
-projection of the data. The left panel displays the reference axes of
-the projection basis, a visual indication of the magnitude and direction
-each variable contributed to the projection. The right panel shows the
-data as projected through the basis set described by the reference axes
-(left). Data points are colored and given shape according to the species
-(while the guided tour was unsupervised with this information).
+The data is defined. A basis set, the orientation of the projection to
+explore, must be provided. One way to identify a projection containing
+interesting features is to apply a guided tour. In a guided tour, the
+projection sequence is selected by optimizing an index function via
+hill-climbing on the projection space. In this case, the holes index is
+selected and applied to standardized flea data. The holes index is
+maximized when the projected observations are furthest from the center.
+Figure \ref{fig:step0} shows a locally optimized projection of the data.
+The left panel displays the reference axes of the projection basis, a
+visual indication of the magnitude and direction each variable
+contributes to the projection. The right panel shows the data as
+projected through the basis set described by the reference axes (left).
+Data points are colored and given shape according to the species (while
+the guided tour was unsupervised with this information).
 
 \begin{Schunk}
 \begin{figure}
@@ -165,8 +168,8 @@ data as projected through the basis set described by the reference axes
 
 Call \texttt{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
 (Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) graphic
-similar to \textbackslash ref\{fig:step0). Projection space is always
-available for display via the matrix multiplication
+similar to figure \ref{fig:step0}. Projection space is always available
+for display via the matrix multiplication
 \(\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}\).
 
 \hypertarget{step-1-choose-variable-of-interest}{%
@@ -176,7 +179,7 @@ interest}\label{step-1-choose-variable-of-interest}}
 In figure \ref{fig:step0} the contributions of the variables tars1 and
 aede2 are mostly orthogonal to the contributions of the other four
 variables. These two variables explain the variation of the data
-distinguishing the purple group from the rest of the sample. Select
+distinguishing the purple cluster from the rest of the sample. Select
 aede2 as the manip var, the variable to be manipulated, as it has a
 larger contribution to the projection. The question that will be
 explored is how important the variable aede2 is to the separation of the
@@ -202,11 +205,15 @@ Adding this new dimension to our projection space allows for the
 coefficients of the manip var to be changed via rotation about the
 origin. For example, the ability to lift a piece of paper, rather than
 being constrained to a 2D plane. Orthonormalizing rescales the new
-vector while the projection down to 2D remains the original basis. Place
-the plane horizontally, with the new dimension extending vertically,
-with axes projecting back onto the reference axes. Figure
-\ref{fig:step2} illustrates this 3D manipulation space with the manip
-var highlighted (height of the other variables are not depicted.)
+vector, while the projection down to 2D remains as the original basis.
+Place the projection plane horizontally, with the new dimension
+extending vertically, with axes projecting back onto the reference axes.
+Figure \ref{fig:step2} illustrates this 3D manipulation space with the
+manip var highlighted (height of the other variables are not depicted).
+This representation is produced by calling the
+\texttt{view\_manip\_space()} function. Functionally, the manipulation
+space is more of a mathematical construct that needn't be visualized but
+does help to digest what is happening mathematically.
 
 \begin{Schunk}
 \begin{figure}
@@ -215,12 +222,9 @@ var highlighted (height of the other variables are not depicted.)
 
 }
 
-\caption[Manipulation space for controlling the contribution of aede2 of standardized flea data]{Manipulation space for controlling the contribution of aede2 of standardized flea data. Basis selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin.}\label{fig:step2}
+\caption[Manipulation space for controlling the contribution of aede2 of standardized flea data]{Manipulation space for controlling the contribution of aede2 of standardized flea data. The basis was selected by a holes-index optimized guided tour lies on the horizontal projection plane, shown in blue. The manip var axis, in red, extends into the vertical manipulation space, allowing the coefficients of the manip var to be changed by rotation around the origin.}\label{fig:step2}
 \end{figure}
 \end{Schunk}
-
-The representation in figure \ref{fig:step2} can be produced by calling
-the function \texttt{view\_manip\_space()}.
 
 \hypertarget{step-3-generate-rotation}{%
 \subsection{Step 3) Generate rotation}\label{step-3-generate-rotation}}
@@ -239,8 +243,7 @@ plane, \(\theta\), and define a sequence for the (vertical) angle coming
 out of the projection plane, \(\phi\), bringing the initial \(XY\)
 contributions of the manip var to a maximum and then to zero before
 returning to the initial position. For an oblique manual tour, capture
-the user manipulation directly on the projection plane (not the
-manipulation space.)
+the user manipulation directly on the \(XY\) of the projection plane.
 
 Post-multiply the manipulation space by the pre-defined rotation matrix
 producing \textbf{RM}, the rotated manip space. This is one frame of
@@ -250,10 +253,10 @@ basis values, repeat this process for each value in the sequences of
 Let:
 
 \begin{itemize}
-  \item[$c_\theta$] be the cosine of $\theta$
-  \item[$c_\phi$]   be the cosine of $\phi$
-  \item[$s_\theta$] be the sine of   $\theta$
-  \item[$s_\phi$]   be the sine of   $\phi$
+  \item[$c_\theta$] be the cosine of $\theta_i$
+  \item[$c_\phi$]   be the cosine of $\phi_i$
+  \item[$s_\theta$] be the sine of   $\theta_i$
+  \item[$s_\phi$]   be the sine of   $\phi_i$
 \end{itemize}
 
 \textbf{For each value of } \(i\) \textbf{:}
@@ -284,14 +287,15 @@ pi. If the manip variable doesn't move as expected these are the first
 places to check.
 
 Figure \ref{fig:step3} illustrates a sequence with 15 projected bases,
-showing the reference axes on top the corresponding projected data
-points on the below. As a result, we can see that changes in the manip
-var controlled the distance between the purple cluster and the remaining
-sample, aede2 is crucial in distinguishing this species. Tours are
-typically viewed as an animation such a dynamic version of this tour can
-be viewed online at
+showing the reference axes on the top half with the corresponding
+projected data points below. Changes in the basis coefficients of the
+manip var correspond to the distance separating the purple cluster and
+the remaining sample, aede2 is crucial in distinguishing the variation
+of species. Tours are typically viewed as an animation. The animation of
+this tour can be viewed online at
 \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The
-page may take a moment to load.
+page may take a moment to load. Animations can be produced using the
+function \texttt{play\_manual\_tour()}.
 
 \begin{Schunk}
 \begin{figure}
@@ -300,33 +304,29 @@ page may take a moment to load.
 
 }
 
-\caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. The change in the projected data shows that aede2 is important for distinguishing the purple species. An animated version can be viewed at  https://nspyrison.netlify.com/thesis/flea\_manualtour\_mvar5/.}\label{fig:step3}
+\caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. Manipulating the coefficeients of aede2 changes the distance separating the purple cluster. This shows that aede2 is important for distinguishing this species from the ramaining data. An animated version can be viewed at  https://nspyrison.netlify.com/thesis/flea\_manualtour\_mvar5/.}\label{fig:step3}
 \end{figure}
 \end{Schunk}
-
-Animations can be produced using the function
-\texttt{play\_manual\_tour()}. This function defaults to an HTML5 widget
-produced from \textbf{plotly}. The \texttt{render\_type} argument can be
-changed to \texttt{render\_gganimate} for exporting to GIF or MP4 files.
 
 \hypertarget{sec:display}{%
 \section{Data in projection-space}\label{sec:display}}
 
-In an appeal to performance, the above operations are performed on the
-bases without the use of the larger datasets. After the bases are
-brought into the projection-space, however, it is helpful to observe
-them with data in the same space. Pre-multiply the data by basis frame
-bringing the data into the projection space.
+In an appeal to performance, the operations of a tour are performed on
+the bases while the larger datasets are not operated on until the
+display of data points are needed. After the bases are brought into the
+projection-space, however, it is helpful to observe them with projected
+data in the same space. Pre-multiply the data by basis frame bringing
+the data into the projection space.
 
 \begin{align*}
   \textbf{P}_{[n,~3]} &= \textbf{X}_{[n,~p]} ~*~ \textbf{RM}_{[p,~3]}
 \end{align*}
 
-For a 2D scatterplot, plot the first two variables from each frame
-statically as in the previous figure, or in sequence, producing an
-animated scatterplot. The remaining variable is sometimes linked to a
-data point aesthetic (such as size or color) to produce depth cues used
-in conjunction with the \(XY\) scatterplot.
+For a 2D scatterplot, plot the first two variables within each frame.
+Show each frame in sequence to form an animation. The remaining
+manipulation space variable can be linked to point aesthetic (such as
+size or color) to produce depth cues used in conjunction with the \(XY\)
+scatterplot.
 
 \hypertarget{sec:usage}{%
 \section{Package structure and functionality}\label{sec:usage}}
@@ -377,9 +377,9 @@ utility & render\_plotly & uses plotly to render the animation\\
 
 \end{Schunk}
 
-In the following section describes and shows usage of the tour related
-functions in parallel with the algorithm. The utility functions are
-called by the tour animation functions, passed to the arguments
+In the following section describes and demonstrates usage of the above
+functions following the order in the algorithm. The utility functions
+are called by the tour animation functions, passed to the arguments
 \texttt{render\_type}. Usage is demonstrated below and in the example
 documentation.
 
@@ -388,9 +388,9 @@ documentation.
 
 We'll start by initializing values including a standardized data set
 (numeric columns only), a starting basis, a categorical variable for
-point aesthetics, and a manip var. To get bearings on the projection,
-start by observing the reference axes of the basis with
-\texttt{view\_basis()}.
+point aesthetics (optional), and a manip var. To get bearings on the
+projection, start by observing the reference axes of the basis with
+\texttt{view\_basis()} producing figure \ref{fig:step0}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -407,10 +407,10 @@ view_basis(basis = f_basis,
 
 After becoming familiar with this space, select a manip var, the
 variable to change the contributions of. Use
-\texttt{view\_manip\_space()} View the new space with a dimension
+\texttt{view\_manip\_space()} to view the new space with a dimension
 orthogonal to the projection plane where the manip var has a full
-contribution. This illustrates how the manip var is manipulated in a
-high space not depicted in the manual tour.
+contribution. This illustrates how the manip var is manipulated with the
+addition of the manipulation space as shown in figure \ref{fig:step2}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -424,9 +424,8 @@ view_manip_space(basis = f_basis,
 
 Now we are ready to perform a manual tour on the selected variable. Use
 \texttt{play\_manual\_tour()} to perform the algorithm as discussed
-above, in section \ref{sec:algorithm}. The argument
-\texttt{render\_type} can be changed to \texttt{render\_gganimate} for a
-respective animation.
+above, in section \ref{sec:algorithm}. This is the animated equivalent
+of figure \ref{fig:step3}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -441,12 +440,13 @@ play_manual_tour(data = f_data,
 \end{Sinput}
 \end{Schunk}
 
-Aside from the code used in the algorithm section a previously generated
-tour path can also be animated via \texttt{play\_tour\_path()}. Utility
-functions can also be passed into arguments: for example animation
-format can be changed by setting
-\texttt{render\_type\ =\ render\_gganimate}. View the guided tour path
-as a gganimate function:
+This concludes the content of the algorithm section, however, lets cover
+animating paths generated in \textbf{tourr}. Animate the previously
+generated guided tour path via \texttt{play\_tour\_path()}. Utility
+functions can also be passed as arguments into either of the tour
+animation function to change the resulting graphics object, set
+\texttt{render\_type\ =\ render\_gganimate} to view the animation as a
+GIF.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -629,8 +629,8 @@ and
 \end{figure}
 \end{Schunk}
 
-\hypertarget{summary}{%
-\subsection{Summary}\label{summary}}
+\hypertarget{sec:summary}{%
+\subsection{Summary}\label{sec:summary}}
 
 Tours, which are a dynamic linear projection of multivariate data, play
 an important role in data visualization; they extend the dimensionality
