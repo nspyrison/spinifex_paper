@@ -138,41 +138,41 @@ The paper is organized as follows. Section \ref{sec:algorithm} describes the alg
 <!-- Algorithm outline -->
 # Algorithm {#sec:algorithm}
 
-The section below describes the algorithm for performing a 2D radial manual tour:
+This section describes the algorithm for performing a 2D radial manual tour, containing these steps:
 
 1. Provided with a 2D projection, choose a variable to manipulate. This is called the "manip var".
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
-These algorithm steps are described in more detail below with descriptions, equations, and figures are given inline. Function names are mentioned, but code usage is discussed in more detail in section \ref{sec:usage}.
+More detail is provided in the following sections. Function names are provided, but code structure and usage is discussed in section \ref{sec:usage}.
 
 ## Notation
 
 This section describes the notation used in the algorithm for a 2D radial manual tour.
 
 <!-- remember mixing latex and rmarkdown bullets isn't trivial. -->
-\begin{itemize}
-  \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions
-  \item $\textbf{B} = (B_1,~ B_2)$, any orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
-  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate, the manip var
-  \item $\theta_i$, the sequence of angles of in-projection-plane rotation, for example, on the reference axes
-  \item $\phi_i$, the sequence of angles of out-of-projection-plane rotation, coming into the manipulation space
-\end{itemize}
+- $\textbf{X}$, the data, an $n \times p$ numeric matrix to be projected to 2D.
+- $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
+- $\textbf{e}$, a 1D coordinate basis vector of length $p$ with the $k-$th element set to one, where $k$ is the index of the variable to manipulate, called the "manip var".
+- $\theta_i$, the sequence of angles of in-projection-plane rotation, for example, on the reference axes.
+- $\phi_i$, the sequence of angles of out-of-projection-plane rotation, coming into the manipulation space.
 
 <!-- operate on bases -->
 The algorithm primarily operates on projection bases and utilizes the data only when making a display. The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first two variables.
 
 
-## Toy data set
+## Set up
 
 <!-- describe data. -->
 The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
-The data is defined. A basis set, the orientation of the projection to explore, must be provided. One way to identify a projection containing interesting features is to apply a guided tour. In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributes to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species (while the guided tour was unsupervised with this information).
+An initial 2D projection basis set must be provided. One way to identify a projection containing interesting features is to apply a guided tour. In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to standardized flea data. The holes index is maximized when the projected observations are furthest from the center. Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributes to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species.
+
+Call `view_basis()` on a basis to produce a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] graphic similar to Figure \ref{fig:step0}. The projected data is always available for display via matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
 
 
-```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. The basis was identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables."}
+```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species."}
 ## Flea holes tour
 f_dat  <- tourr::rescale(flea[,1:6])
 f_cat  <- factor(flea$species)
@@ -190,8 +190,6 @@ view_basis(f_bas, labels = colnames(f_dat)) +
              pch = as.integer(f_cat) + 15) +
   theme(panel.border = element_rect(colour = "black", fill = NA))
 ```
-
-Call `view_basis()` on a basis to produce a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] graphic similar to figure \ref{fig:step0}. Projection space is always available for display via the matrix multiplication $\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}$.
 
 
 ## Step 1) Choose variable of interest

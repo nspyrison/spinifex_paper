@@ -91,8 +91,8 @@ future directions.
 \hypertarget{sec:algorithm}{%
 \section{Algorithm}\label{sec:algorithm}}
 
-The section below describes the algorithm for performing a 2D radial
-manual tour:
+This section describes the algorithm for performing a 2D radial manual
+tour, containing these steps:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -108,9 +108,8 @@ manual tour:
   coefficient to 1 and zeros it.
 \end{enumerate}
 
-These algorithm steps are described in more detail below with
-descriptions, equations, and figures are given inline. Function names
-are mentioned, but code usage is discussed in more detail in section
+More detail is provided in the following sections. Function names are
+provided, but code structure and usage is discussed in section
 \ref{sec:usage}.
 
 \hypertarget{notation}{%
@@ -120,11 +119,24 @@ This section describes the notation used in the algorithm for a 2D
 radial manual tour.
 
 \begin{itemize}
-  \item $\textbf{X}$, the data, an $n \times p$ numeric matrix to be embedded in two dimensions
-  \item $\textbf{B} = (B_1,~ B_2)$, any orthonormal projection basis set, $p \times 2$ matrix, describing the projection from $p$ to two dimensions
-  \item $\textbf{e}$, a zero column vector of length $p$ with the $k-$th element set to one, where $k$ is the number of the variable to manipulate, the manip var
-  \item $\theta_i$, the sequence of angles of in-projection-plane rotation, for example, on the reference axes
-  \item $\phi_i$, the sequence of angles of out-of-projection-plane rotation, coming into the manipulation space
+\tightlist
+\item
+  \(\textbf{X}\), the data, an \(n \times p\) numeric matrix to be
+  projected to 2D.
+\item
+  \(\textbf{B} = (B_1,~ B_2)\), any 2D orthonormal projection basis,
+  \(p \times 2\) matrix, describing the projection from \(p\) to two
+  dimensions
+\item
+  \(\textbf{e}\), a 1D coordinate basis vector of length \(p\) with the
+  \(k-\)th element set to one, where \(k\) is the index of the variable
+  to manipulate, called the ``manip var''.
+\item
+  \(\theta_i\), the sequence of angles of in-projection-plane rotation,
+  for example, on the reference axes.
+\item
+  \(\phi_i\), the sequence of angles of out-of-projection-plane
+  rotation, coming into the manipulation space.
 \end{itemize}
 
 The algorithm primarily operates on projection bases and utilizes the
@@ -132,8 +144,8 @@ data only when making a display. The projection space can be viewed at
 any point in the process by pre-multiplying the data and plotting the
 first two variables.
 
-\hypertarget{toy-data-set}{%
-\subsection{Toy data set}\label{toy-data-set}}
+\hypertarget{set-up}{%
+\subsection{Set up}\label{set-up}}
 
 The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
@@ -141,20 +153,25 @@ The flea data, originally from Lubischew
 observations across 6 variables, which are physical measurements of the
 flea beetles. Each observation belongs to one of three species.
 
-The data is defined. A basis set, the orientation of the projection to
-explore, must be provided. One way to identify a projection containing
-interesting features is to apply a guided tour. In a guided tour, the
-projection sequence is selected by optimizing an index function via
-hill-climbing on the projection space. In this case, the holes index is
-selected and applied to standardized flea data. The holes index is
-maximized when the projected observations are furthest from the center.
-Figure \ref{fig:step0} shows a locally optimized projection of the data.
-The left panel displays the reference axes of the projection basis, a
-visual indication of the magnitude and direction each variable
-contributes to the projection. The right panel shows the data as
-projected through the basis set described by the reference axes (left).
-Data points are colored and given shape according to the species (while
-the guided tour was unsupervised with this information).
+An initial 2D projection basis set must be provided. One way to identify
+a projection containing interesting features is to apply a guided tour.
+In a guided tour, the projection sequence is selected by optimizing an
+index function via hill-climbing on the projection space. In this case,
+the holes index is selected and applied to standardized flea data. The
+holes index is maximized when the projected observations are furthest
+from the center. Figure \ref{fig:step0} shows a locally optimized
+projection of the data. The left panel displays the reference axes of
+the projection basis, a visual indication of the magnitude and direction
+each variable contributes to the projection. The right panel shows the
+data as projected through the basis set described by the reference axes
+(left). Data points are colored and given shape according to the
+species.
+
+Call \texttt{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
+(Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) graphic
+similar to Figure \ref{fig:step0}. The projected data is always
+available for display via matrix multiplication
+\(\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}\).
 
 \begin{Schunk}
 \begin{figure}
@@ -163,15 +180,9 @@ the guided tour was unsupervised with this information).
 
 }
 
-\caption[Basis reference axes (left) and projected data (right) of standardized flea data]{Basis reference axes (left) and projected data (right) of standardized flea data. Data points color and shape are mapped to beetle species. The basis was identified by a holes-index guided tour. The variables aede2 and tars1 contribute mostly orthogonal to the other variables.}\label{fig:step0}
+\caption[Initial 2D projection]{Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species.}\label{fig:step0}
 \end{figure}
 \end{Schunk}
-
-Call \texttt{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
-(Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) graphic
-similar to figure \ref{fig:step0}. Projection space is always available
-for display via the matrix multiplication
-\(\textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]} ~=~ \textbf{P}_{[n,~d]}\).
 
 \hypertarget{step-1-choose-variable-of-interest}{%
 \subsection{Step 1) Choose variable of
