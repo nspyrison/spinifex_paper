@@ -161,7 +161,7 @@ This section describes the notation used in the algorithm for a 2D radial manual
 The algorithm primarily operates on projection bases and utilizes the data only when making a display. The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first two variables.
 
 
-## Set up
+## Step 0) Set up
 
 <!-- describe data. -->
 The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belongs to one of three species.
@@ -195,7 +195,7 @@ view_basis(f_bas, labels = colnames(f_dat)) +
 ## Step 1) Choose variable of interest
 
 <!-- select a manip var-->
-In Figure \ref{fig:step0} the contributions of the variables tars1 and aede2 are mostly orthogonal to the contributions of the other four variables. These two variables explain the variation of the data distinguishing the purple cluster from the rest of the sample. Select aede2 as the manip var, the variable to be manipulated, as it has a larger contribution to the projection. The question that will be explored is how important the variable aede2 is to the separation of the clusters.
+In Figure \ref{fig:step0} the contribution of the variables `tars1` and `aede2` mostly contrast the contribution of the other four variables. These two variables combined contribute in the direction of the projection where the purple cluster is separated from the other two clusters. The variable `aede2` is selected as the manip var, the variable to be controlled in the tour. The question that will be explored is how important this variable is to the separation of the clusters.
 
 
 ## Step 2) Create the manip space
