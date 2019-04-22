@@ -1,25 +1,28 @@
 % !TeX root = RJwrapper.tex
-\title{spinifex: A Package for Creating an Animation of a Manually Controlled
-Tour of Linear Projections of Multivariate Data, to Explore the
-Sensitivity of Structure to Specific Variables}
+\title{spinifex: An R Package for Creating a Manual Tour of Low-dimensional
+Projections of Multivariate Data}
 \author{by Nicholas Spyrison, Dianne Cook}
 
 \maketitle
 
 \abstract{%
-Dynamic linear projections of multivariate data collectively known as
-\textbf{tours} provide an important tool for exploring mulitvariate data
-and models. The R package \textbf{tourr} provides functions for several
-types of tours: grand, guided, little, local and frozen. Each of these
-can be viewed dynamically, or saved into a data object for animation.
-This paper describes a new package, \textbf{spinifex}, to provide a
-manual tour, that allows the coefficient for a single variable to be
-varied, with the result displayed using animation, with the packages,
-\textbf{plotly} and \textbf{gganimate}. By varying the coefficient of a
-single variable, it is possible to explore the sensitivity of structure
-in the projection to that variable. It is particularly useful when used
-with a projection pursuit guided tour to simplify and understand the
-solution. The manual tour is applied to a problem from particle physics.
+Dynamic low-dimensional linear projections of multivariate data
+collectively known as \textbf{tours} provide an important tool for
+exploring mulitvariate data and models. The R package \textbf{tourr}
+provides functions for several types of tours: grand, guided, little,
+local and frozen. Each of these can be viewed dynamically, or saved into
+a data object for animation. This paper describes a new package,
+\textbf{spinifex}, to provide a manual tour, that allows the coefficient
+for a single variable to be controlled. The variable is rotated fully
+into the projection with a coefficient of 1 or -1, or completely out of
+the projection with a coefficient of 0. The resulting sequence of
+projections can be displayed using animation, with functions from either
+the \textbf{plotly} and \textbf{gganimate} packages. By varying the
+coefficient of a single variable, it is possible to explore the
+sensitivity of structure in the projection to that variable. It is
+particularly useful when used with a projection pursuit guided tour to
+simplify and understand the solution. The use of the manual tour is
+illustrated using a problem from particle physics.
 }
 
 
@@ -28,61 +31,62 @@ solution. The manual tour is applied to a problem from particle physics.
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Exploring multivariate spaces is a challenging task and increasingly so
-as dimensionality increases. Traditionally, static projections display
-an embedding of multivariate data in two dimensions. Such static views
-cannot provide depth cues or convey the information of other
-orientations. Alternatively, tours are a class of dynamic linear
-projections viewed as an animation while the orientation of the
-projection is rotated. Tours are a crucial tool extending the
-dimensionality of visualization which is increasingly important as
-datasets and models exist in increasing cardinality. The package
-\CRANpkg{tourr} (Wickham et al.
-\protect\hyperlink{ref-wickham_tourr_2011}{2011}) builds a platform for
-generating tour paths and applying to a wide number of display
-geometrics in \textbf{base} graphics.
+Exploring multivariate spaces is a challenging task, increasingly so as
+dimensionality increases. Traditionally, static low-dimensional
+projections are used to display multivariate data in two dimensions,
+such as principal component analysis, linear discriminant spaces or
+projection pursuit. These are useful for finding relationships between
+multiple variables, but they are limited because they show only a
+glimpse of the high-dimensional space. An alternative approach, is to
+use a tour of dynamic linear projections, to look at many different
+low-dimensional proections. Tours can be considered to extend the
+dimensionality of visualization, which is important as data and models
+exist in more than 3D. The package \CRANpkg{tourr} (Wickham et al.
+\protect\hyperlink{ref-wickham_tourr_2011}{2011}) provides a platform
+for generating tours. It has many types of tours available, and many
+types of displays possible. A user can make a grand, guided, little,
+local or frozen tour, and display the resulting projected data as a
+scatterplot, density plot, histogram, or even as Chernoff faces if the
+projection dimension is more than 3.
 
-While there are numerous methods that generate tour paths, this research
-focuses on the manual tour. The manual tour was described in Cook and
-Buja (\protect\hyperlink{ref-cook_manual_1997}{1997}) and allows a user
-to control the projection coefficients of a selected variable in a 2D
+This work adds a manual tour to the collection. The manual tour was
+described in Cook and Buja
+(\protect\hyperlink{ref-cook_manual_1997}{1997}) and allows a user to
+control the projection coefficients of a selected variable in a 2D
 projection. The manipulation of these coefficients allows the analyst to
 explore their sensitivity to the structure within the projection. As
-manual tours operate on only one variable at a time, they particularly
-useful once a feature of interest has been identified. One way to
-identify ``interesting'' features is with the use of a guided tour
-(Hurley and Buja \protect\hyperlink{ref-hurley_analyzing_1990}{1990}).
-Guided tours select a very specific path, that which approaches a
-projection that optimizes an objective-function, in a manner similar to
-simulated annealing (Kirkpatrick, Gelatt, and Vecchi
+manual tours operate on only one variable at a time, they are
+particularly useful once a feature of interest has been identified.
+
+One way to identify ``interesting'' features is with the use of a guided
+tour (Cook et al. \protect\hyperlink{ref-cook_grand_1995}{1995}). Guided
+tours select a very specific path, that which approaches a projection
+that optimizes an objective-function. The optimization is conducted in a
+manner similar to simulated annealing (Kirkpatrick, Gelatt, and Vecchi
 \protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
 optimization of a function allows guided tours to rapidly identify
 interesting projection features given the relatively large
 parameter-space. After a projection of interest is identified an analyst
 can then use the ``finer brush'' of the manual tour, by controlling the
 contributions of individual variables to explore the sensitivity they
-have on the structure within the projection.
+have on the structure visible in the projection.
 
-This paper offers an implementation of manual tours with the package
-\CRANpkg{spinifex}. This package also extends the graphics display of
-\textbf{tourr} to the animation frameworks offered by \CRANpkg{plotly}
-(Sievert \protect\hyperlink{ref-sievert_plotly_2018}{2018}) and
+The paper is organized as follows. Section \ref{sec:algorithm} describes
+the algorithm used to perform a radial manual tour as implemented in the
+package \CRANpkg{spinifex}. Section \ref{sec:display} explains how to
+generate an animation of the manual tour using the animation frameworks
+offered by \CRANpkg{plotly} (Sievert
+\protect\hyperlink{ref-sievert_plotly_2018}{2018}) and
 \CRANpkg{gganimate} (Pedersen and Robinson
-\protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}). The algorithm
-used to perform a radial manual tour is demonstrated on a toy data set.
-Followed by an application and discussion of the radial manual tour on
-an aggregation of high energy physics experiments in a large
-multivariate space.
-
-The paper is organized as follows. Section \ref{sec:algorithm} explains
-the algorithm using a toy dataset. Section \ref{sec:display} discusses
-the display of the animation after the path has been generated. Package
+\protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}). Package
 functionality and code usage following the order applied in the
 algorithm follows in section \ref{sec:usage}. Section
 \ref{sec:application} illustrates how this can be used for sensitivity
-analysis applied to contemporary high energy physics. Then section
-\ref{sec:summary} summarizes this paper. Lastly, section
-\ref{sec:discussion} discusses possible future research.
+analysis applied to multivariate data collected on high energy physics
+experiments (Wang et al.
+\protect\hyperlink{ref-wang_mapping_2018}{2018}). Section
+\ref{sec:discussion} summarizes this paper and discusses potential
+future directions.
 
 \hypertarget{sec:algorithm}{%
 \section{Algorithm}\label{sec:algorithm}}
@@ -626,8 +630,8 @@ and
 \end{figure}
 \end{Schunk}
 
-\hypertarget{sec:summary}{%
-\subsection{Summary}\label{sec:summary}}
+\hypertarget{sec:discussion}{%
+\subsection{Discussion}\label{sec:discussion}}
 
 Tours, which are a dynamic linear projection of multivariate data, play
 an important role in data visualization; they extend the dimensionality
@@ -648,9 +652,6 @@ structure with the selected variable. This information can be used by
 physicists to identify which experiments are probing which parameter
 spaces, which can be indispensable for smarter planning of effort and
 funding.
-
-\hypertarget{sec:discussion}{%
-\section{Discussion}\label{sec:discussion}}
 
 Future research on the algorithm would include extending it for use in
 3D projections. The addition of another dimension theoretically allows
@@ -738,6 +739,12 @@ High-Dimensional Data Projections.'' \emph{Journal of Computational and
 Graphical Statistics} 6 (4): 464--80.
 \url{https://doi.org/10.2307/1390747}.
 
+\leavevmode\hypertarget{ref-cook_grand_1995}{}%
+Cook, Dianne, Andreas Buja, Javier Cabrera, and Catherine Hurley. 1995.
+``Grand Tour and Projection Pursuit.'' \emph{Journal of Computational
+and Graphical Statistics} 4 (3): 155.
+\url{https://doi.org/10.2307/1390844}.
+
 \leavevmode\hypertarget{ref-cook_dynamical_2018}{}%
 Cook, Dianne, Ursula Laa, and German Valencia. 2018. ``Dynamical
 Projections for the Visualization of PDFSense Data.'' \emph{Eur. Phys.
@@ -748,11 +755,6 @@ Furnas, George W., and Andreas Buja. 1994. ``Prosection Views:
 Dimensional Inference Through Sections and Projections.'' \emph{Journal
 of Computational and Graphical Statistics} 3 (4): 323--53.
 \url{https://doi.org/10.2307/1390897}.
-
-\leavevmode\hypertarget{ref-hurley_analyzing_1990}{}%
-Hurley, C., and A. Buja. 1990. ``Analyzing High-Dimensional Data with
-Motion Graphics.'' \emph{SIAM Journal on Scientific and Statistical
-Computing} 11 (6): 1193--1211. \url{https://doi.org/10.1137/0911068}.
 
 \leavevmode\hypertarget{ref-kirkpatrick_optimization_1983}{}%
 Kirkpatrick, Scott, C. Daniel Gelatt, and Mario P. Vecchi. 1983.
