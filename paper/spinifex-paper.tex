@@ -1,28 +1,25 @@
 % !TeX root = RJwrapper.tex
-\title{spinifex: A Package for Manual Control of Dynamic Linear Projections of
-Multivariate Data}
+\title{spinifex: A Package for Creating an Animation of a Manually Controlled
+Tour of Linear Projections of Multivariate Data, to Explore the
+Sensitivity of Structure to Specific Variables}
 \author{by Nicholas Spyrison, Dianne Cook}
 
 \maketitle
 
 \abstract{%
-The set of dynamic linear projections of multivariate data collectively
-known as \textbf{tours} provides an important tool for extending the
-dimensionality of visuals. The R package \textbf{tourr} offers a variety
-of path generators and geometric displays for conducting tours. This
-paper discusses an extension package, \textbf{spinifex}, that adds
-support for the path generation of manual tours and extends the display
-of tours to use with the animation packages, \textbf{plotly} and
-\textbf{gganimate}. Manual tours are used to explore the sensitivity of
-structure as the contributions of a manipulation variable are changed. A
-recent paper (Wang et al.
-\protect\hyperlink{ref-wang_mapping_2018}{2018}) visualized the
-sensitivity of the hadronic experiments to nucleon structure.
-Sensitivity was characterized in non-linear 3D embeddings of the first
-10 principal components. This research applies manual tours to this data
-showing that manual tours resolve information about the structure of
-cluster distribution by bringing revealing information that is
-orthogonal to static viewing planes.
+Dynamic linear projections of multivariate data collectively known as
+\textbf{tours} provide an important tool for exploring mulitvariate data
+and models. The R package \textbf{tourr} provides functions for several
+types of tours: grand, guided, little, local and frozen. Each of these
+can be viewed dynamically, or saved into a data object for animation.
+This paper describes a new package, \textbf{spinifex}, to provide a
+manual tour, that allows the coefficient for a single variable to be
+varied, with the result displayed using animation, with the packages,
+\textbf{plotly} and \textbf{gganimate}. By varying the coefficient of a
+single variable, it is possible to explore the sensitivity of structure
+in the projection to that variable. It is particularly useful when used
+with a projection pursuit guided tour to simplify and understand the
+solution. The manual tour is applied to a problem from particle physics.
 }
 
 
@@ -828,5 +825,5 @@ Dianne Cook\\
 Monash University\\
 Department of Econometrics and Business Statistics\\
 }
-\href{mailto:DiCook@monash.edu}{\nolinkurl{DiCook@monash.edu}}
+\href{mailto:dicook@monash.edu}{\nolinkurl{dicook@monash.edu}}
 
