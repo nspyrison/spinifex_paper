@@ -98,22 +98,24 @@ if (load_funcs) # overwrites the spinifex functions: rotate_manip_space and manu
 #runif(1, max = 2 * pi)
 #my_t <- 1
 rad_theta <- atan(f_bas[f_mvar, 2]/f_bas[f_mvar, 1])
-my_p <- 2
 f_msp <- create_manip_space(basis = f_bas, manip_var = f_mvar)
 b <- rotate_manip_space(f_msp, theta = my_t, phi = my_p) #omega is Null)
-b0 <- rotate_manip_space(f_msp, theta = my_p, phi = my_p, omega = 0)
+b_a  <- rotate_manip_space(f_msp, theta = rad_theta, phi = rad_theta, omega = 0)
 # comparing 2 Euler angle rotaion with 3 angle.
 view_basis(b)
-view_basis(o0) # far cry from equal, values too small, orthonormality broken?
+view_basis(b_a) # far cry from equal, values too small, orthonormality broken?
 is_orthonormal(b) # neither are orthonormal
-is_orthonormal(o0)
+is_orthonormal(b_a)
 # changing omega; fixed theta, phi. manip_var = 4. rotating whole plane.
-o05 <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = .5)
-o1  <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = 1)
-o15 <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = 1.5)
-o2  <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = 2)
-o25 <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = 2.5)
-o3  <- rotate_manip_space(f_msp, theta = rad_theta, phi = my_p, omega = 3)
+my_t <- rad_theta
+my_p <- rad_theta
+o0  <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 0)
+o05 <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = .5)
+o1  <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 1)
+o15 <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 1.5)
+o2  <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 2)
+o25 <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 2.5)
+o3  <- rotate_manip_space(f_msp, theta = my_t, phi = my_p, omega = 3)
 view_basis(o0)
 view_basis(o05)
 view_basis(o1)
@@ -124,12 +126,13 @@ view_basis(o3)
 
 
 # Fix omega and theta, change phi. manip_var = 4
+my_t <- rad_theta
 my_o <- 0
-p1  <- rotate_manip_space(f_msp, theta = rad_theta, phi = 1, omega = my_o)
-p15 <- rotate_manip_space(f_msp, theta = rad_theta, phi = 1.5, omega = my_o)
-p2  <- rotate_manip_space(f_msp, theta = rad_theta, phi = 2, omega = my_o)
-p25 <- rotate_manip_space(f_msp, theta = rad_theta, phi = 2.5, omega = my_o)
-p3  <- rotate_manip_space(f_msp, theta = rad_theta, phi = 3, omega = my_o)
+p1  <- rotate_manip_space(f_msp, theta = my_t, phi = 1,   omega = my_o)
+p15 <- rotate_manip_space(f_msp, theta = my_t, phi = 1.5, omega = my_o)
+p2  <- rotate_manip_space(f_msp, theta = my_t, phi = 2,   omega = my_o)
+p25 <- rotate_manip_space(f_msp, theta = my_t, phi = 2.5, omega = my_o)
+p3  <- rotate_manip_space(f_msp, theta = my_t, phi = 3,   omega = my_o)
 view_basis(p1)
 view_basis(p15)
 view_basis(p2)
@@ -139,16 +142,17 @@ view_basis(p3)
 
 
 # Fix phi and omega, change theta. manip_var = 4
-my_o <- 0
-my_p <- 2
-t1  <- rotate_manip_space(f_msp, phi = my_p, theta = 1, omega = my_o)
+my_o <- rad_theta
+my_p <- rad_theta
+t1  <- rotate_manip_space(f_msp, phi = my_p, theta = 1,   omega = my_o)
 t15 <- rotate_manip_space(f_msp, phi = my_p, theta = 1.5, omega = my_o)
-t2  <- rotate_manip_space(f_msp, phi = my_p, theta = 2, omega = my_o)
+t2  <- rotate_manip_space(f_msp, phi = my_p, theta = 2,   omega = my_o)
 t25 <- rotate_manip_space(f_msp, phi = my_p, theta = 2.5, omega = my_o)
-t3  <- rotate_manip_space(f_msp, phi = my_p, theta = 3, omega = my_o)
+t3  <- rotate_manip_space(f_msp, phi = my_p, theta = 3,   omega = my_o)
 view_basis(t1)
 view_basis(t15)
 view_basis(t2)
 view_basis(t25)
 view_basis(t3)
 # swapping the order of phi and omega, to match order of the variables, not expecting any better.
+s
