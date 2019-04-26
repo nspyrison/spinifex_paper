@@ -523,12 +523,11 @@ play_tour_path(tour_path = f_path,
 The \textbf{tourr} package utilizes \textbf{base} graphics for the
 display of tours. \textbf{spinifex} allows tours to be rendered in
 \textbf{plotly} as an HTML5 object or \textbf{gganimate} as GIF or MP4
-files. Both of which build off \textbf{ggplot2} objects in internal
-functions. Sharing of animations is not trivial especially in print and
-static file formats such as PDF. Even with the use of computers and
-dynamic file formats capturing the correct resolution, aspect, and
-display is challenging and many formats quickly bloat file sizes. Keep
-in mind hosting options and exporting functions from \textbf{plotly},
+files. Sharing of animations is not trivial, especially static formats
+like print and PDF. Even with dynamic display capturing the correct
+resolution and aspect ratio can be challenging, while many formats
+quickly bloat file sizes limiting sharing options. Keep in mind hosting
+options and exporting functions offered in \textbf{plotly},
 \textbf{gganimate} and \textbf{tourr}.
 
 \hypertarget{storage}{%
@@ -569,7 +568,7 @@ change in the basis, or orientation to the subspace, tours are able to
 better resolve the distribution shape of clusters, intra-cluster detail,
 and better outlier detection than the use of PDFSense \& TFEP
 (TensorFlow embedded projections) or traditional static embeddings.
-Before applying manual tours let's discuss the structure of the data.
+Before applying manual tours the structure of the data is discussed.
 
 The data has a hierarchical structure with top-level clusters; DIS, VBP,
 and jet. Each cluster is a particular class of experiments, each with
@@ -592,20 +591,20 @@ two groups with a reasonable number of observations that occupy
 different parts of the subspace. Radial manual tours controlling
 contributions from PC4 and PC3 are shown in Figure
 \ref{fig:JetClusterGood} and Figure \ref{fig:JetClusterBad}
-respectively. These variables are selected to contrast the difference of
-information conveyed by touring different variables. Links to dynamic
-HTML5 animations controlling each of the four variables are also
-provided.
+respectively. These variables are selected to contrast the information
+conveyed by different manip variables. Links to dynamic HTML5 animations
+controlling each of the four variables are also provided.
 
 When manipulating PC4, there is a clear difference in the parameter
 space spanned by the experiment types ATLAS7new and ATLAS7old.
-Specifically, the variation of ATLAS7new becomes more singular. The
-experiments are probing different parameter space and PC4 is important
-to demonstrate this. Yet, when PC3 is manipulated there is no clear
-indication that the different experiments probe different parameter
-space. Performing a radial manual tour on PC4 is more insightful than
-for PC3. Radial manual tours manipulating each of the principal
-components in the jet cluster can be viewed by following the links:
+Specifically, the variation of ATLAS7new (green) becomes more singular.
+The experiments are probing different parameter space and PC4 is
+important to demonstrate this. Yet, when PC3 is manipulated there is no
+clear indication that the different experiments probe different
+parameter space. Performing a radial manual tour on PC4 is more
+insightful than for PC3. Radial manual tours manipulating each of the
+principal components in the jet cluster can be viewed by following the
+links:
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/}{PC1},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/}{PC2},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/}{PC3},
@@ -619,7 +618,7 @@ and
 
 }
 
-\caption[A radial manual tour of PC4 within the jet cluster]{A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. When PC4 fully/negligibly contributes to the projection ATLAS7new (green) spans the same space as the orange points. During the intermediate frames, the ATLAS7new is compressed in the direction radial to PC4. The differece in distribution shape demonstrates the experiments probe different phase-space, which has a linear mapping back to the original dimensions. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
+\caption[A radial manual tour of PC4 within the jet cluster]{A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. When PC4 fully/negligibly contributes to the projection ATLAS7new (green) spans the same space as the orange points. During the intermediate frames, the ATLAS7new is compressed in the direction radial to PC4. The differece in distribution shape demonstrates the experiments probe different phase-space, which has a linear mapping back to the original variables for interpretation and further exploration. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -651,13 +650,13 @@ of the different experiment classes. PC6 is particularly important to
 describe the variations of DIS HERA1+2 and charm SIDIS observations,
 Whereas manipulating the contributions of PC2 only shows a subset of the
 dimensionality and shape information. Manipulating the contributions of
-PC6 turned out to be much more insightful than that of PC2. This result
-might seem counter-intuitive at first as PC2 should explain much more of
-the variation in the data. However, features and structures in the data
-regularly reside in smaller dimensionality. The details finer resolution
-of these features can be lost when looking only at static projections.
-DIS cluster manual tours manipulating each of the principal components
-can be viewed from the links:
+PC6 turned out to be much more insightful than PC2. This result might
+seem counter-intuitive at first as PC2 should explain much more of the
+variation in the data. However, features and structures in the data
+regularly reside in smaller dimensionality which can be overlooked when
+optimizing on full sample statistics. DIS cluster manual tours
+manipulating each of the principal components can be viewed from the
+links:
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/}{PC1},
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/}{PC2},
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/}{PC3},
@@ -684,44 +683,45 @@ and
 
 }
 
-\caption[A radial manual tour manipulating the contribution of PC2 within the DIS cluster]{A radial manual tour manipulating the contribution of PC2 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The plane of cross distributed DIS HERA data (green) and a nearly orthogonal jet of dimuon SIDIS (purple) is present. This jet does extend more in the plane of view when the contribution of PC2 is full, giving insight to its orientation. However, less information about the shape of DIS HERA (green) and charm SIDIS (orange) is available. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
+\caption[A radial manual tour manipulating the contribution of PC2 within the DIS cluster]{A radial manual tour manipulating the contribution of PC2 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The plane of cross distributed DIS HERA data (green) and a nearly orthogonal jet of dimuon SIDIS (purple) is present. This jet does extend more in the plane of view when the contribution of PC2 is full, giving insight to its orientation. However, less information about the shape of DIS HERA (green) and charm SIDIS (orange) is available compared to PC6 as the manip var. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
 \end{figure}
 \end{Schunk}
 
 \hypertarget{sec:discussion}{%
 \subsection{Discussion}\label{sec:discussion}}
 
-Tours, which are a dynamic linear projection of multivariate data, play
-an important role in data visualization; they extend the dimensionality
-of visuals while data- and parameter-spaces become ever larger. This
-research has modified the algorithm producing manual tours which and has
-made this functionality available in package \textbf{spinifex}. The
-package adds to \textbf{tourr}, extending the graphics offerings that
-can be used to display tours.
+Tours, which are a dynamic linear projection of numeric multivariate
+data, play an important role in data visualization; they extend the
+dimensionality of visuals while data- and parameter-spaces become ever
+larger. This research has modified the algorithm producing manual tours
+which and has made this functionality available in package
+\textbf{spinifex}. The package adds to \textbf{tourr}, extending the
+graphics offerings that can be used to display tours.
 
 Radial manual tours were applied to a dataset across different
 experiments of hadronic collisions. The importance of selecting the
-correct variable to manipulate is demonstrated by comparing tours of
-varying quality. The manual tours convey a better picture of the
-structure of the clustering than static linear or non-linear
-projections. Giving the full contribution of the manipulation space to
-the manip var enables analysts to explore the sensitivity of the
-structure with the selected variable. This information can be used by
-physicists to identify which experiments are probing which parameter
-spaces, which can be indispensable for smarter planning of effort and
-funding.
+correct manip var, as demonstrated by comparing tours of varying amounts
+of structural information. Manual tours, by giving the full contribution
+of the manipulation space to the manip var, enable analysts to explore
+the sensitivity of the structure with the selected variable. This
+information can be used by domain experts to identify which variables
+are probing which parameter spaces and how sensitive those variables are
+to structural features. This insight can be indispensable for variable
+inclusion/exclusions in a model, or in high-level decisions, such as
+budgeting time and funding.
 
 Future research on the algorithm would include extending it for use in
 3D projections. The addition of another dimension theoretically allows
-for improved perception. This could explore interactions in immersive
+for improved perception. In some frameworks, such as the game engine
+\textbf{unity}, this would allow for the exploration in immersive
 virtual reality or mixed reality, which may further allow for a better
 perception of structure and aid in higher-dimensional function
 visualization. Functions with many parameters suffer from the same
 dimensionality problem as data while their possible values lie on a
-plane of values rather than discrete points. Occulation, or the closer
+surface of values rather than discrete points. Occulation, or the closer
 surface blocking further surfaces, will likely be an issue that may be
 alleviated by the use of wire mesh, changing opacity, or looking at
-sections of the projections (Furnas and Buja
+sections of the projections known as prosections (Furnas and Buja
 \protect\hyperlink{ref-furnas_prosection_1994}{1994}).
 
 The \textbf{tourr} package provides many other geometric displays with
@@ -732,19 +732,19 @@ be integrated into the \textbf{ggplot2} framework for display on
 (\protect\hyperlink{ref-xie_animation:_2018}{2018}) could be implemented
 for another graphics framework. However, \textbf{animation} builds from
 \textbf{base} graphics while \textbf{spinifex} utilizes \textbf{ggplot2}
-graphics, a significant paradigm shift.
+graphics, a significant paradigm shift, which may have a low return on
+investment.
 
 The Givens rotations and Householder reflections as outlined in Buja et
 al. (\protect\hyperlink{ref-buja_computational_2005}{2005}) could also
 be added. Currently, Gram-Schmidt is the only form of frame
-interpolation used (not used in manual tours). In a Givens rotation, the
-\(x\) and \(y\) components (for example \(\theta~= 0,~pi/2\)) of the
-in-plane rotation are calculated separately and would be applied
-sequentially to produce the radial rotation. Householder reflections
-define reflection axes to project points on to the axes and generate
-rotations.
+interpolation used. In a Givens rotation, the \(x\) and \(y\) components
+(for example \(\theta~= 0,~pi/2\)) of the in-plane rotation are
+calculated separately and would be applied sequentially to produce the
+radial rotation. Householder reflections define reflection axes to
+project points on to the axes to generate rotations.
 
-Having a script only interaction with tours causes a significant barrier
+Having script-only interaction with tours causes a significant barrier
 to entry. To a lesser extent, \textbf{plotly} offers some static
 interactions with the contained object, such as tooltips, brushing, and
 linking without communicating back to the R console. The development of
