@@ -8,7 +8,7 @@ Projections of Multivariate Data}
 \abstract{%
 Dynamic low-dimensional linear projections of multivariate data
 collectively known as \textbf{tours} provide an important tool for
-exploring mulitvariate data and models. The R package \textbf{tourr}
+exploring multivariate data and models. The R package \textbf{tourr}
 provides functions for several types of tours: grand, guided, little,
 local and frozen. Each of these can be viewed dynamically, or saved into
 a data object for animation. This paper describes a new package,
@@ -37,9 +37,9 @@ projections are used to display multivariate data in two dimensions,
 such as principal component analysis, linear discriminant spaces or
 projection pursuit. These are useful for finding relationships between
 multiple variables, but they are limited because they show only a
-glimpse of the high-dimensional space. An alternative approach, is to
-use a tour of dynamic linear projections, to look at many different
-low-dimensional proections. Tours can be considered to extend the
+glimpse of the high-dimensional space. An alternative approach is to use
+a tour of dynamic linear projections, to look at many different
+low-dimensional projections. Tours can be considered to extend the
 dimensionality of visualization, which is important as data and models
 exist in more than 3D. The package \CRANpkg{tourr} (Wickham et al.
 \protect\hyperlink{ref-wickham_tourr_2011}{2011}) provides a platform
@@ -60,8 +60,8 @@ particularly useful once a feature of interest has been identified.
 
 One way to identify ``interesting'' features is with the use of a guided
 tour (Cook et al. \protect\hyperlink{ref-cook_grand_1995}{1995}). Guided
-tours select a very specific path, that which approaches a projection
-that optimizes an objective-function. The optimization is conducted in a
+tours select a very specific path, which approaches a projection that
+optimizes an objective-function. The optimization is conducted in a
 manner similar to simulated annealing (Kirkpatrick, Gelatt, and Vecchi
 \protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
 optimization of a function allows guided tours to rapidly identify
@@ -161,7 +161,7 @@ is as follows:
   rotation, coming into the manipulation space.
 \end{itemize}
 
-The algorithm operates entirely on projection bases, and utilizes the
+The algorithm operates entirely on projection bases and utilizes the
 data only later when making a display.
 
 \hypertarget{step-0-set-up}{%
@@ -270,56 +270,72 @@ this diagram provides intuition for the technique.
 \subsection{Step 3) Generate rotation}\label{step-3-generate-rotation}}
 
 Imagine holding the manip var, the red axis in Figure \ref{fig:step2},
-at one end fixed to the origin and moving it like a lever. This is
+one end fixed to the origin and moving it like a lever. This is
 effectively the process of the radial manual to rotate the manip
-variable into and out of the 2D projection (Figure \ref{fig:step3}).
-
-As it is controlled the manipulation space rotates about the origin, the
-projection onto the horizontal projection plane correspondingly moves.
-This is what happens in a manual tour. Generating a sequence of values
-for the horizontal and vertical, angles produces a path for the rotation
-of the manipulation space. This defines the (orthonormally-constrained)
-rotation on the coefficients of the variables.
+variable into and out of the 2D projection (Figure \ref{fig:step3}). As
+the variable is controlled, the manipulation space rotates about the
+origin, the projection onto the horizontal projection plane
+correspondingly moves. This is what happens in a manual tour. Generating
+a sequence of values for the horizontal and vertical, angles produces a
+path for the rotation of the manipulation space. This defines the
+(orthonormally-constrained) rotation on the basis coefficients.
 
 For a radial tour fix the (horizontal) angle within the projection
 plane, \(\theta\), and define a sequence for the (vertical) angle coming
 out of the projection plane, \(\phi\), bringing the initial \(XY\)
 contributions of the manip var to a maximum and then to zero before
-returning to the initial position. For an oblique manual tour, capture
-the user manipulation directly on the \(XY\) of the projection plane.
+returning to the initial position. Alternatively, for an oblique manual
+tour, capture the user manipulation directly on the \(XY\) of the
+projection plane.
 
-Post-multiply the manipulation space by the pre-defined rotation matrix
-producing \textbf{RM}, the rotated manip space. This is one frame of
-basis values, repeat this process for each value in the sequences of
-\(\theta\) and \(\phi\) for the complete animation.
+Rotations are defined by the axes they pivot on, \(\theta\) then is the
+rotation around the \(Z\) axis. While \(\phi\) will be the rotation
+around, \(U\), a new axis on the \(XY\) plane, orthogonal to \(\phi\).
+Given these axes, the rotation matrix can be derived by the following.
 
 Let:
 
 \begin{itemize}
-  \item[$c_\theta$] be the cosine of $\theta_i$
+  \item[$c_\theta$] be the cosine of $\theta$
   \item[$c_\phi$]   be the cosine of $\phi_i$
-  \item[$s_\theta$] be the sine of   $\theta_i$
+  \item[$s_\theta$] be the sine of   $\theta$
   \item[$s_\phi$]   be the sine of   $\phi_i$
 \end{itemize}
 
-\textbf{For each value of } \(i\) \textbf{:}
+\begin{align*}
+  \textbf{B}_k &= (c_\theta, s_\theta, 0) \\
+  \vec{u} &= (s_\theta, -c_\theta, 0) \\ &=
+  \begin{bmatrix}
+     0 & 0 & -c_\theta \\
+     0 & 0 & -s_\theta \\
+     c_\theta & s_\theta & 0 \\
+   \end{bmatrix} \\
+  \text{Apply Rodrigues' rotation formula:} \\
+    \textbf{R}_{[3,~3]} 
+    &= \textbf{I}_3 + s_\phi\*\vec{u} + (1-c_\phi)\*\vec{u}^2 \\
+    &= 
+    \begin{bmatrix}
+      c_\theta^2 c_\phi + s_\theta^2 &
+      -c_\theta s_\theta (1 - c_\phi) &
+      -c_\theta s_\phi \\
+      -c_\theta s_\theta (1 - c_\phi) &
+      s_\theta^2 c_\phi + c_\theta^2 &
+      -s_\theta s_\phi \\
+      c_\theta s_\phi &
+      s_\theta s_\phi &
+      c_\phi
+    \end{bmatrix}
+\end{align*}
+
+Post-multiply the manipulation space by the pre-defined rotation matrix
+producing \textbf{RM}, the rotated manip space. This is one frame of
+basis values, repeat this process for each value in the sequence
+\(\phi_i\) for the complete animation.
+
+\textbf{For each value of } \(\phi_i\) \textbf{:}
 
 \begin{align*}
-  \textbf{RM}_{[p,~3,~i]}
-  &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} \\
-  &= \textbf{M}_{[p,~3]}
-    ~*~
-  \begin{bmatrix}
-    c_\theta^2 c_\phi s_\theta^2 &
-    -c_\theta s_\theta (1 - c_\phi) &
-    -c_\theta s_\phi \\
-    -c_\theta s_\theta (1 - c_\phi) &
-    s_\theta^2 c_\phi + c_\theta^2 &
-    -s_\theta s_\phi \\
-    c_\theta s_\phi &
-    s_\theta s_\phi &
-    c_\phi
-  \end{bmatrix}_{[3,~3,~i]}
+  \textbf{RM}_{[p,~3,~i]} &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} 
 \end{align*}
 
 A note on application: \(\phi\) is the angle relative to the initial
@@ -420,11 +436,11 @@ utility & render\_plotly & uses plotly to render the animation\\
 
 \end{Schunk}
 
-In the following section describes and demonstrates usage of the above
-functions following the order in the algorithm. The utility functions
-are called by the tour animation functions, passed to the arguments
-\texttt{render\_type}. Usage is demonstrated below and in the example
-documentation.
+In the following section describes and demonstrates the usage of the
+above functions following the order in the algorithm. The utility
+functions are called by the tour animation functions, passed to the
+arguments \texttt{render\_type}. Usage is demonstrated below and in the
+example documentation.
 
 \hypertarget{algorithm-code}{%
 \subsection{Algorithm code}\label{algorithm-code}}
@@ -737,7 +753,7 @@ a dynamic graphical user interface, perhaps with the use of a
 \protect\hyperlink{ref-chang_shiny:_2018}{2018}) application, would
 mitigate the barrier to entry, allow for more rapid analysis, and offer
 an approachable demo tool. The user could easily switch between
-variables to control, adjust interpolation step angle, or flag/save
+variables to control, adjust the interpolation step angle, or flag/save
 specific frame basis sets.
 
 \hypertarget{acknowledgments}{%
