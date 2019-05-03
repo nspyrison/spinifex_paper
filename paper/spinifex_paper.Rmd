@@ -37,9 +37,10 @@ knitr::opts_chunk$set(
 library(spinifex)
 library(ggplot2)
 library(gridExtra)
+library(magrittr)
 ```
 
-```{r localFunctions, include=FALSE}
+```{r paperFunctions, include=FALSE}
 ## FUNCTION FOR STATIC OUTPPUT, 
 # going to facets loses control of output size, simpler to just live with this.
 array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
@@ -251,6 +252,8 @@ Initialize the coordinate basis vector as a zero vector **e** of length *p*, and
 The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [-1, 1]. 3D rotation can be used to rotate the mani variable completely into or completely out of a 2D projection. Figure \ref{fig:step2} illustrates this 3D manipulation space with the manip var highlighted. This representation is produced by calling the `view_manip_space()` function. Functionally, the manipulation space is more of a mathematical construct that needn't be visualized but this diagram provides intuition for the technique.
 
 ```{r step2, echo=F, out.width='70%',                                           fig.cap = "Illustration of a 3D manipulation space, constructed to change the contribution of the variable aede2 in the example data. The red circle indicates a unit sphere. The 2D projection is represented by the blue circle, with the projection coefficients represented by grey lines and text. The manip var axis, in red, has length 1 touching the sphere, extends the projection to a third dimension. The shadow of this axis (blue) is its contribution in the original 2D projection."}
+mvar <- as.data.frame(f_msp[manip_var, ])
+mvar <- .6*data.frame(mvar, norm2 = sqrt(mvar$V1^2 + mvar$V2^2))
 
 view_manip_space(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
     theme(panel.border = element_rect(colour = "black", fill = NA))
@@ -309,7 +312,9 @@ Apply Rodrigues' rotation formula:
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
         &=
     \begin{bmatrix}
-      1&0&0 \\ 0&1&0 \\ 0&0&1 \\
+      1&0&0 \\ 
+      0&1&0 \\ 
+      0&0&1 \\
     \end{bmatrix} +
     \begin{bmatrix}
       0 & 0 & c_\theta s_\phi \\
