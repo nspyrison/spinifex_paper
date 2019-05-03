@@ -244,7 +244,7 @@ Imagine holding the manip var, the red axis in Figure \ref{fig:step2}, one end f
 For a radial tour fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle coming out of the projection plane, $\phi$, bringing the initial $XY$ contributions of the manip var to a maximum and then to zero before returning to the initial position. Alternatively, for an oblique manual tour, capture the user manipulation directly on the $XY$ of the projection plane.
 
 <!-- define the rotation matrix -->
-Rotations are defined by the axes they pivot on, $\theta$ then is the rotation around the $Z$ axis. While $\phi$ will be the rotation around, $U$, a new axis on the $XY$ plane, orthogonal to $\phi$. Given these axes, the rotation matrix can be derived by the following.
+Rotations are defined by the axes they pivot on, $\theta$ then is the rotation around the $Z$ axis. While $\phi$ will be the rotation around, $\textbf{U}$, a new axis on the $XY$ plane, orthogonal to $\phi$. Given these axes, the SO(3) rotation matrix can be derived by the following.
 
 Let:
 \begin{itemize}
@@ -252,19 +252,42 @@ Let:
   \item[$c_\phi$]   be the cosine of $\phi_i$
   \item[$s_\theta$] be the sine of   $\theta$
   \item[$s_\phi$]   be the sine of   $\phi_i$
+  \item[$\textbf{U}$] be the axis of rotation for $\phi$.
 \end{itemize}
 
 \begin{align*}
-  \textbf{B}_k &= (c_\theta, s_\theta, 0) \\
-  \vec{u} &= (s_\theta, -c_\theta, 0) \\ &=
+  \textbf{U} &= (u_x, u_y, u_z) =
+  (s_\theta, -c_\theta, 0) \\ 
+  &=
   \begin{bmatrix}
-     0 & 0 & -c_\theta \\
-     0 & 0 & -s_\theta \\
-     c_\theta & s_\theta & 0 \\
-   \end{bmatrix} \\
-  \text{Apply Rodrigues' rotation formula:} \\
+  0 & -u_z & u_y  \\
+  u_z & 0 & -u_x \\
+  -u_y & u_x & 0 \\
+  \end{bmatrix} =
+  \begin{bmatrix}
+    0 & 0 & -c_\theta \\
+    0 & 0 & -s_\theta \\
+    c_\theta & s_\theta & 0 \\
+  \end{bmatrix} \\
+  \end{align*}
+Apply Rodrigues' rotation formula:
+  \begin{align*}
     \textbf{R}_{[3,~3]} 
-    &= \textbf{I}_3 + s_\phi\*\vec{u} + (1-c_\phi)\*\vec{u}^2 \\
+    &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
+        &=
+    \begin{bmatrix}
+      1&0&0 \\ 0&1&0 \\ 0&0&1 \\
+    \end{bmatrix} +
+    \begin{bmatrix}
+      0 & 0 & c_\theta s_\phi \\
+      0 & 0 & s_\theta s_\phi \\
+      -c_\theta s_\phi & -s_\theta s_\phi & 0 \\
+    \end{bmatrix} +
+    \begin{bmatrix}
+      -c_\theta (1-c_\phi) & s^2_\theta (1-c_\phi) & 0 \\
+      -c_\theta s_\theta (1-c_\phi) & -s^2_\theta (1-c_\phi) & 0 \\
+      0 & 0 & c_\phi-1 \\
+    \end{bmatrix} \\
     &= 
     \begin{bmatrix}
       c_\theta^2 c_\phi + s_\theta^2 &
@@ -276,12 +299,12 @@ Let:
       c_\theta s_\phi &
       s_\theta s_\phi &
       c_\phi
-    \end{bmatrix}
+    \end{bmatrix} \\
 \end{align*}
-
+<!-- The term $(1-c_\phi)$ is used by convention, but $2sin^2(\phi/2)$ is more computationally robust. -->
 
 <!-- rotate manip space -->
-Post-multiply the manipulation space by the pre-defined rotation matrix producing **RM**, the rotated manip space. This is one frame of basis values, repeat this process for each value in the sequence $\phi_i$ for the complete animation.
+Defining the axis of rotation for $\phi$ and the application of Rogrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manipulation space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process for each value in the sequence $\phi_i$ for the complete animation.
 
 
 **For each value of ** $\phi_i$ **:**
