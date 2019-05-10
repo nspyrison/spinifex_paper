@@ -8,16 +8,16 @@ Projections of Multivariate Data}
 \abstract{%
 Dynamic low-dimensional linear projections of multivariate data
 collectively known as \textbf{tours} provide an important tool for
-exploring multivariate data and models. The R package \textbf{tourr}
+exploring multivariate data and models. The R package \pkg{tourr}
 provides functions for several types of tours: grand, guided, little,
 local and frozen. Each of these can be viewed dynamically, or saved into
 a data object for animation. This paper describes a new package,
-\textbf{spinifex}, to provide a manual tour, that allows the coefficient
+\pkg{spinifex}, to provide a manual tour, that allows the coefficient
 for a single variable to be controlled. The variable is rotated fully
 into the projection with a coefficient of 1 or -1, or completely out of
 the projection with a coefficient of 0. The resulting sequence of
 projections can be displayed using animation, with functions from either
-the \textbf{plotly} and \textbf{gganimate} packages. By varying the
+the \pkg{plotly} and \pkg{gganimate} packages. By varying the
 coefficient of a single variable, it is possible to explore the
 sensitivity of structure in the projection to that variable. It is
 particularly useful when used with a projection pursuit guided tour to
@@ -150,9 +150,13 @@ is as follows:
   dimensions. We will call this the ``original projection'' because it
   is the starting point for the manual tour.
 \item
+  \(k\), is the index of the variable to manipulate, called the ``manip
+  var''.
+\item
+  \(|\textbf{B}_k|\), the norm of the manip var, \(k\) 
+\item
   \(\textbf{e}\), a 1D coordinate basis vector of length \(p\) with the
-  \(k-\)th element set to one, where \(k\) is the index of the variable
-  to manipulate, called the ``manip var''.
+  \(k\)-th element set to one.
 \item
   \(\theta\), the angle of in-projection-plane rotation, for example, on
   the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
@@ -174,7 +178,7 @@ data only later when making a display.
 
 The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
-\textbf{tourr} is used to illustrate the algorithm. The data contains 74
+\pkg{tourr} is used to illustrate the algorithm. The data contains 74
 observations across 6 variables, which are physical measurements of the
 flea beetles. Each observation belongs to one of three species.
 
@@ -192,7 +196,7 @@ shows the data as projected through the basis set described by the
 reference axes (left). Data points are colored and given shape according
 to the species.
 
-Call \texttt{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
+Call \code{view\_basis()} on a basis to produce a \CRANpkg{ggplot2}
 (Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) graphic
 similar to Figure \ref{fig:step0}. The projected data is processed for
 display using matrix multiplication
@@ -213,28 +217,27 @@ display using matrix multiplication
 \subsubsection{Step 1) Choose manip
 variable}\label{step-1-choose-manip-variable}}
 
-In Figure \ref{fig:step0} the contribution of the variables
-\texttt{tars1} and \texttt{aede2} mostly contrast the contribution of
-the other four variables. These two variables combined contribute in the
-direction of the projection where the purple cluster is separated from
-the other two clusters. The variable \texttt{aede2} is selected as the
-manip var, the variable to be controlled in the tour. The question that
-will be explored is how important this variable is to the separation of
-the clusters.
+In Figure \ref{fig:step0} the contribution of the variables tars1 and
+aede2 mostly contrast the contribution of the other four variables.
+These two variables combined contribute in the direction of the
+projection where the purple cluster is separated from the other two
+clusters. The variable aede2 is selected as the manip var, the variable
+to be controlled in the tour. The question that will be explored is how
+important this variable is to the separation of the clusters.
 
 \hypertarget{step-2-create-the-3d-manip-space}{%
 \subsubsection{Step 2) Create the 3D manip
 space}\label{step-2-create-the-3d-manip-space}}
 
-Initialize the coordinate basis vector as a zero vector \textbf{e} of
-length \emph{p}, and set the \(k^{th}\) element to 1. In the example
-data, \texttt{aede2} is the fifth variable in the data, so \(k=5\). Use
+Initialize the coordinate basis vector as a zero vector \(\textbf{e}\)
+of length \(p\), and set the \(k\)-th element to 1. In the example data,
+aede2 is the fifth variable in the data, so \(k=5\), set \(e_5=1\) . Use
 a Gram-Schmidt process to orthonormalize the coordinate basis vector on
 the original 2D projection to describe a 3D manipulation space,
-\textbf{M}.
+\(\textbf{M}\).
 
 \begin{align*}
-  \textbf{e}_k &\leftarrow 1 \\ 
+  e_k &\leftarrow 1 \\ 
   \textbf{e}^*   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e}^*)
 \end{align*}
@@ -245,7 +248,7 @@ where the coefficient of the manip var can range completely between
 completely into or completely out of a 2D projection. Figure
 \ref{fig:step2} illustrates this 3D manipulation space with the manip
 var highlighted. This representation is produced by calling the
-\texttt{view\_manip\_space()} function. Functionally, the manipulation
+\code{view\_manip\_space()} function. Functionally, the manipulation
 space is more of a mathematical construct that needn't be visualized but
 this diagram provides intuition for the technique.
 
@@ -314,7 +317,9 @@ the following.
     0 & 0 & -s_\theta \\
     c_\theta & s_\theta & 0 \\
   \end{bmatrix} \\
-  \end{align*} Apply Rodrigues' rotation formula: \begin{align*}
+  \end{align*} Apply Rodrigues' rotation
+\href{mailto:formula\%7B@rodrigues_lois_1840}{\nolinkurl{formula\{@rodrigues\_lois\_1840}}\}:
+\begin{align*}
     \textbf{R}_{[3,~3]} 
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
         &=
@@ -353,8 +358,7 @@ group SO(3). Continue with the rotation of the manipulation space,
 post-multiply the space by the above rotation matrix producing
 \textbf{RM}, the rotated manip space. This is basis values, the linear
 combination of variables, for one frame of the animation, repeat this
-process for each value in the sequence \(\phi_i\) for the complete
-animation.
+process over a number of values of \(\phi\) to produce an animation.
 
 \textbf{For each value of } \(\phi_i\) \textbf{:}
 
@@ -372,8 +376,8 @@ fully into the projection, completely out, and then back to the start.
 This involves changing \(\phi\), the angle relative to its initial
 value.
 
-When \(\phi\) is XXX the manip var is completely in the projection, and
-when \(\phi\) is not contributing at all.
+When \(\phi\) is 0, the manip var is completely in the projection, and
+when \(\phi\) is \(\pi\), \(\textbf{X}_k\) is not contributing at all.
 
 \hypertarget{sequence-of-phi_i}{%
 \subsubsection{\texorpdfstring{Sequence of
@@ -388,12 +392,12 @@ when \(\phi\) is not contributing at all.
   Set an angle value (\(\Delta_\phi\)) that sets the step size to make
   in rotating the manip var into and out of the projection. (Note: Using
   angle value to control this is consistent with the tour algorithm, as
-  implemented in the \CRANpkg{tourr}. )
+  implemented in the \CRANpkg{tourr}).
 \item
   Step towards \(0\), where the manip var has a completely in the
   projection.
 \item
-  Step towards XXX where the manip variable has no contribution.
+  Step towards \(\pi/2\) where the manip variable has no contribution.
 \item
   Step back to \(\phi_1\).
 \end{enumerate}
@@ -419,7 +423,7 @@ of species. Tours are typically viewed as an animation. The animation of
 this tour can be viewed online at
 \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The
 page may take a moment to load. Animations can be produced using the
-function \texttt{play\_manual\_tour()}.
+function \code{play\_manual\_tour()}.
 
 \begin{Schunk}
 \begin{figure}
@@ -504,7 +508,7 @@ utility & render\_plotly & uses plotly to render the animation\\
 In the following section describes and demonstrates the usage of the
 above functions following the order in the algorithm. The utility
 functions are called by the tour animation functions, passed to the
-arguments \texttt{render\_type}. Usage is demonstrated below and in the
+argument \code{render\_type}. Usage is demonstrated below and in the
 example documentation.
 
 \hypertarget{algorithm-code}{%
@@ -514,7 +518,7 @@ We'll start by initializing values including a standardized data set
 (numeric columns only), a starting basis, a categorical variable for
 point aesthetics (optional), and a manip var. To get bearings on the
 projection, start by observing the reference axes of the basis with
-\texttt{view\_basis()} producing Figure \ref{fig:step0}.
+\code{view\_basis()} producing Figure \ref{fig:step0}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -530,11 +534,11 @@ view_basis(basis = f_basis,
 \end{Schunk}
 
 After becoming familiar with this space, select a manip var, the
-variable to change the contributions of. Use
-\texttt{view\_manip\_space()} to view the new space with a dimension
-orthogonal to the projection plane where the manip var has a full
-contribution. This illustrates how the manip var is manipulated with the
-addition of the manipulation space as shown in Figure \ref{fig:step2}.
+variable to change the contributions of. Use \code{view\_manip\_space()}
+to view the new space with a dimension orthogonal to the projection
+plane where the manip var has a full contribution. This illustrates how
+the manip var is manipulated with the addition of the manipulation space
+as shown in Figure \ref{fig:step2}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -547,9 +551,9 @@ view_manip_space(basis = f_basis,
 \end{Schunk}
 
 Now we are ready to perform a manual tour on the selected variable. Use
-\texttt{play\_manual\_tour()} to perform the algorithm as discussed
-above, in section \ref{sec:algorithm}. This is the animated equivalent
-of Figure \ref{fig:step3}.
+\code{play\_manual\_tour()} to perform the algorithm as discussed above,
+in section \ref{sec:algorithm}. This is the animated equivalent of
+Figure \ref{fig:step3}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -565,12 +569,11 @@ play_manual_tour(data = f_data,
 \end{Schunk}
 
 This concludes the content of the algorithm section, however, lets cover
-animating paths generated in \textbf{tourr}. Animate the previously
-generated guided tour path via \texttt{play\_tour\_path()}. Utility
+animating paths generated in \pkg{tourr}. Animate the previously
+generated guided tour path via \code{play\_tour\_path()}. Utility
 functions can also be passed as arguments into either of the tour
 animation function to change the resulting graphics object, set
-\texttt{render\_type\ =\ render\_gganimate} to view the animation as a
-GIF.
+\code{render\_type = render\_gganimate} to view the animation as a GIF.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -585,15 +588,14 @@ play_tour_path(tour_path = f_path,
 \hypertarget{rendering-and-sharing}{%
 \subsection{Rendering and sharing}\label{rendering-and-sharing}}
 
-The \textbf{tourr} package utilizes \textbf{base} graphics for the
-display of tours. \textbf{spinifex} allows tours to be rendered in
-\textbf{plotly} as an HTML5 object or \textbf{gganimate} as GIF or MP4
-files. Sharing of animations is not trivial, especially static formats
-like print and PDF. Even with dynamic display capturing the correct
-resolution and aspect ratio can be challenging, while many formats
-quickly bloat file sizes limiting sharing options. Keep in mind hosting
-options and exporting functions offered in \textbf{plotly},
-\textbf{gganimate} and \textbf{tourr}.
+The \pkg{tourr} package utilizes \pkg{base} graphics for the display of
+tours. \pkg{spinifex} allows tours to be rendered in \pkg{plotly} as an
+HTML5 object or \pkg{gganimate} as GIF or MP4 files. Sharing of
+animations is not trivial, especially static formats like print and PDF.
+Even with dynamic display capturing the correct resolution and aspect
+ratio can be challenging, while many formats quickly bloat file sizes
+limiting sharing options. Keep in mind hosting options and exporting
+functions offered in \pkg{plotly}, \pkg{gganimate} and \pkg{tourr}.
 
 \hypertarget{storage}{%
 \subsection{Storage}\label{storage}}
@@ -604,7 +606,7 @@ be stored as bases and a single instance of the data. Consider a radial
 manual tour, we can store the salient features in 3 bases, where
 \(\phi\) is at its starting, minimum, and maximum values. The frames in
 between can be interpolated by supplying angular speed. With the use of
-the \texttt{tourr::save\_history()} function, the target bases can be
+the \code{tourr::save\_history()} function, the target bases can be
 saved. From there geodesic interpolation can be used to populate the
 intermittent frames. This type of interpolation should not be used on
 manual tours, which have already been initialized into a 3D manipulation
@@ -760,8 +762,8 @@ data, play an important role in data visualization; they extend the
 dimensionality of visuals while data- and parameter-spaces become ever
 larger. This research has modified the algorithm producing manual tours
 which and has made this functionality available in package
-\textbf{spinifex}. The package adds to \textbf{tourr}, extending the
-graphics offerings that can be used to display tours.
+\pkg{spinifex}. The package adds to \pkg{tourr}, extending the graphics
+offerings that can be used to display tours.
 
 Radial manual tours were applied to a dataset across different
 experiments of hadronic collisions. The importance of selecting the
@@ -789,16 +791,15 @@ alleviated by the use of wire mesh, changing opacity, or looking at
 sections of the projections known as prosections (Furnas and Buja
 \protect\hyperlink{ref-furnas_prosection_1994}{1994}).
 
-The \textbf{tourr} package provides many other geometric displays with
-the \texttt{tourr::display\_*()} family. These geometric options could
-be integrated into the \textbf{ggplot2} framework for display on
-\textbf{plotly} and \textbf{gganimate}. Additionally, the
-\CRANpkg{animation} package Xie et al.
-(\protect\hyperlink{ref-xie_animation:_2018}{2018}) could be implemented
-for another graphics framework. However, \textbf{animation} builds from
-\textbf{base} graphics while \textbf{spinifex} utilizes \textbf{ggplot2}
-graphics, a significant paradigm shift, which may have a low return on
-investment.
+The \pkg{tourr} package provides many other geometric displays with the
+\code{tourr::display\_*()} family. These geometric options could be
+integrated into the \pkg{ggplot2} framework for display on \pkg{plotly}
+and \pkg{gganimate}. Additionally, the \CRANpkg{animation} package Xie
+et al. (\protect\hyperlink{ref-xie_animation:_2018}{2018}) could be
+implemented for another graphics framework. However, \pkg{animation}
+builds from \pkg{base} graphics while \pkg{spinifex} utilizes
+\pkg{ggplot2} graphics, a significant paradigm shift, which may have a
+low return on investment.
 
 The Givens rotations and Householder reflections as outlined in Buja et
 al. (\protect\hyperlink{ref-buja_computational_2005}{2005}) could also
@@ -810,7 +811,7 @@ radial rotation. Householder reflections define reflection axes to
 project points on to the axes to generate rotations.
 
 Having script-only interaction with tours causes a significant barrier
-to entry. To a lesser extent, \textbf{plotly} offers some static
+to entry. To a lesser extent, \pkg{plotly} offers some static
 interactions with the contained object, such as tooltips, brushing, and
 linking without communicating back to the R console. The development of
 a dynamic graphical user interface, perhaps with the use of a
@@ -831,7 +832,7 @@ and \CRANpkg{rmarkdown} (Xie, Allaire, and Grolemund
 \protect\hyperlink{ref-xie_r_2018}{2018}), with code generating the
 examples inline. The source files for this article be found at
 \href{https://github.com/nspyrison/spinifex_paper/}{github.com/nspyrison/spinifex\_paper/}.
-The source code for the \textbf{spinifex} package can be found at
+The source code for the \pkg{spinifex} package can be found at
 \href{https://github.com/nspyrison/spinifex/}{github.com/nspyrison/spinifex/}.
 
 \hypertarget{bibliography}{%
