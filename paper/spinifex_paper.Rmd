@@ -419,7 +419,7 @@ Rotations are defined by the axes they pivot on, $\theta$ then is the rotation a
     c_\theta & s_\theta & 0 \\
   \end{bmatrix} \\
   \end{align*}
-Apply Rodrigues' rotation formula:
+Apply Rodrigues' rotation formula{@rodrigues_lois_1840}:
   \begin{align*}
     \textbf{R}_{[3,~3]} 
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
@@ -591,7 +591,7 @@ play_manual_tour(data = f_data,
                  pch = f_cat)
 ```
 
-This concludes the content of the algorithm section, however, lets cover animating paths generated in **tourr**. Animate the previously generated guided tour path via `play_tour_path()`. Utility functions can also be passed as arguments into either of the tour animation function to change the resulting graphics object, set `render_type = render_gganimate` to view the animation as a GIF.
+This concludes the content of the algorithm section, however, lets cover animating paths generated in \pkg{tourr}. Animate the previously generated guided tour path via `play_tour_path()`. Utility functions can also be passed as arguments into either of the tour animation function to change the resulting graphics object, set `render_type = render_gganimate` to view the animation as a GIF.
 
 ```{r guidedTourCODEEXAMPLE, eval=F, echo=T}
 play_tour_path(tour_path = f_path,
