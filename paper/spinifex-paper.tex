@@ -154,18 +154,23 @@ is as follows:
   \(k-\)th element set to one, where \(k\) is the index of the variable
   to manipulate, called the ``manip var''.
 \item
-  \(\theta_i\), the sequence of angles of in-projection-plane rotation,
-  for example, on the reference axes.
+  \(\theta\), the angle of in-projection-plane rotation, for example, on
+  the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
 \item
-  \(\phi_i\), the sequence of angles of out-of-projection-plane
-  rotation, coming into the manipulation space.
+  \(\phi\), the angle of out-of-projection-plane rotation, into the
+  manipulation space; \(c_\phi, s_\phi\) are the cosine and sine.
+\item
+  \(\textbf{U}\) is the axis of rotation for \(\phi\).
 \end{itemize}
 
 The algorithm operates entirely on projection bases and utilizes the
 data only later when making a display.
 
+\hypertarget{steps}{%
+\subsection{Steps}\label{steps}}
+
 \hypertarget{step-0-set-up}{%
-\subsection{Step 0) Set up}\label{step-0-set-up}}
+\subsubsection{Step 0) Set up}\label{step-0-set-up}}
 
 The flea data, originally from Lubischew
 (\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
@@ -205,7 +210,7 @@ display using matrix multiplication
 \end{Schunk}
 
 \hypertarget{step-1-choose-manip-variable}{%
-\subsection{Step 1) Choose manip
+\subsubsection{Step 1) Choose manip
 variable}\label{step-1-choose-manip-variable}}
 
 In Figure \ref{fig:step0} the contribution of the variables
@@ -218,7 +223,7 @@ will be explored is how important this variable is to the separation of
 the clusters.
 
 \hypertarget{step-2-create-the-3d-manip-space}{%
-\subsection{Step 2) Create the 3D manip
+\subsubsection{Step 2) Create the 3D manip
 space}\label{step-2-create-the-3d-manip-space}}
 
 Initialize the coordinate basis vector as a zero vector \textbf{e} of
@@ -267,7 +272,8 @@ this diagram provides intuition for the technique.
 \end{Schunk}
 
 \hypertarget{step-3-generate-rotation}{%
-\subsection{Step 3) Generate rotation}\label{step-3-generate-rotation}}
+\subsubsection{Step 3) Generate
+rotation}\label{step-3-generate-rotation}}
 
 Imagine holding the manip var, the red axis in Figure \ref{fig:step2},
 one end fixed to the origin and moving it like a lever. This is
@@ -293,16 +299,6 @@ rotation around the \(Z\) axis. While \(\phi\) will be the rotation
 around, \(\textbf{U}\), a new axis on the \(XY\) plane, orthogonal to
 \(\phi\). Given these axes, the SO(3) rotation matrix can be derived by
 the following.
-
-Let:
-
-\begin{itemize}
-  \item[$c_\theta$] be the cosine of $\theta$
-  \item[$c_\phi$]   be the cosine of $\phi_i$
-  \item[$s_\theta$] be the sine of   $\theta$
-  \item[$s_\phi$]   be the sine of   $\phi_i$
-  \item[$\textbf{U}$] be the axis of rotation for $\phi$.
-\end{itemize}
 
 \begin{align*}
   \textbf{U} &= (u_x, u_y, u_z) =
@@ -366,12 +362,53 @@ animation.
   \textbf{RM}_{[p,~3,~i]} &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} 
 \end{align*}
 
-A note on application: \(\phi\) is the angle relative to the initial
-value of \(\phi\), we find the transformation \(\phi_i\) - \(\phi_1\)
-useful to think about \(\phi\) relative to the basis plane.
-Additionally, the value of \(\phi\) may be out of phase by a factor of
-pi. If the manip variable doesn't move as expected these are the first
-places to check.
+\hypertarget{creating-the-animation}{%
+\subsection{Creating the animation}\label{creating-the-animation}}
+
+The steps outlined above can be used to create any arbitrary rotation in
+the manip space. To use these for sensitivity analysis, the radial
+rotation is built into an animation where the manip variable is rotated
+fully into the projection, completely out, and then back to the start.
+This involves changing \(\phi\), the angle relative to its initial
+value.
+
+When \(\phi\) is XXX the manip var is completely in the projection, and
+when \(\phi\) is not contributing at all.
+
+\hypertarget{sequence-of-phi_i}{%
+\subsubsection{\texorpdfstring{Sequence of
+\(\phi_i\)}{Sequence of \textbackslash phi\_i}}\label{sequence-of-phi_i}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Set initial value to be \(\phi_1\).
+\item
+  Set an angle value (\(\Delta_\phi\)) that sets the step size to make
+  in rotating the manip var into and out of the projection. (Note: Using
+  angle value to control this is consistent with the tour algorithm, as
+  implemented in the \CRANpkg{tourr}. )
+\item
+  Step towards \(0\), where the manip var has a completely in the
+  projection.
+\item
+  Step towards XXX where the manip variable has no contribution.
+\item
+  Step back to \(\phi_1\).
+\end{enumerate}
+
+In each of steps 3-5, a small step may be made to bring it exactly to
+the end position.
+
+\hypertarget{checks-that-need-to-be-made}{%
+\subsubsection{Checks that need to be
+made}\label{checks-that-need-to-be-made}}
+
+find the transformation \(\phi_i\) - \(\phi_1\) useful to think about
+\(\phi\) relative to the basis plane. Additionally, the value of
+\(\phi\) may be out of phase by a factor of pi. If the manip variable
+doesn't move as expected these are the first places to check.
 
 Figure \ref{fig:step4} illustrates a sequence with 15 projected bases,
 showing the reference axes on the top half with the corresponding
@@ -396,7 +433,7 @@ function \texttt{play\_manual\_tour()}.
 \end{Schunk}
 
 \hypertarget{sec:display}{%
-\section{Data in projection-space}\label{sec:display}}
+\subsection{Data in projection-space}\label{sec:display}}
 
 In an appeal to performance, the operations of a tour are performed on
 the bases while the larger datasets are not operated on until the

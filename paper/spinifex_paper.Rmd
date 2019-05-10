@@ -316,14 +316,15 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\textbf{X}$, the data, an $n \times p$ numeric matrix to be projected to 2D.
 - $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $p$ to two dimensions. We will call this the "original projection" because it is the starting point for the manual tour.
 - $\textbf{e}$, a 1D coordinate basis vector of length $p$ with the $k-$th element set to one, where $k$ is the index of the variable to manipulate, called the "manip var".
-- $\theta_i$, the sequence of angles of in-projection-plane rotation, for example, on the reference axes.
-- $\phi_i$, the sequence of angles of out-of-projection-plane rotation, coming into the manipulation space.
+- $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
+- $\phi$, the angle of out-of-projection-plane rotation, into the manipulation space; $c_\phi, s_\phi$ are the cosine and sine.
+- $\textbf{U}$ is the axis of rotation for $\phi$.
 
 <!-- operate on bases -->
 The algorithm operates entirely on projection bases and utilizes the data only later when making a display. <!--The projection space can be viewed at any point in the process by pre-multiplying the data and plotting the first two variables.-->
 
-
-## Step 0) Set up
+## Steps
+### Step 0) Set up
 
 <!-- describe data. -->
 The flea data, originally from @lubischew_use_1962, made available in **tourr**  is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belongs to one of three species.
@@ -355,13 +356,13 @@ view_basis(f_bas, labels = colnames(f_dat)) +
 ```
 
 
-## Step 1) Choose manip variable
+### Step 1) Choose manip variable
 
 <!-- select a manip var-->
 In Figure \ref{fig:step0} the contribution of the variables `tars1` and `aede2` mostly contrast the contribution of the other four variables. These two variables combined contribute in the direction of the projection where the purple cluster is separated from the other two clusters. The variable `aede2` is selected as the manip var, the variable to be controlled in the tour. The question that will be explored is how important this variable is to the separation of the clusters.
 
 
-## Step 2) Create the 3D manip space
+### Step 2) Create the 3D manip space
 
 <!-- Zero Vect, manip sp -->
 Initialize the coordinate basis vector as a zero vector **e** of length *p*, and set the $k^{th}$ element to 1. In the example data, `aede2`  is the fifth variable in the data, so $k=5$. Use a Gram-Schmidt process to orthonormalize the coordinate basis vector on the original 2D projection to describe a 3D manipulation space, **M**.
@@ -392,7 +393,7 @@ p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle(
 grid.arrange(p1, p2, p3, p4, ncol=4)
 ```
 
-## Step 3) Generate rotation
+### Step 3) Generate rotation
 
 <!-- illustration of axis manip -->
 Imagine holding the manip var, the red axis in Figure \ref{fig:step2}, one end fixed to the origin and moving it like a lever. This is effectively the process of the radial manual to rotate the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable is controlled, the manipulation space rotates about the origin, the projection onto the horizontal projection plane correspondingly moves. This is what happens in a manual tour. Generating a sequence of values for the horizontal and vertical, angles produces a path for the rotation of the manipulation space. This defines the (orthonormally-constrained) rotation on the basis coefficients.
@@ -402,15 +403,6 @@ For a radial tour fix the (horizontal) angle within the projection plane, $\thet
 
 <!-- define the rotation matrix -->
 Rotations are defined by the axes they pivot on, $\theta$ then is the rotation around the $Z$ axis. While $\phi$ will be the rotation around, $\textbf{U}$, a new axis on the $XY$ plane, orthogonal to $\phi$. Given these axes, the SO(3) rotation matrix can be derived by the following.
-
-Let:
-\begin{itemize}
-  \item[$c_\theta$] be the cosine of $\theta$
-  \item[$c_\phi$]   be the cosine of $\phi_i$
-  \item[$s_\theta$] be the sine of   $\theta$
-  \item[$s_\phi$]   be the sine of   $\phi_i$
-  \item[$\textbf{U}$] be the axis of rotation for $\phi$.
-\end{itemize}
 
 \begin{align*}
   \textbf{U} &= (u_x, u_y, u_z) =
@@ -473,8 +465,26 @@ Defining the axis of rotation for $\phi$ and the application of Rogrigues' rotat
   \textbf{RM}_{[p,~3,~i]} &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]} 
 \end{align*}
 
-<!--  phi transform and application note -->
-A note on application: $\phi$ is the angle relative to the initial value of $\phi$, we find the transformation $\phi_i$ - $\phi_1$ useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of pi. If the manip variable doesn't move as expected these are the first places to check.
+## Creating the animation
+
+<!--  phi transform and animation -->
+The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip variable is rotated fully into the projection, completely out, and then back to the start. This involves changing $\phi$, the angle relative to its initial value. 
+
+When $\phi$ is XXX the manip var is completely in the projection, and when $\phi$ is not contributing at all. 
+
+### Sequence of $\phi_i$
+
+1. Set initial value to be $\phi_1$.
+2. Set an angle value ($\Delta_\phi$) that sets the step size to make in rotating the manip var into and out of the projection. (Note: Using angle value to control this is consistent with the tour algorithm, as implemented in the \CRANpkg{tourr}. )
+3. Step towards $0$, where the manip var has a completely in the projection.
+4. Step towards XXX where the manip variable has no contribution.
+5. Step back to $\phi_1$.
+
+In each of steps 3-5, a small step may be made to bring it exactly to the end position. 
+
+### Checks that need to be made
+
+find the transformation $\phi_i$ - $\phi_1$ useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of pi. If the manip variable doesn't move as expected these are the first places to check.
 
 <!-- description of slides, on the technical side we haven't gone back to data space yet. -->
 Figure \ref{fig:step4} illustrates a sequence with 15 projected bases, showing the reference axes on the top half with the corresponding projected data points below. Changes in the basis coefficients of the manip var correspond to the distance separating the purple cluster and the remaining sample, aede2 is crucial in distinguishing the variation of species. Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function `play_manual_tour()`.
@@ -486,7 +496,7 @@ array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 ```
 
 
-# Data in projection-space {#sec:display}
+## Data in projection-space {#sec:display}
 
 <!-- the reminder of basis operation and now apply data -->
 In an appeal to performance, the operations of a tour are performed on the bases while the larger datasets are not operated on until the display of data points are needed. After the bases are brought into the projection-space, however, it is helpful to observe them with projected data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
