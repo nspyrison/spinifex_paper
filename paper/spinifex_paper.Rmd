@@ -316,9 +316,8 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\textbf{X}$, the data, an $n \times p$ numeric matrix to be projected to 2D.
 - $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $p$ to two dimensions. We will call this the "original projection" because it is the starting point for the manual tour.
 - $k$, is the index of the variable to manipulate, called the "manip var".
-- $|\textbf{B}_k|$, the norm of the manip var, $k$
-<!-- - $\textbf{B}_k$, the manipulation variable (manip var), the variable whoes contribution will be controled. -->
-- $\textbf{e}$, a 1D coordinate basis vector of length $p$ with the $k$-th element set to one. 
+- $|\textbf{B}_k|$, the norm of the manip var, $k$, the length of this basis vector between 0 and 1 inclusive.
+- $\textbf{e}$, a 1D coordinate basis vector of length $p$ with the $k$-th element set to one and orthonormalized on the end of $\textbf{B}$. 
 - $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
 - $\phi$, the angle of out-of-projection-plane rotation, into the manipulation space; $c_\phi, s_\phi$ are the cosine and sine.
 - $\textbf{U}$ is the axis of rotation for $\phi$.
@@ -422,7 +421,7 @@ Rotations are defined by the axes they pivot on, $\theta$ then is the rotation a
     c_\theta & s_\theta & 0 \\
   \end{bmatrix} \\
   \end{align*}
-Apply Rodrigues' rotation formula{@rodrigues_lois_1840}:
+Apply Rodrigues' rotation formula [@rodrigues_lois_1840]:
   \begin{align*}
     \textbf{R}_{[3,~3]} 
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
@@ -458,7 +457,7 @@ Apply Rodrigues' rotation formula{@rodrigues_lois_1840}:
 <!-- The term $(1-c_\phi)$ is used by convention, but $2sin^2(\phi/2)$ is more computationally robust. -->
 
 <!-- rotate manip space -->
-Defining the axis of rotation for $\phi$ and the application of Rogrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manipulation space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process over a sequence of values for $\phi$ to produce an animation.
+Defining the axis of rotation for $\phi$ and the application of Rodrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manipulation space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process over a sequence of values for $\phi$ to produce an animation.
 
 
 <!-- **For each value of ** $\phi_i$ **:** -->
@@ -470,9 +469,7 @@ Defining the axis of rotation for $\phi$ and the application of Rogrigues' rotat
 ## Creating the animation
 
 <!--  phi transform and animation -->
-The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the start. This involves changing $\phi$, the angle relative to its initial value. 
-
-When $\phi$ is 0, the manip var is completely in the projection, and when $\phi$ is $\pi/2$, $\textbf{X}_k$ is not contributing at all. 
+The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the start. This involves changing $\phi$, the angle relative to its initial value. Apply the transformation $\phi_i \leftarrow \phi_i-\phi_1$. When $\phi$ is 0, the manip var is completely in the projection, and when $\phi$ is $\pi/2$, $\textbf{B}_k$ is not contributing at all. 
 
 ### Sequence of $\phi_i$
 
@@ -482,20 +479,19 @@ When $\phi$ is 0, the manip var is completely in the projection, and when $\phi$
 4. Step towards $\pi/2$ where the manip variable has no contribution.
 5. Step back to $\phi_1$.
 
-In each of steps 3-5, a small step may be made to bring it exactly to the end position. 
+In each of the steps 3-5, a small step may be made to bring it exactly to the end position. 
 
-### Checks that need to be made
+<!-- Animation on flea data -->
+Figure \ref{fig:step4} illustrates a sequence with 15 projected bases, showing the reference axes on the top half with the corresponding projected data points below. Changes in $\textbf{B}_k$ correspond to the distance separating the purple cluster and the remaining sample. This shows aede2 is crucial in distinguishing the variation of species. Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
-The value of $\phi$ is relative to its initial value. The transformation $\phi_i$ - $\phi_1$ is useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of pi. If the manip variable doesn't move as expected these are the first places to check.
-
-<!-- description of slides, on the technical side we haven't gone back to data space yet. -->
-Figure \ref{fig:step4} illustrates a sequence with 15 projected bases, showing the reference axes on the top half with the corresponding projected data points below. Changes in the basis coefficients of the manip var correspond to the distance separating the purple cluster and the remaining sample, aede2 is crucial in distinguishing the variation of species. Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
-
-<!-- step3 caption -->
 ```{r step4, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                                                fig.cap = "Radial manual tour manipulating aede2 of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. Manipulating the coefficeients of aede2 changes the distance separating the purple cluster. This shows that aede2 is important for distinguishing this species from the ramaining data. Animated versions made with the \\code{play\\_manual\\_tour()} function and can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
 #play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
 array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 ```
+
+### Checks that need to be made
+
+The value of $\phi$ is relative to its initial value. The transformation $\phi_i$ - $\phi_1$ is useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of $\pi$. If the manip variable doesn't move as expected these are the first places to check.
 
 
 ## Data in projection-space {#sec:display}
@@ -522,7 +518,7 @@ This section discusses the functions and code usage of the package before delvin
 install.package("spinifex")
 library("spinifex")
 
-# Also see the vignette: 
+# Also see the vignette for further code usage: 
 vignette("spinifex_vignette")
 ```
 

@@ -153,10 +153,12 @@ is as follows:
   \(k\), is the index of the variable to manipulate, called the ``manip
   var''.
 \item
-  \(|\textbf{B}_k|\), the norm of the manip var, \(k\) 
+  \(|\textbf{B}_k|\), the norm of the manip var, \(k\), the length of
+  this basis vector between 0 and 1 inclusive.
 \item
   \(\textbf{e}\), a 1D coordinate basis vector of length \(p\) with the
-  \(k\)-th element set to one.
+  \(k\)-th element set to one and orthonormalized on the end of
+  \(\textbf{B}\).
 \item
   \(\theta\), the angle of in-projection-plane rotation, for example, on
   the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
@@ -317,9 +319,8 @@ the following.
     0 & 0 & -s_\theta \\
     c_\theta & s_\theta & 0 \\
   \end{bmatrix} \\
-  \end{align*} Apply Rodrigues' rotation
-\href{mailto:formula\%7B@rodrigues_lois_1840}{\nolinkurl{formula\{@rodrigues\_lois\_1840}}\}:
-\begin{align*}
+  \end{align*} Apply Rodrigues' rotation formula (Rodrigues
+\protect\hyperlink{ref-rodrigues_lois_1840}{1840}): \begin{align*}
     \textbf{R}_{[3,~3]} 
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
         &=
@@ -353,7 +354,7 @@ the following.
 \end{align*}
 
 Defining the axis of rotation for \(\phi\) and the application of
-Rogrigues' rotation formula results in the rotation matrix, the rotation
+Rodrigues' rotation formula results in the rotation matrix, the rotation
 group SO(3). Continue with the rotation of the manipulation space,
 post-multiply the space by the above rotation matrix producing
 \textbf{RM}, the rotated manip space. This is basis values, the linear
@@ -368,9 +369,9 @@ the manip space. To use these for sensitivity analysis, the radial
 rotation is built into an animation where the manip var is rotated fully
 into the projection, completely out, and then back to the start. This
 involves changing \(\phi\), the angle relative to its initial value.
-
-When \(\phi\) is 0, the manip var is completely in the projection, and
-when \(\phi\) is \(\pi/2\), \(\textbf{X}_k\) is not contributing at all.
+Apply the transformation \(\phi_i \leftarrow \phi_i-\phi_1\). When
+\(\phi\) is 0, the manip var is completely in the projection, and when
+\(\phi\) is \(\pi/2\), \(\textbf{B}_k\) is not contributing at all.
 
 \hypertarget{sequence-of-phi_i}{%
 \subsubsection{\texorpdfstring{Sequence of
@@ -395,26 +396,16 @@ when \(\phi\) is \(\pi/2\), \(\textbf{X}_k\) is not contributing at all.
   Step back to \(\phi_1\).
 \end{enumerate}
 
-In each of steps 3-5, a small step may be made to bring it exactly to
-the end position.
-
-\hypertarget{checks-that-need-to-be-made}{%
-\subsubsection{Checks that need to be
-made}\label{checks-that-need-to-be-made}}
-
-The value of \(\phi\) is relative to its initial value. The
-transformation \(\phi_i\) - \(\phi_1\) is useful to think about \(\phi\)
-relative to the basis plane. Additionally, the value of \(\phi\) may be
-out of phase by a factor of pi. If the manip variable doesn't move as
-expected these are the first places to check.
+In each of the steps 3-5, a small step may be made to bring it exactly
+to the end position.
 
 Figure \ref{fig:step4} illustrates a sequence with 15 projected bases,
 showing the reference axes on the top half with the corresponding
-projected data points below. Changes in the basis coefficients of the
-manip var correspond to the distance separating the purple cluster and
-the remaining sample, aede2 is crucial in distinguishing the variation
-of species. Tours are typically viewed as an animation. The animation of
-this tour can be viewed online at
+projected data points below. Changes in \(\textbf{B}_k\) correspond to
+the distance separating the purple cluster and the remaining sample.
+This shows aede2 is crucial in distinguishing the variation of species.
+Tours are typically viewed as an animation. The animation of this tour
+can be viewed online at
 \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The
 page may take a moment to load. Animations can be produced using the
 function \code{play\_manual\_tour()}.
@@ -429,6 +420,16 @@ function \code{play\_manual\_tour()}.
 \caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data.  The contributions increase from its initial contribution to a full contribution to the projection before decreasing to zero and then returning to its initial value. Manipulating the coefficeients of aede2 changes the distance separating the purple cluster. This shows that aede2 is important for distinguishing this species from the ramaining data. Animated versions made with the \code{play\_manual\_tour()} function and can be viewed at https://nspyrison.netlify.com/thesis/flea\_manualtour\_mvar5/.}\label{fig:step4}
 \end{figure}
 \end{Schunk}
+
+\hypertarget{checks-that-need-to-be-made}{%
+\subsubsection{Checks that need to be
+made}\label{checks-that-need-to-be-made}}
+
+The value of \(\phi\) is relative to its initial value. The
+transformation \(\phi_i\) - \(\phi_1\) is useful to think about \(\phi\)
+relative to the basis plane. Additionally, the value of \(\phi\) may be
+out of phase by a factor of \(\pi\). If the manip variable doesn't move
+as expected these are the first places to check.
 
 \hypertarget{sec:display}{%
 \subsection{Data in projection-space}\label{sec:display}}
@@ -465,7 +466,7 @@ before delving into a domain-specific application of the manual tour.
 install.package("spinifex")
 library("spinifex")
 
-# Also see the vignette: 
+# Also see the vignette for further code usage: 
 vignette("spinifex_vignette")
 \end{Sinput}
 \end{Schunk}
@@ -893,6 +894,12 @@ Grammar of Animated Graphics}.
 R Core Team. 2018. \emph{R: A Language and Environment for Statistical
 Computing}. Vienna, Austria: R Foundation for Statistical Computing.
 \url{https://www.R-project.org/}.
+
+\leavevmode\hypertarget{ref-rodrigues_lois_1840}{}%
+Rodrigues, Olinde. 1840. \emph{Des Lois Géométriques Qui Régissent Les
+Déplacements d'un Système Solide Dans L'espace: Et de La Variation Des
+Cordonnées Provenant de Ces Déplacements Considérés Indépendamment Des
+Causes Qui Peuvent Les Produire}.
 
 \leavevmode\hypertarget{ref-sievert_plotly_2018}{}%
 Sievert, Carson. 2018. \emph{Plotly for R}.
