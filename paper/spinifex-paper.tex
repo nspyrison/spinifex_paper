@@ -293,24 +293,22 @@ technique.
 \subsubsection{Step 3) Generate
 rotation}\label{step-3-generate-rotation}}
 
-Imagine holding the manip var, the red axis in Figure \ref{fig:step2},
-one end fixed to the origin and moving it like a lever. This is
-effectively the process of the radial manual to rotate the manip
-variable into and out of the 2D projection (Figure \ref{fig:step3}). As
-the variable is controlled, the manipulation space rotates about the
-origin, the projection onto the horizontal projection plane
-correspondingly moves. This is what happens in a manual tour. Generating
-a sequence of values for the horizontal and vertical, angles produces a
-path for the rotation of the manipulation space. This defines the
-(orthonormally-constrained) rotation on the basis coefficients.
+Imagine moving the axis of manip var, the red line in Figure
+\ref{fig:step2}, like a lever. This is effectively the process of the
+radial manual control, that rotates the manip variable into and out of
+the 2D projection (Figure \ref{fig:step3}). As the variable is
+controlled, the manipulation space rotates, and the projection onto the
+horizontal projection plane correspondingly changes. This is a manual
+tour. Generating a sequence of values for the horizontal and vertical
+angles produces a path for the rotation of the manipulation space. This
+defines the (orthonormally-constrained) rotation on the basis
+coefficients.
 
-For a radial tour fix the (horizontal) angle within the projection
-plane, \(\theta\), and define a sequence for the (vertical) angle coming
-out of the projection plane, \(\phi\), bringing the initial value of
-\(|\textbf{B}_k|\) to a maximum and then to zero before returning to the
-initial position. Alternatively, for an \emph{oblique} manual tour,
-capture the user manipulation directly on the \(XY\) of the projection
-plane.
+For a radial tour, fix the (horizontal) angle within the projection
+plane, \(\theta\), and define a sequence for the (vertical) angle,
+\(\phi\), defining movement out of the plane, that changes the initial
+value of \(|\textbf{B}_k|\) to a maximum of 1, and then to 0, before
+returning to the initial value.
 
 Rotations are defined by the axes they pivot on, \(\theta\) then is the
 rotation around the \(Z\) axis. While \(\phi\) will be the rotation
