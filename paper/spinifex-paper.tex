@@ -167,7 +167,8 @@ is as follows:
   the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
 \item
   \(\phi\), the angle of out-of-projection-plane rotation, into the
-  manipulation space; \(c_\phi, s_\phi\) are the cosine and sine.
+  manipulation space; \(c_\phi, s_\phi\) are the cosine and sine. The
+  initial value for animation purposes is \(\phi_1\).
 \item
   \(\textbf{U}\), the axis of rotation for \(\phi\).
 \item
@@ -180,6 +181,10 @@ is as follows:
   \(\textbf{P} = \textbf{X} * \textbf{RM}\), the data projection, the
   data as projected through the rotated manipulation space.
 \end{itemize}
+
+XXX Clean up the notation, not all of this is needed or useful. The
+shadow of \(e\) in the projection may need some notation. The projected
+data should be \(Y\) not \(P\).
 
 The algorithm operates entirely on projection bases and utilizes the
 data only later when making a display.
@@ -289,32 +294,32 @@ technique.
 \end{figure}
 \end{Schunk}
 
-\hypertarget{step-3-generate-rotation}{%
-\subsubsection{Step 3) Generate
-rotation}\label{step-3-generate-rotation}}
+\hypertarget{step-3-defining-a-3d-rotation}{%
+\subsubsection{Step 3) Defining a 3D
+rotation}\label{step-3-defining-a-3d-rotation}}
 
-Imagine moving the axis of manip var, the red line in Figure
-\ref{fig:step2}, like a lever. This is effectively the process of the
-radial manual control, that rotates the manip variable into and out of
-the 2D projection (Figure \ref{fig:step3}). As the variable is
-controlled, the manipulation space rotates, and the projection onto the
-horizontal projection plane correspondingly changes. This is a manual
-tour. Generating a sequence of values for the horizontal and vertical
-angles produces a path for the rotation of the manipulation space. This
-defines the (orthonormally-constrained) rotation on the basis
-coefficients.
+The basis vector corresponding to the manip var (red line in Figure
+\ref{fig:step2}), can be operated like a lever. This is the process of
+the manual control, that rotates the manip variable into and out of the
+2D projection (Figure \ref{fig:step3}). As the variable is controlled,
+the manipulation space rotates, and the projection onto the horizontal
+projection plane correspondingly changes. This is a manual tour.
+Generating a sequence of values for the horizontal and vertical angles
+produces a path for the rotation of the manipulation space. This defines
+the (orthonormally-constrained) rotation on the basis coefficients.
 
 For a radial tour, fix the (horizontal) angle within the projection
 plane, \(\theta\), and define a sequence for the (vertical) angle,
 \(\phi\), defining movement out of the plane, that changes the initial
-value of \(|\textbf{B}_k|\) to a maximum of 1, and then to 0, before
-returning to the initial value.
+value of \(\phi_1\), the angle between \(\textbf{e}\) and its shadow in
+\(\textbf{B}\), to a maximum of 1, and then to 0, before returning to
+\(\phi_1\).
 
-Rotations are defined by the axes they pivot on, \(\theta\) then is the
-rotation around the \(Z\) axis. While \(\phi\) will be the rotation
-around, \(\textbf{U}\), a new axis on the \(XY\) plane, orthogonal to
-\(\phi\). Given these axes, the SO(3) rotation matrix can be derived by
-the following.
+Rotations in 3D can be defined by the axes they pivot on. \(\theta\)
+describes the rotation around the \(Z\) axis. While \(\phi\) is the
+rotation around \(\textbf{U}\), an axis on the \(XY\) plane, orthogonal
+to \(\textbf{e}\). Given these axes, the SO(3) rotation matrix can be
+derived as follows:
 
 \begin{align*}
   \textbf{U} &= (u_x, u_y, u_z) =
@@ -372,18 +377,15 @@ post-multiply the space by the above rotation matrix producing
 combination of variables, for one frame of the animation, repeat this
 process over a sequence of values for \(\phi\) to produce an animation.
 
-\hypertarget{creating-the-animation}{%
-\subsection{Creating the animation}\label{creating-the-animation}}
+\hypertarget{creating-the-animation-of-the-radial-rotation}{%
+\subsection{Creating the animation of the radial
+rotation}\label{creating-the-animation-of-the-radial-rotation}}
 
 The steps outlined above can be used to create any arbitrary rotation in
 the manip space. To use these for sensitivity analysis, the radial
 rotation is built into an animation where the manip var is rotated fully
 into the projection, completely out, and then back to the initial value.
-This involves changing \(\phi\), the angle relative to its initial
-value. Apply the transformation \(\phi_i \leftarrow \phi_i-\phi_1\) such
-that \(\phi\) is relative to the projection plane. When \(\phi\) is 0,
-\(|\textbf{B}_k| = 1\), and when \(\phi\) is \(\pi/2\), the manip var
-has no contribution to the projection.
+This involves allowing \(\phi\), to vary between 0 and 1.
 
 \hypertarget{sequence-of-phi_i}{%
 \subsubsection{\texorpdfstring{Sequence of
@@ -393,12 +395,18 @@ has no contribution to the projection.
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Set initial value to be \(\phi_1\).
+  Set initial value of \(\phi_1\) and \(\theta\):
+  \(\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}\),
+  \(\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}\). \(\phi_1\) is the angle
+  between \(\textbf{e}\) and its shadow in \(\textbf{B}\). Check that
+  \(\phi_1\) is between 0 and \(\pi/2\), and if not, transform it into
+  this range, by subtracting or adding \(\pi\) XXX.
 \item
-  Set an angle value (\(\Delta_\phi\)) that sets the step size to make
-  in rotating the manip var into and out of the projection. (Note: Using
-  angle value to control this is consistent with the tour algorithm, as
-  implemented in the \pkg{tourr}).
+  Set an angle increment (\(\Delta_\phi\)) that sets the step size to
+  make, to rotate the manip var into and out of the projection. (Note:
+  Using angle increment, rather than a number of steps, to control the
+  movement, is consistent with the tour algorithm as implemented in the
+  \pkg{tourr}).
 \item
   Step towards \(0\), where the manip var has a completely in the
   projection.
@@ -432,16 +440,6 @@ function \code{play\_manual\_tour()}.
 \caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data. The contributions increase from its initial vlaue to a full contribution to the projection before decreasing to zero and then returning to the initial value. Manipulating the coefficeients of aede2 changes the distance separating the purple cluster. This shows that aede2 is important for distinguishing this species from the ramaining data. Animated versions made with the \code{play\_manual\_tour()} function and can be viewed at https://nspyrison.netlify.com/thesis/flea\_manualtour\_mvar5/.}\label{fig:step4}
 \end{figure}
 \end{Schunk}
-
-\hypertarget{checks-that-need-to-be-made}{%
-\subsubsection{Checks that need to be
-made}\label{checks-that-need-to-be-made}}
-
-The value of \(\phi\) is relative to its initial value. The
-transformation \(\phi_i\) - \(\phi_1\) is useful to think about \(\phi\)
-relative to the basis plane. Additionally, the value of \(\phi\) may be
-out of phase by a factor of \(\pi\). If the rotation does not behave as
-expected these are the first places to check.
 
 \hypertarget{sec:display}{%
 \subsection{Projecting the data}\label{sec:display}}
