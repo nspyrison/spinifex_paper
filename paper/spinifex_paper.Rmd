@@ -383,52 +383,25 @@ Initialize the coordinate basis vector as a zero vector $\textbf{e}$ of length $
 \end{align*}
 
 <!-- What the manip space provides -->
-The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [0, 1]. 3D rotation can be used to rotate the manip variable completely into or completely out of a 2D projection. Figure \ref{fig:step2} illustrates this 3D manip space with the manip var highlighted. This representation is produced by calling the \code{view\_manip\_space()} function. Functionally, the manip space adds another layer of complexity that needn't be displayed in the final animation, but this diagram aids in comprehension of the technique.
+The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [0, 1]. 3D rotation can be used to rotate the manip variable completely into or completely out of a 2D projection. Figure \ref{fig:step2} illustrates this 3D manip space with the manip var highlighted. This representation is produced by calling the \code{view\_manip\_space()} function. This diagram is purely used to help explain the algorithm.
 
 ```{r step2, echo=F, out.width='70%',                                           fig.cap = "Illustration of a 3D manip space, constructed to change the contribution of the variable aede2 in the example data. The red circle indicates a unit sphere. The 2D projection is represented by the blue circle, with the projection coefficients represented by grey lines and text. The manip var axis, in red, has length 1 touching the sphere, extends the projection to a third dimension. The shadow of this axis (blue) is its contribution in the original 2D projection. Illustrated with the \\code{view\\_manip\\_space()} function."}
 view_manip_space2(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
     theme(panel.border = element_rect(colour = "black", fill = NA))
 ```
 
-```{r step3, echo=F, warning=F, fig.height=2, fig.width=8, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
-f_angle <- .26
-f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
-if(dim(f_mtour)[3] != 15) message(
-  paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
-p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1")
-p2 <- view_basis2(f_mtour[,,6],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2")
-p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3")
-p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle("4")
-grid.arrange(p1, p2, p3, p4, ncol=4)
-```
 
 ### Step 3) Defining a 3D rotation
 
 <!-- illustration of axis manip -->
-The basis vector corresponding to the manip var (red line in Figure \ref{fig:step2}), can be operated like a lever. This is the process of the manual control, that rotates the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable is controlled, the manip space rotates, and the projection onto the horizontal projection plane correspondingly changes. This is a manual tour. Generating a sequence of values for the horizontal and vertical angles produces a path for the rotation of the manip space. This defines the (orthonormally-constrained) rotation on the basis coefficients.
+The basis vector corresponding to the manip var (red line in Figure \ref{fig:step2}), can be operated like a lever. This is the process of the manual control, that rotates the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable contribution is controlled, the manip space rotates, and the projection onto the horizontal projection plane correspondingly changes. This is a manual tour. Generating a sequence of values for the rotation angles produces a path for the rotation of the manip space. <!--This defines the (orthonormally-constrained) rotation on the basis coefficients.-->
 
 <!-- describe manip var path -->
-For a radial tour, fix the (horizontal) angle within the projection plane, $\theta$, and define a sequence for the (vertical) angle, $\phi$, defining movement out of the plane, that changes the initial value of $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of 1, and then to 0, before returning to $\phi_1$. 
+For a radial tour, fix $\theta$, the angle describing rotation within the projection plane, and compute a sequence for $\phi$, defining movement out of the plane. This will change the initial value, $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of $0$ (manip var fully in projection), then to a minimum of $\pi/2$ (manip var out of projection), before returning to $\phi_1$. 
 
 <!-- define the rotation matrix -->
-Rotations in 3D can be defined by the axes they pivot on. $\theta$ describes the rotation around the $Z$ axis. While $\phi$ is the rotation around $\textbf{U}$, an axis on the $XY$ plane, orthogonal to $\textbf{e}$. Given these axes, the SO(3) rotation matrix can be derived as follows:
+Rotations in 3D can be defined by the axes they pivot on. Rotation within the projection, $\theta$, is rotation around the $Z$ axis. Out-of-projection rotation, $\phi$, is the rotation around an axis on the $XY$ plane, $\textbf{U}$, orthogonal to $\textbf{e}$. Given these axes, the rotation matrix, $\textbf{R}$ can be written as follows, using Rodrigues' rotation formula (originally pubished in @rodrigues_lois_1840):
 
-\begin{align*}
-  \textbf{U} &= (u_x, u_y, u_z) =
-  (s_\theta, -c_\theta, 0) \\ 
-  &=
-  \begin{bmatrix}
-  0 & -u_z & u_y  \\
-  u_z & 0 & -u_x \\
-  -u_y & u_x & 0 \\
-  \end{bmatrix} =
-  \begin{bmatrix}
-    0 & 0 & -c_\theta \\
-    0 & 0 & -s_\theta \\
-    c_\theta & s_\theta & 0 \\
-  \end{bmatrix} \\
-  \end{align*}
-Apply Rodrigues' rotation formula [@rodrigues_lois_1840]:
   \begin{align*}
     \textbf{R}_{[3,~3]} 
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
@@ -461,11 +434,30 @@ Apply Rodrigues' rotation formula [@rodrigues_lois_1840]:
       c_\phi
     \end{bmatrix} \\
 \end{align*}
+
+\noindent where
+
+\begin{align*}
+  \textbf{U} &= (u_x, u_y, u_z) =
+  (s_\theta, -c_\theta, 0) \\ 
+  &=
+  \begin{bmatrix}
+  0 & -u_z & u_y  \\
+  u_z & 0 & -u_x \\
+  -u_y & u_x & 0 \\
+  \end{bmatrix} =
+  \begin{bmatrix}
+    0 & 0 & -c_\theta \\
+    0 & 0 & -s_\theta \\
+    c_\theta & s_\theta & 0 \\
+  \end{bmatrix} \\
+  \end{align*}
+  
 <!-- The term $(1-c_\phi)$ is used by convention, but $2sin^2(\phi/2)$ is more computationally robust. -->
 
 <!-- rotate manip space -->
-Defining the axis of rotation for $\phi$ and the application of Rodrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manip space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process over a sequence of values for $\phi$ to produce an animation.
-
+<!--Defining the axis of rotation for $\phi$ and the application of Rodrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manip space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process over a sequence of values for $\phi$ to produce an animation.
+-->
 
 <!-- **For each value of ** $\phi_i$ **:** -->
 
@@ -473,27 +465,54 @@ Defining the axis of rotation for $\phi$ and the application of Rodrigues' rotat
 <!--   \textbf{RM}_{[p,~3,~i]} &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]}  -->
 <!-- \end{align*} -->
 
-## Creating the animation of the radial rotation
+### Step 4) Creating an animation of the radial rotation
 
 <!--  phi transform and animation -->
-The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$, to vary between 0 and 1. 
+The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$, to vary between 0 and $\pi/2$, call the steps $\phi_i$. 
 
 <!--Apply the transformation $\phi_i \leftarrow \phi_i-\phi_1$ such that $\phi$ is relative to the projection plane. When $\phi$ is 0, $|\textbf{B}_k| = 1$, and when $\phi$ is $\pi/2$, the manip var has no contribution to the projection.--> 
 
-### Sequence of $\phi_i$
 
-1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow in $\textbf{B}$. Check that  $\phi_1$ is between 0 and $\pi/2$, and if not,  transform it into this range, by subtracting or adding $\pi$ XXX. 
-2. Set an angle increment ($\Delta_\phi$) that sets the step size to make, to rotate the manip var into and out of the projection. (Note: Using angle increment, rather than a number of steps, to control the movement, is consistent with the tour algorithm as implemented in the \pkg{tourr}).
-3. Step towards $0$, where the manip var has a completely in the projection.
-4. Step towards $\pi/2$ where the manip variable has no contribution.
+```{r step3, echo=F, warning=F, fig.height=2, fig.width=8, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
+f_angle <- .26
+f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
+if(dim(f_mtour)[3] != 15) message(
+  paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
+p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1 phi=0.78")
+p2 <- view_basis2(f_mtour[,,6],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=1.57")
+p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=0")
+p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle("4 phi=0.78")
+grid.arrange(p1, p2, p3, p4, ncol=4)
+```
+
+<!--### Sequence of $\phi_i$-->
+
+1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow in $\textbf{B}$. Check that  $\phi_1$ is between 0 and $\pi/2$, and if not, transform it into this range, by subtracting or adding $\pi$. (XXX Nick needs to check this math, and the ways to check and fix if angle produced by the calculation given fall in the right range.)
+2. Set an angle increment ($\Delta_\phi$) that sets the step size for the animation, to rotate the manip var into and out of the projection. (Note: Using angle increment, rather than a number of steps, to control the movement, is consistent with the tour algorithm as implemented in the \pkg{tourr}).
+3. Step towards $0$, where the manip var is a completely in the projection.
+4. Step towards $\pi/2$, where the manip variable has no contribution.
 5. Step back to $\phi_1$.
 
-In each of the steps 3-5, a small step may be appended to bring $\phi$ exactly to the desired value. 
+In each of the steps 3-5, a small step may be added to ensure that the end points of $\phi$ (0, $\pi/2$) are reached. 
+
+### Step 4) Projecting the data {#sec:display}
+
+<!-- the reminder of basis operation and now apply data -->
+The operation of a manual tour is defined on the projection bases. Only when the data plot needs to be made is the data projected into the relevant basis. 
+
+\begin{align*}
+  \textbf{Y}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
+\end{align*}
+
+<!-- plot 2 var in seq for animation -->
+Plot the first two columns of \textbf{Y} to make the data plot. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
 
 <!-- Animation on flea data -->
-Figure \ref{fig:step4} illustrates a sequence with 15 projected bases, showing the reference axes on the top half with the corresponding projected data points below. Changes in $\textbf{B}_k$ correspond to the distance separating the purple cluster and the remaining sample. This shows aede2 is crucial in distinguishing the variation of species. Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
+Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which correspond to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
 
-```{r step4, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                                                fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The contributions increase from its initial vlaue to a full contribution to the projection before decreasing to zero and then returning to the initial value. Manipulating the coefficeients of aede2 changes the distance separating the purple cluster. This shows that aede2 is important for distinguishing this species from the ramaining data. Animated versions made with the \\code{play\\_manual\\_tour()} function and can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
+Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
+
+```{r step4, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                                                fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This affects the separatiion between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
 #play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
 array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 ```
@@ -506,17 +525,6 @@ The initial value of $\phi$ is determined by the angle between $\textbf{e}$ and 
 relative to its initial value. The transformation $\phi_i$ - $\phi_1$ is useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of $\pi$. If the rotation does not behave as expected these are the first places to check.
 -->
 
-## Projecting the data {#sec:display}
-
-<!-- the reminder of basis operation and now apply data -->
-In an appeal to performance, the operations of a tour are performed on the bases while the larger datasets are not operated on until the display of data points are needed. After the bases are brought into the projection-space, however, it is helpful to observe them with projected data in the same space. Pre-multiply the data by basis frame bringing the data into the projection space.
-
-\begin{align*}
-  \textbf{P}_{[n,~3]} &= \textbf{X}_{[n,~p]} ~*~ \textbf{RM}_{[p,~3]}
-\end{align*}
-
-<!-- plot 2 var in seq for animation -->
-For a 2D scatterplot, plot the first two variables within each frame. Show each frame in sequence to form an animation. The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.
 
 # Package structure and functionality {#sec:usage}
 
