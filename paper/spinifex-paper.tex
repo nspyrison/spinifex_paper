@@ -113,25 +113,7 @@ The algorithm described here produces a \textbf{radial} tour as an
 \emph{animation sequence}. It takes the current contribution of the
 chosen variable, and using rotation brings this variable fully into the
 projection, completely removes it, and then returns to the original
-position. This is an overview of the steps:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Provided with a 2D projection, choose a variable to manipulate. This
-  is called the ``manip var''.
-\item
-  Create a 3D manipulation space, where the manip variable has the full
-  contribution.
-\item
-  Generate a rotation sequence which increases the norm of the
-  coefficient to 1 and zeros it.
-\end{enumerate}
-
-More detail is provided in the following sections. Function names are
-provided, but code structure and usage is discussed in section
-\ref{sec:usage}.
+position.
 
 \hypertarget{notation}{%
 \subsection{Notation}\label{notation}}
@@ -146,48 +128,35 @@ is as follows:
   projected to 2D.
 \item
   \(\textbf{B} = (B_1,~ B_2)\), any 2D orthonormal projection basis,
-  \(p \times 2\) matrix, describing the projection from \(p\) to two
-  dimensions. We will call this the ``original projection'' because it
-  is the starting point for the manual tour.
+  \(p \times 2\) matrix, describing the projection from
+  \(\mathbb{R}^p \Rightarrow \mathbb{R}^2\). This is called this the
+  ``original projection'' because it is the starting point for the
+  manual tour.
 \item
   \(k\), is the index of the variable to manipulate, called the ``manip
-  var''.
+  var''. 
 \item
-  \(|\textbf{B}_k|\), the norm of the manip var, \(k\), the length of
-  this basis vector between 0 and 1 inclusive.
+  \(\textbf{e}\), a 1D basis vector of length \(p\), with 1 in the
+  \(k\)-th position and 0 elsewhere.
 \item
-  \(\textbf{e}\), a 1D coordinate zero basis vector of length \(p\) with
-  the \(k\)-th element set to one.
-\item
-  \(\textbf{M} = orthonormalize(\textbf{B}|\textbf{e})\), the
-  manipulation space, a \(p \times 3\) matrix where out-of-plane
-  rotation takes place.
+  \(\textbf{M}\) is a \(p \times 3\) matrix, defining the 3D subspace
+  where data rotation occurs, and is called the manip(ulation) space.
 \item
   \(\theta\), the angle of in-projection-plane rotation, for example, on
   the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
 \item
   \(\phi\), the angle of out-of-projection-plane rotation, into the
-  manipulation space; \(c_\phi, s_\phi\) are the cosine and sine. The
-  initial value for animation purposes is \(\phi_1\).
+  manip space; \(c_\phi, s_\phi\) are the cosine and sine. The initial
+  value for animation purposes is \(\phi_1\).
 \item
-  \(\textbf{U}\), the axis of rotation for \(\phi\).
+  \(\textbf{U}\), the axis of rotation for out-of-projection rotation.
 \item
-  \(\textbf{R}\), the rotation matrix, containing the rotaions of
-  \(\theta\) and \(\phi\) within the manipulation space, \(\textbf{M}\).
-\item
-  \(\textbf{RM} = \textbf{M} * \textbf{R}\), the result of the
-  manipulation space after the application of the rotation matrix.
-\item
-  \(\textbf{P} = \textbf{X} * \textbf{RM}\), the data projection, the
-  data as projected through the rotated manipulation space.
+  \(\textbf{R}\), the 3D rotation matrix, for performing unconstrained
+  3D rotations within the manip space, \(\textbf{M}\). 
 \end{itemize}
 
-XXX Clean up the notation, not all of this is needed or useful. The
-shadow of \(e\) in the projection may need some notation. The projected
-data should be \(Y\) not \(P\).
-
-The algorithm operates entirely on projection bases and utilizes the
-data only later when making a display.
+The algorithm operates entirely on projection bases, and incorporates
+the data only when making the projected data plots.
 
 \hypertarget{steps}{%
 \subsection{Steps}\label{steps}}
@@ -195,31 +164,26 @@ data only later when making a display.
 \hypertarget{step-0-set-up}{%
 \subsubsection{Step 0) Set up}\label{step-0-set-up}}
 
-The flea data, originally from Lubischew
-(\protect\hyperlink{ref-lubischew_use_1962}{1962}), made available in
-\pkg{tourr} is used to illustrate the algorithm. The data contains 74
-observations across 6 variables, which are physical measurements of the
-flea beetles. Each observation belongs to one of three species.
+The flea data (Lubischew
+(\protect\hyperlink{ref-lubischew_use_1962}{1962})), available in the
+\pkg{tourr} package, is used to illustrate the algorithm. The data
+contains 74 observations on 6 variables, which are physical measurements
+made on beetles. Each observation belongs to one of three species.
 
-An initial 2D projection basis set must be provided. One way to identify
-a projection containing interesting features is to apply a guided tour.
-In a guided tour, the projection sequence is selected by optimizing an
-index function via hill-climbing on the projection space. In this case,
-the holes index is selected and applied to the standardized flea data.
-The holes index is maximized when the projected observations are
-furthest from the center.
-
-Figure \ref{fig:step0} shows a locally optimized projection of the data.
-The left panel displays the reference axes of the projection basis, a
-visual indication of the magnitude and direction each variable
+An initial 2D projection basis must be provided. A suggested way to
+start is to identify an interesting projection using a projection
+pursuit guided tour. Here the holes index is used to find a 2D
+projection of the flea data, which shows three separated groups. Figure
+\ref{fig:step0} shows the initial projection of the data. The left panel
+displays the projection basis (\(\textbf{B}\)), and can be used as a
+visual guide of the magnitude and direction that each variable
 contributes to the projection. The right panel shows the data as
-projected through the basis set described by the reference axes (left).
-Data points are colored and given shape according to the species. Call
-\code{view\_basis()} on a basis to produce a \CRANpkg{ggplot2} (Wickham
-\protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object similar to
-Figure \ref{fig:step0}. The projected data is processed for display
-using matrix multiplication,
-\(\textbf{P}_{[n,~d]} ~=~ \textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]}\).
+projected in \(\textbf{B}\). The colour and shape of points is mapped to
+the flea species. This plot is made using the \code{view\_basis()}
+function in \CRANpkg{spinifex}, which generated a \CRANpkg{ggplot2}
+(Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
+The projected data is processed for display using matrix multiplication,
+\(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\).
 
 \begin{Schunk}
 \begin{figure}

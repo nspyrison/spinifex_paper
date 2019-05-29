@@ -301,46 +301,48 @@ The algorithm to conduct a manual tour interactively, by recording mouse/cursor 
 - *angular*: fix the magnitude, and allow the angle or direction of the contribution to vary.
 - *horizontal*, *vertical*: allow rotation only around the horizontal or vertical axis of the current 2D projection.
 
-The algorithm described here produces a **radial** tour as an *animation sequence*. It takes the current contribution of the chosen variable, and using rotation brings this variable fully into the projection, completely removes it, and then returns to the original position. This is an overview of the steps:
+The algorithm described here produces a **radial** tour as an *animation sequence*. It takes the current contribution of the chosen variable, and using rotation brings this variable fully into the projection, completely removes it, and then returns to the original position. <!--This is an overview of the steps:
 
 1. Provided with a 2D projection, choose a variable to manipulate. This is called the "manip var".
 2. Create a 3D manipulation space, where the manip variable has the full contribution.
 3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
 
 More detail is provided in the following sections. Function names are provided, but code structure and usage is discussed in section \ref{sec:usage}.
+-->
 
 ## Notation
 
 The notation used to describe the algorithm for a 2D radial manual tour is as follows:
 
 - $\textbf{X}$, the data, an $n \times p$ numeric matrix to be projected to 2D.
-- $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $p$ to two dimensions. We will call this the "original projection" because it is the starting point for the manual tour.
+- $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $\mathbb{R}^p \Rightarrow \mathbb{R}^2$. This is called this the "original projection" because it is the starting point for the manual tour.
 - $k$, is the index of the variable to manipulate, called the "manip var".
-- $|\textbf{B}_k|$, the norm of the manip var, $k$, the length of this basis vector between 0 and 1 inclusive.
-- $\textbf{e}$, a 1D coordinate zero basis vector of length $p$ with the $k$-th element set to one.
-- $\textbf{M} = orthonormalize(\textbf{B}|\textbf{e})$, the manipulation space, a $p \times 3$ matrix where out-of-plane rotation takes place. 
+<!--- $|\textbf{B}_k|$, the norm of the manip var, $k$, the length of this basis vector between 0 and 1 inclusive.
+-->
+- $\textbf{e}$, a 1D basis vector of length $p$, with 1 in the $k$-th position and 0 elsewhere.
+- $\textbf{M}$ is a $p \times 3$ matrix, defining the 3D subspace where data rotation occurs, and is called the manip(ulation) space. 
 - $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
-- $\phi$, the angle of out-of-projection-plane rotation, into the manipulation space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
-- $\textbf{U}$, the axis of rotation for $\phi$.
-- $\textbf{R}$, the rotation matrix, containing the rotaions of $\theta$ and $\phi$ within the manipulation space, $\textbf{M}$.
+- $\phi$, the angle of out-of-projection-plane rotation, into the manip space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
+- $\textbf{U}$, the axis of rotation for out-of-projection rotation.
+- $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
+<!--
 - $\textbf{RM} = \textbf{M} * \textbf{R}$, the result of the manipulation space after the application of the rotation matrix.
 - $\textbf{P} = \textbf{X} * \textbf{RM}$, the data projection, the data as projected through the rotated manipulation space.
 
 XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. The projected data should be $Y$ not $P$. 
+-->
 
 <!-- operate on bases -->
-The algorithm operates entirely on projection bases and utilizes the data only later when making a display.
+The algorithm operates entirely on projection bases, and incorporates the data only when making the projected data plots.
 
 ## Steps
 ### Step 0) Set up
 
 <!-- describe data. -->
-The flea data, originally from @lubischew_use_1962, made available in \pkg{tourr} is used to illustrate the algorithm. The data contains 74 observations across 6 variables, which are physical measurements of the flea beetles. Each observation belongs to one of three species.
+The flea data (@lubischew_use_1962), available in the \pkg{tourr} package, is used to illustrate the algorithm. The data contains 74 observations on 6 variables, which are physical measurements made on beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
-An initial 2D projection basis set must be provided. One way to identify a projection containing interesting features is to apply a guided tour. In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space. In this case, the holes index is selected and applied to the standardized flea data. The holes index is maximized when the projected observations are furthest from the center. 
-
-Figure \ref{fig:step0} shows a locally optimized projection of the data. The left panel displays the reference axes of the projection basis, a visual indication of the magnitude and direction each variable contributes to the projection. The right panel shows the data as projected through the basis set described by the reference axes (left). Data points are colored and given shape according to the species. Call \code{view\_basis()} on a basis to produce a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object similar to Figure \ref{fig:step0}. The projected data is processed for display using matrix multiplication, $\textbf{P}_{[n,~d]} ~=~ \textbf{X}_{[n,~p]} ~*~ \textbf{B}_{[p,~d]}$.
+An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. <!--In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space.--> Here the holes index is used to find a 2D projection of the flea data, which shows three separated groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$), and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the data as projected in $\textbf{B}$. The colour and shape of points is mapped to the flea species. This plot is made using the  \code{view\_basis()} function in \CRANpkg{spinifex}, which generated a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. The projected data is processed for display using matrix multiplication, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$.
 
 
 ```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
