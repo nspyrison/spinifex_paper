@@ -177,13 +177,12 @@ projection of the flea data, which shows three separated groups. Figure
 \ref{fig:step0} shows the initial projection of the data. The left panel
 displays the projection basis (\(\textbf{B}\)), and can be used as a
 visual guide of the magnitude and direction that each variable
-contributes to the projection. The right panel shows the data as
-projected in \(\textbf{B}\). The colour and shape of points is mapped to
-the flea species. This plot is made using the \code{view\_basis()}
-function in \CRANpkg{spinifex}, which generated a \CRANpkg{ggplot2}
-(Wickham \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
-The projected data is processed for display using matrix multiplication,
-\(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\).
+contributes to the projection. The right panel shows the projected data,
+\(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\). The
+colour and shape of points is mapped to the flea species. This plot is
+made using the \code{view\_basis()} function in \CRANpkg{spinifex},
+which generates a \CRANpkg{ggplot2} (Wickham
+\protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
 
 \begin{Schunk}
 \begin{figure}
@@ -205,8 +204,8 @@ aede2 mostly contrast the contribution of the other four variables.
 These two variables combined contribute in the direction of the
 projection where the purple cluster is separated from the other two
 clusters. The variable aede2 is selected as the manip var, the variable
-to be controlled in the tour. The question that will be explored is how
-important this variable is to the separation of the clusters.
+to be controlled in the tour. The question that will be explored, is,
+how important this variable is to the separation of the clusters.
 
 \hypertarget{step-2-create-the-3d-manip-space}{%
 \subsubsection{Step 2) Create the 3D manip
@@ -216,8 +215,7 @@ Initialize the coordinate basis vector as a zero vector \(\textbf{e}\)
 of length \(p\), and set the \(k\)-th element to 1. In the example data,
 aede2 is the fifth variable in the data, so \(k=5\), set \(e_5=1\). Use
 a Gram-Schmidt process to orthonormalize the coordinate basis vector on
-the original 2D projection to describe a 3D manipulation space,
-\(\textbf{M}\).
+the original 2D projection to describe a 3D manip space, \(\textbf{M}\).
 
 \begin{align*}
   e_k &\leftarrow 1 \\ 
@@ -227,14 +225,13 @@ the original 2D projection to describe a 3D manipulation space,
 
 The manip space provides a 3D projection from \(p\)-dimensional space,
 where the coefficient of the manip var can range completely between
-{[}-1, 1{]}. 3D rotation can be used to rotate the manip variable
+{[}0, 1{]}. 3D rotation can be used to rotate the manip variable
 completely into or completely out of a 2D projection. Figure
-\ref{fig:step2} illustrates this 3D manipulation space with the manip
-var highlighted. This representation is produced by calling the
-\code{view\_manip\_space()} function. Functionally, the manipulation
-space adds another layer of complexity that needn't be displayed in the
-final animation, but this diagram aids in comprehension of the
-technique.
+\ref{fig:step2} illustrates this 3D manip space with the manip var
+highlighted. This representation is produced by calling the
+\code{view\_manip\_space()} function. Functionally, the manip space adds
+another layer of complexity that needn't be displayed in the final
+animation, but this diagram aids in comprehension of the technique.
 
 \begin{Schunk}
 \begin{figure}
@@ -243,7 +240,7 @@ technique.
 
 }
 
-\caption[Illustration of a 3D manipulation space, constructed to change the contribution of the variable aede2 in the example data]{Illustration of a 3D manipulation space, constructed to change the contribution of the variable aede2 in the example data. The red circle indicates a unit sphere. The 2D projection is represented by the blue circle, with the projection coefficients represented by grey lines and text. The manip var axis, in red, has length 1 touching the sphere, extends the projection to a third dimension. The shadow of this axis (blue) is its contribution in the original 2D projection. Illustrated with the \code{view\_manip\_space()} function.}\label{fig:step2}
+\caption[Illustration of a 3D manip space, constructed to change the contribution of the variable aede2 in the example data]{Illustration of a 3D manip space, constructed to change the contribution of the variable aede2 in the example data. The red circle indicates a unit sphere. The 2D projection is represented by the blue circle, with the projection coefficients represented by grey lines and text. The manip var axis, in red, has length 1 touching the sphere, extends the projection to a third dimension. The shadow of this axis (blue) is its contribution in the original 2D projection. Illustrated with the \code{view\_manip\_space()} function.}\label{fig:step2}
 \end{figure}
 \end{Schunk}
 
@@ -266,11 +263,11 @@ The basis vector corresponding to the manip var (red line in Figure
 \ref{fig:step2}), can be operated like a lever. This is the process of
 the manual control, that rotates the manip variable into and out of the
 2D projection (Figure \ref{fig:step3}). As the variable is controlled,
-the manipulation space rotates, and the projection onto the horizontal
+the manip space rotates, and the projection onto the horizontal
 projection plane correspondingly changes. This is a manual tour.
 Generating a sequence of values for the horizontal and vertical angles
-produces a path for the rotation of the manipulation space. This defines
-the (orthonormally-constrained) rotation on the basis coefficients.
+produces a path for the rotation of the manip space. This defines the
+(orthonormally-constrained) rotation on the basis coefficients.
 
 For a radial tour, fix the (horizontal) angle within the projection
 plane, \(\theta\), and define a sequence for the (vertical) angle,
@@ -335,7 +332,7 @@ derived as follows:
 
 Defining the axis of rotation for \(\phi\) and the application of
 Rodrigues' rotation formula results in the rotation matrix, the rotation
-group SO(3). Continue with the rotation of the manipulation space,
+group SO(3). Continue with the rotation of the manip space,
 post-multiply the space by the above rotation matrix producing
 \textbf{RM}, the rotated manip space. This is basis values, the linear
 combination of variables, for one frame of the animation, repeat this
@@ -420,10 +417,9 @@ the data into the projection space.
 \end{align*}
 
 For a 2D scatterplot, plot the first two variables within each frame.
-Show each frame in sequence to form an animation. The remaining
-manipulation space variable can be linked to point aesthetic (such as
-size or color) to produce depth cues used in conjunction with the \(XY\)
-scatterplot.
+Show each frame in sequence to form an animation. The remaining manip
+space variable can be linked to point aesthetic (such as size or color)
+to produce depth cues used in conjunction with the \(XY\) scatterplot.
 
 \hypertarget{sec:usage}{%
 \section{Package structure and functionality}\label{sec:usage}}
@@ -466,7 +462,7 @@ demonstrated below and in the example documentation.
 Class & Function & Description\\
 \midrule
 tour preparation & view\_basis & displays the reference frame of the basis\\
-tour preparation & view\_manip\_space & displays the manipulation space\\
+tour preparation & view\_manip\_space & displays the manip space\\
 tour animation & play\_tour\_path & animates given tour path\\
 tour animation & play\_manual\_tour & animates the manual tour algorithm\\
 utility & render\_gganimate & uses gganimate to render the animation\\
@@ -504,8 +500,8 @@ After becoming familiar with this space, select a manip var, the
 variable to change the contributions of. Use \code{view\_manip\_space()}
 to view the new space with a dimension orthogonal to the projection
 plane where the manip var has a full contribution. This illustrates how
-the manip var is manipulated with the addition of the manipulation space
-as shown in Figure \ref{fig:step2}.
+the manip var is manipulated with the addition of the manip space as
+shown in Figure \ref{fig:step2}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -576,8 +572,8 @@ between can be interpolated by supplying angular speed. With the use of
 the \code{tourr::save\_history()} function, the target bases can be
 saved. From there geodesic interpolation can be used to populate the
 intermittent frames. This type of interpolation should not be used on
-manual tours, which have already been initialized into a 3D manipulation
-space where direct linear interpolation is appropriate.
+manual tours, which have already been initialized into a 3D manip space
+where direct linear interpolation is appropriate.
 
 \hypertarget{sec:application}{%
 \section{Application}\label{sec:application}}
@@ -677,10 +673,10 @@ contained within the aggregated data (Cook, Laa, and Valencia
 are performed on PC6 and PC2 in Figure \ref{fig:DISclusterGood} and
 Figure \ref{fig:DISclusterBad} respectively.
 
-The selection of the manip variable is important, as the manipulation
-spaces convey substantially different information. The manual tour of
-PC6 offers information about the dimensionality, shape, and orientations
-of the different experiment classes. PC6 is particularly important to
+The selection of the manip variable is important, as the manip spaces
+convey substantially different information. The manual tour of PC6
+offers information about the dimensionality, shape, and orientations of
+the different experiment classes. PC6 is particularly important to
 describe the variations of DIS HERA1+2 and charm SIDIS observations,
 Whereas manipulating the contributions of PC2 only shows a subset of the
 dimensionality and shape information. Manipulating the contributions of
