@@ -505,7 +505,7 @@ The operation of a manual tour is defined on the projection bases. Only when the
 \end{align*}
 
 <!-- plot 2 var in seq for animation -->
-Plot the first two columns of \textbf{Y} to make the data plot. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
+\noindent Plot the first two columns of \textbf{Y} to make the data plot. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
 
 <!-- Animation on flea data -->
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which correspond to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
