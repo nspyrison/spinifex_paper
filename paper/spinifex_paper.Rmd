@@ -479,8 +479,8 @@ f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
   paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
 p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1 phi=0.78")
-p2 <- view_basis2(f_mtour[,,6],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=1.57")
-p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=0")
+p2 <- view_basis2(f_mtour[,,6],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=0")
+p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=1.57")
 p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle("4 phi=0.78")
 grid.arrange(p1, p2, p3, p4, ncol=4)
 ```
@@ -505,7 +505,7 @@ The operation of a manual tour is defined on the projection bases. Only when the
 \end{align*}
 
 <!-- plot 2 var in seq for animation -->
-\noindent Plot the first two columns of \textbf{Y} to make the data plot. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
+\noindent where $\textbf{R}^{(i)}_{[3,3]}$ is the incremental rotation matrix, using $\phi_i$. To make the data plot, use the first two columns of \textbf{Y}. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
 
 <!-- Animation on flea data -->
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which correspond to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
@@ -528,17 +528,23 @@ relative to its initial value. The transformation $\phi_i$ - $\phi_1$ is useful 
 
 # Package structure and functionality {#sec:usage}
 
-This section discusses the functions and code usage of the package before delving into a domain-specific application of the manual tour.
+This section describes the functions available in the package, and how to use them.
 
 ## Installation
 
+The \CRANpkg{spinifex} is available from CRAN, and can be installed by: 
 ```{r installCODEEXAMPLE, eval=F, echo=T}
-# remotes::install_github("nspyrison/spinifex") # Development version
 install.package("spinifex")
 library("spinifex")
 
-# Also see the vignette for further code usage: 
+# Also see the vignette for details on using the code: 
 vignette("spinifex_vignette")
+```
+
+The development version can be installed from github:
+
+```
+remotes::install_github("nspyrison/spinifex") 
 ```
 
 ## Primary package functions 
