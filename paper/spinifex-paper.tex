@@ -461,7 +461,7 @@ algorithm description.
 \centering
 \begin{tabular}{lll}
 \toprule
-Class & Function & Description\\
+Type & Function & Description\\
 \midrule
 construction & create\_manip\_space & forms the 3D space of rotation\\
 construction & rotate\_manip\_space & performs 3D rotation\\
@@ -483,56 +483,24 @@ specialty & view\_manip\_space & illustrative display of any manip space\\
 
 \end{Schunk}
 
-\hypertarget{algorithm-code}{%
-\subsection{Algorithm code}\label{algorithm-code}}
+\hypertarget{usage}{%
+\subsection{Usage}\label{usage}}
 
-We'll start by initializing values including a standardized data set
-(numeric columns only), a starting basis, a categorical variable for
-point aesthetics (optional), and a manip var. To get bearings on the
-projection, start by observing the reference axes of the basis with
-\code{view\_basis()} producing Figure \ref{fig:step0}.
+Using the \texttt{flea} data from the \CRANpkg{tourr} package, we will
+illustrate generating a manual tour to explore the sensitivity of the
+cluster structure is to the variable \texttt{aede2}.
 
 \begin{Schunk}
 \begin{Sinput}
+library(spinifex)
 f_data  <- tourr::rescale(flea[, 1:6])                    ## standardize data
-f_path  <- save_history(f_data, guided_tour(holes()))     ## produce guided tour
-f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## end of guided tour
+f_path  <- save_history(f_data, guided_tour(holes()))     ## guided tour using holes index
+f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## optimal projection
 f_cat   <- factor(flea$species)                           ## categorical var
-
-view_basis(basis = f_basis, 
-           data = f_data,
-           labels = colnames(f_data))
-\end{Sinput}
-\end{Schunk}
-
-After becoming familiar with this space, select a manip var, the
-variable to change the contributions of. Use \code{view\_manip\_space()}
-to view the new space with a dimension orthogonal to the projection
-plane where the manip var has a full contribution. This illustrates how
-the manip var is manipulated with the addition of the manip space as
-shown in Figure \ref{fig:step2}.
-
-\begin{Schunk}
-\begin{Sinput}
-f_mvar  <- 5  ## manip var number
-
-view_manip_space(basis = f_basis, 
-                 manip_var = f_mvar, 
-                 labels = colnames(f_data))
-\end{Sinput}
-\end{Schunk}
-
-Now we are ready to perform a manual tour on the selected variable. Use
-\code{play\_manual\_tour()} to perform the algorithm as discussed above,
-in section \ref{sec:algorithm}. This is the animated equivalent of
-Figure \ref{fig:step3}.
-
-\begin{Schunk}
-\begin{Sinput}
+f_mvar  <- 5                                              ## set manip var
 angle_speed <- .26
-
-play_manual_tour(data = f_data,
-                 basis = f_basis, 
+play_manual_tour(data = f_data,                           ## Generates animation
+                 basis = f_basis,                         ## using plotly
                  manip_var = f_mvar, 
                  angle = angle_speed,
                  col = f_cat,
@@ -540,20 +508,34 @@ play_manual_tour(data = f_data,
 \end{Sinput}
 \end{Schunk}
 
-This concludes the content of the algorithm section, however, lets cover
-animating paths generated in \pkg{tourr}. Animate the previously
-generated guided tour path via \code{play\_tour\_path()}. Utility
-functions can also be passed as arguments into either of the tour
-animation function to change the resulting graphics object, set
-\code{render\_type = render\_gganimate} to view the animation as a GIF.
+The \texttt{play\_manual\_tour} function is a composite function for
+user convenience that does these operations:
 
 \begin{Schunk}
 \begin{Sinput}
-play_tour_path(tour_path = f_path,
-               data = f_data,
-               render_type = render_gganimate, 
-               angle = angle_speed
-)
+manual_tour()
+array2df()
+render_plotly()
+\end{Sinput}
+\end{Schunk}
+
+\hypertarget{extras}{%
+\subsubsection{Extras}\label{extras}}
+
+\begin{Schunk}
+\begin{Sinput}
+view_basis(basis = f_basis, 
+           data = f_data,
+           labels = colnames(f_data))
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+
+view_manip_space(basis = f_basis, 
+                 manip_var = f_mvar, 
+                 labels = colnames(f_data))
 \end{Sinput}
 \end{Schunk}
 
