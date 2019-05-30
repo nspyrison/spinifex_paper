@@ -536,42 +536,56 @@ The \CRANpkg{spinifex} is available from CRAN, and can be installed by:
 ```{r installCODEEXAMPLE, eval=F, echo=T}
 install.package("spinifex")
 library("spinifex")
+```
 
-# Also see the vignette for details on using the code: 
+\noindent Also see the vignette for examples of usage: 
+
+```
 vignette("spinifex_vignette")
 ```
 
-The development version can be installed from github:
+\noindent The development version can be installed from github:
 
 ```
 remotes::install_github("nspyrison/spinifex") 
 ```
 
-## Primary package functions 
+## Functions 
 <!-- in terms of work flow. -->
 
-The primary functions that will aid users in performing their own manual tours are broken into the following groupings: tour preparation, tour animation, and utility. In the following section describes and demonstrates the usage of the above functions following the order in the algorithm. The utility functions are called by the tour animation functions, passed to the argument \code{render\_type}. Usage is demonstrated below and in the example documentation.
+Table \ref{tab:functionsTable} lists the primary functions and their purpose. These are grouped into four types: construction for building a tour path, render to make the plot objects, animation for running the animation, and specialty for providing illustrations used in the algorithm description.
+
+<!--
+The primary functions that will aid users in performing their own manual tours are broken into the following groupings: tour preparation, tour animation, and utility. In the following section describes and demonstrates the usage of the above functions following the order in the algorithm. The utility functions are called by the tour animation functions, passed to the argument \code{render\_type}. Usage is demonstrated below and in the example documentation.-->
 
 ```{r functionsTable, echo=F}
 library(kableExtra)
 
 funcs <- rbind(
-  c("tour preparation", "view_basis", "displays the reference frame of the basis"),
-  c("tour preparation", "view_manip_space", "displays the manip space"),
-  c("tour animation", "play_tour_path", "animates given tour path"),
-  c("tour animation", "play_manual_tour", "animates the manual tour algorithm"),
+  c("construction", "create_manip_space", "forms the 3D space of rotation"),
+  c("construction", "rotate_manip_space", "performs 3D rotation"),
+  c("construction", "manual_tour", "generates sequence of 2D frames"),
+  c("", "", ""),
+  c("render", "render_", "constructs the ggplot object to feed to animation"),
+  c("render", "render_plotly", "converts the ggplot object to a plotly animation"),
+  c("render", "render_gganimate", "converts the ggplot object to a gganimate  animation"),
+  c("render", "array2df", "turns a tour path array into long form, for plotting"),
+  c("", "", ""),
+  c("animation", "play_tour_path", "animates given tour path"),
+  c("animation", "play_manual_tour", "animates the manual tour algorithm"),
+  c("", "", ""),
   # c("utility", "col_of", "maps a variable to the point color"),
   # c("utility", "pch_of", "maps a variable to the point character (shape)"),
-  c("utility", "render_gganimate", "uses gganimate to render the animation"),
-  c("utility", "render_plotly", "uses plotly to render the animation")
+  c("specialty", "view_basis", "displays the reference frame of a given basis"),
+  c("specialty", "view_manip_space", "illustrative display of any manip space")
 )
-colnames(funcs) <- c("Class", "Function", "Description")
+colnames(funcs) <- c("Type", "Function", "Description")
   
-kable(funcs, "latex", caption = "Primary functions", booktabs = T)
+kable(funcs, "latex", caption = "Summary of available functions.", booktabs = T, linesep="") 
 ```
 
 
-## Algorithm code
+## Usage
 
 We'll start by initializing values including a standardized data set (numeric columns only), a starting basis, a categorical variable for point aesthetics (optional), and a manip var. To get bearings on the projection, start by observing the reference axes of the basis with \code{view\_basis()} producing Figure \ref{fig:step0}.
 

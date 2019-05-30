@@ -386,9 +386,10 @@ relevant basis.
   \textbf{Y}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
 \end{align*}
 
-\noindent Plot the first two columns of \textbf{Y} to make the data
-plot. Show the projected data for each frame in sequence to form an
-animation.
+\noindent where \(\textbf{R}^{(i)}_{[3,3]}\) is the incremental rotation
+matrix, using \(\phi_i\). To make the data plot, use the first two
+columns of \textbf{Y}. Show the projected data for each frame in
+sequence to form an animation.
 
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15
 steps. The projection axes are displayed on the top half, which
@@ -417,50 +418,65 @@ function \code{play\_manual\_tour()}.
 \hypertarget{sec:usage}{%
 \section{Package structure and functionality}\label{sec:usage}}
 
-This section discusses the functions and code usage of the package
-before delving into a domain-specific application of the manual tour.
+This section describes the functions available in the package, and how
+to use them.
 
 \hypertarget{installation}{%
 \subsection{Installation}\label{installation}}
 
+The \CRANpkg{spinifex} is available from CRAN, and can be installed by:
+
 \begin{Schunk}
 \begin{Sinput}
-# remotes::install_github("nspyrison/spinifex") # Development version
 install.package("spinifex")
 library("spinifex")
-
-# Also see the vignette for further code usage: 
-vignette("spinifex_vignette")
 \end{Sinput}
 \end{Schunk}
 
-\hypertarget{primary-package-functions}{%
-\subsection{Primary package functions}\label{primary-package-functions}}
+\noindent Also see the vignette for examples of usage:
 
-The primary functions that will aid users in performing their own manual
-tours are broken into the following groupings: tour preparation, tour
-animation, and utility. In the following section describes and
-demonstrates the usage of the above functions following the order in the
-algorithm. The utility functions are called by the tour animation
-functions, passed to the argument \code{render\_type}. Usage is
-demonstrated below and in the example documentation.
+\begin{verbatim}
+vignette("spinifex_vignette")
+\end{verbatim}
+
+\noindent The development version can be installed from github:
+
+\begin{verbatim}
+remotes::install_github("nspyrison/spinifex") 
+\end{verbatim}
+
+\hypertarget{functions}{%
+\subsection{Functions}\label{functions}}
+
+Table \ref{tab:functionsTable} lists the primary functions and their
+purpose. These are grouped into four types: construction for building a
+tour path, render to make the plot objects, animation for running the
+animation, and specialty for providing illustrations used in the
+algorithm description.
 
 \begin{Schunk}
 \begin{table}[t]
 
-\caption{\label{tab:functionsTable}Primary functions}
+\caption{\label{tab:functionsTable}Summary of available functions.}
 \centering
 \begin{tabular}{lll}
 \toprule
 Class & Function & Description\\
 \midrule
-tour preparation & view\_basis & displays the reference frame of the basis\\
-tour preparation & view\_manip\_space & displays the manip space\\
-tour animation & play\_tour\_path & animates given tour path\\
-tour animation & play\_manual\_tour & animates the manual tour algorithm\\
-utility & render\_gganimate & uses gganimate to render the animation\\
-\addlinespace
-utility & render\_plotly & uses plotly to render the animation\\
+construction & create\_manip\_space & forms the 3D space of rotation\\
+construction & rotate\_manip\_space & performs 3D rotation\\
+construction & manual\_tour & generates sequence of 2D frames\\
+ &  & \\
+render & render\_ & constructs the ggplot object to feed to animation\\
+render & render\_plotly & converts the ggplot object to a plotly animation\\
+render & render\_gganimate & converts the ggplot object to a gganimate  animation\\
+render & array2df & turns a tour path array into long form, for plotting\\
+ &  & \\
+animation & play\_tour\_path & animates given tour path\\
+animation & play\_manual\_tour & animates the manual tour algorithm\\
+ &  & \\
+specialty & view\_basis & displays the reference frame of a given basis\\
+specialty & view\_manip\_space & illustrative display of any manip space\\
 \bottomrule
 \end{tabular}
 \end{table}
