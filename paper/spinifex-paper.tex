@@ -14,15 +14,15 @@ local and frozen. Each of these can be viewed dynamically, or saved into
 a data object for animation. This paper describes a new package,
 \pkg{spinifex}, to provide a manual tour, that allows the coefficient
 for a single variable to be controlled. The variable is rotated fully
-into the projection with a coefficient of 1 or -1, or completely out of
-the projection with a coefficient of 0. The resulting sequence of
-projections can be displayed using animation, with functions from either
-the \pkg{plotly} and \pkg{gganimate} packages. By varying the
-coefficient of a single variable, it is possible to explore the
+into the projection, or completely out of the projection. The resulting
+sequence of projections can be displayed using animation, with functions
+from either the \pkg{plotly} and \pkg{gganimate} packages. By varying
+the coefficient of a single variable, it is possible to explore the
 sensitivity of structure in the projection to that variable. It is
 particularly useful when used with a projection pursuit guided tour to
-simplify and understand the solution. The use of the manual tour is
-illustrated using a problem from particle physics.
+simplify and understand the solution. The use of the manual tour for
+studying the sensitivity of structure, in a projection, to specific
+variable contributions, is illustrated using particle physics data.
 }
 
 
@@ -38,10 +38,11 @@ such as principal component analysis, linear discriminant spaces or
 projection pursuit. These are useful for finding relationships between
 multiple variables, but they are limited because they show only a
 glimpse of the high-dimensional space. An alternative approach is to use
-a tour of dynamic linear projections, to look at many different
-low-dimensional projections. Tours can be considered to extend the
-dimensionality of visualization, which is important as data and models
-exist in more than 3D. The package \CRANpkg{tourr} (Wickham et al.
+a tour (Asimov \protect\hyperlink{ref-asimov_grand_1985}{1985}) of
+dynamic linear projections, to look at many different low-dimensional
+projections. Tours can be considered to extend the dimensionality of
+visualization, which is important as data and models exist in more than
+3D. The package \CRANpkg{tourr} (Wickham et al.
 \protect\hyperlink{ref-wickham_tourr_2011}{2011}) provides a platform
 for generating tours. It has many types of tours available, and many
 types of displays possible. A user can make a grand, guided, little,
@@ -556,27 +557,24 @@ view_manip_space(basis = f_basis,
 \hypertarget{sec:application}{%
 \section{Application}\label{sec:application}}
 
-In a recent paper, Wang et al.
-(\protect\hyperlink{ref-wang_mapping_2018}{2018}), the authors aggregate
-and visualize the sensitivity of hadronic experiments to nucleon
-structure. The authors introduce a new tool, PDFSense, to aid in the
-visualization of parton distribution functions (PDF). The
-parameter-space of these experiments lies in 56 dimensions,
-\(\delta \in \mathbb{R}^{56}\), and are visualized as 3D subspaces of
-the 10 first principal components in linear (PCA) and non-linear (t-SNE)
-embeddings.
+Wang et al. (\protect\hyperlink{ref-wang_mapping_2018}{2018}) introduce
+a new tool, PDFSense, to visualize the sensitivity of hadronic
+experiments to nucleon structure. The parameter-space of these
+experiments lies in 56 dimensions, \(\delta \in \mathbb{R}^{56}\), and
+are visualized as 3D subspaces of the 10 first principal components in
+linear (PCA) and non-linear (t-SNE) embeddings.
 
-Using the same data, another study, Cook, Laa, and Valencia
-(\protect\hyperlink{ref-cook_dynamical_2018}{2018}), applied grand tours
-(Asimov \protect\hyperlink{ref-asimov_grand_1985}{1985}) to the same
-subspaces. Grand tours are dynamic linear projections of high
-dimensional spaces where basis sets are selected at random and animated
-with geodesic interpolation of the intermediate frames. Because of the
-change in the basis, or orientation to the subspace, tours are able to
-better resolve the distribution shape of clusters, intra-cluster detail,
-and better outlier detection than the use of PDFSense \& TFEP
-(TensorFlow embedded projections) or traditional static embeddings.
-Before applying manual tours the structure of the data is discussed.
+Cook, Laa, and Valencia
+(\protect\hyperlink{ref-cook_dynamical_2018}{2018}) illustrates how to
+learn more about the structures using a grand tour. Tours are able to
+better resolve the shape of clusters, intra-cluster detail, and better
+outlier detection than PDFSense \& TFEP (TensorFlow embedded
+projections) or traditional static embeddings. This example builds from
+here, illustrating how the manual tour can be used to examine the
+sensitivity of structure in a projection to different parameters. The
+specific 2D projections passed to the manual tour were provided from
+Cook, Laa, and Valencia
+(\protect\hyperlink{ref-cook_dynamical_2018}{2018}).
 
 The data has a hierarchical structure with top-level clusters; DIS, VBP,
 and jet. Each cluster is a particular class of experiments, each with
@@ -594,30 +592,29 @@ The jet cluster resides in a smaller dimensionality than the full set of
 experiments with four principal components explaining 95\% of the
 variation in the cluster (Cook, Laa, and Valencia
 \protect\hyperlink{ref-cook_dynamical_2018}{2018}). The data within this
-4D embedding is subset down to ATLAS7old and ATLAS7new to focus in on
-two groups with a reasonable number of observations that occupy
-different parts of the subspace. Radial manual tours controlling
-contributions from PC4 and PC3 are shown in Figure
-\ref{fig:JetClusterGood} and Figure \ref{fig:JetClusterBad}
-respectively. These variables are selected to contrast the information
-conveyed by different manip variables. Links to dynamic HTML5 animations
-controlling each of the four variables are also provided.
+4D embedding is further subsetted, to ATLAS7old and ATLAS7new, in order
+to focus on two groups, with a reasonable number of observations, that
+occupy different parts of the subspace. Radial manual tours controlling
+contributions from PC4 and PC3 are shown in Figures
+\ref{fig:JetClusterGood} and \ref{fig:JetClusterBad}, respectively. The
+difference in shape can be interpreted as the experiments probing
+different phase-spaces. Back-transforming the principal components to
+the original variables can be done for more detailed interpretation.
 
-When manipulating PC4, there is a clear difference in the parameter
-space spanned by the experiment types ATLAS7new and ATLAS7old.
-Specifically, the variation of ATLAS7new (green) becomes more singular.
-The experiments are probing different parameter space and PC4 is
-important to demonstrate this. Yet, when PC3 is manipulated there is no
-clear indication that the different experiments probe different
-parameter space. Performing a radial manual tour on PC4 is more
-insightful than for PC3. Radial manual tours manipulating each of the
-principal components in the jet cluster can be viewed by following the
-links:
+When PC4 is removed from the projection (Figure
+\ref{fig:JetClusterGood}), the difference between the two groups is
+removed, indicating that it is important for distinguishing experiments.
+However, removing PC3 from the projection (Figure
+\ref{fig:JetClusterBad}), has no effect on the structure, indicating it
+is not important for distinguishing experiments. Animations for the
+remaining PCs can be viewed at the following links:
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/}{PC1},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/}{PC2},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/}{PC3},
 and
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/}{PC4}.
+It can be seen that only PC4 is important for viewing the difference in
+these two experiments.
 
 \begin{Schunk}
 \begin{figure}
@@ -626,7 +623,7 @@ and
 
 }
 
-\caption[A radial manual tour of PC4 within the jet cluster]{A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. When PC4 fully/negligibly contributes to the projection ATLAS7new (green) spans the same space as the orange points. During the intermediate frames, the ATLAS7new is compressed in the direction radial to PC4. The differece in distribution shape demonstrates the experiments probe different phase-space, which has a linear mapping back to the original variables for interpretation and further exploration. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
+\caption[Snapshots of a radial manual tour of PC4 focusing on the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC4 focusing on the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments.  The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -637,34 +634,29 @@ and
 
 }
 
-\caption[A radial manual tour of PC4 within the jet cluster]{A radial manual tour of PC4 within the jet cluster. Colored by experiment type: ATLAS7new in green and ATLAS7old in orange. Data from ATLAS7new (green) spans mostly the same space as ALTLAS7old (orange) with no evident difference in cluster structure across varying contributions of PC3. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc3/.}\label{fig:JetClusterBad}
+\caption[Snapshots of a radial manual tour of PC3 focusing on the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC3 focusing on the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution of PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc3/.}\label{fig:JetClusterBad}
 \end{figure}
 \end{Schunk}
 
 \hypertarget{dis-cluster}{%
 \subsection{DIS cluster}\label{dis-cluster}}
 
-A different space is used to explore the DIS cluster; specifically the
-first six principal components, which explains 48\% of the variation
-contained within the aggregated data (Cook, Laa, and Valencia
-\protect\hyperlink{ref-cook_dynamical_2018}{2018}). Radial manual tours
-are performed on PC6 and PC2 in Figure \ref{fig:DISclusterGood} and
-Figure \ref{fig:DISclusterBad} respectively.
+Following Cook, Laa, and Valencia
+(\protect\hyperlink{ref-cook_dynamical_2018}{2018}), to explore the DIS
+cluster, PCA is recomputed and the first six principal components,
+explaining 48\% of the variation is used. The contributions of PC6 and
+PC2 are explored in Figures \ref{fig:DISclusterGood} and
+\ref{fig:DISclusterBad}, respectively. Three experiments are examined:
+DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
 
-The selection of the manip variable is important, as the manip spaces
-convey substantially different information. The manual tour of PC6
-offers information about the dimensionality, shape, and orientations of
-the different experiment classes. PC6 is particularly important to
-describe the variations of DIS HERA1+2 and charm SIDIS observations,
-Whereas manipulating the contributions of PC2 only shows a subset of the
-dimensionality and shape information. Manipulating the contributions of
-PC6 turned out to be much more insightful than PC2. This result might
-seem counter-intuitive at first as PC2 should explain much more of the
-variation in the data. However, features and structures in the data
-regularly reside in smaller dimensionality which can be overlooked when
-optimizing on full sample statistics. DIS cluster manual tours
-manipulating each of the principal components can be viewed from the
-links:
+Both PC2 and PC6 contribute to the projection similarly. When PC6 is
+rotated into the projection, variation in the DIS HERA1+2 is greatly
+reduced. When PC2 is removed from the projection, dimuon SIDIS becomes
+more clearly distinct. Even though both variables contribute similarly
+to the original projection, their contributions have quite different
+effects on the structure of each cluster, and the distinction between
+clusters. Animations of all of the principal components can be viewed
+from the links:
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/}{PC1},
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/}{PC2},
 \href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/}{PC3},
@@ -680,7 +672,7 @@ and
 
 }
 
-\caption[A radial manual tour manipulating the contribution of PC6 within the DIS cluster]{A radial manual tour manipulating the contribution of PC6 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The cluster DIS HERA1+2 (green) is distributed in a cross-shaped plane, charm SIDIS (orange) occupies the center space of this cross. As the contribution of PC6 becomes whole the distributions of DIS HERA1+2 (green) and charm SIDIS (orange) become singular but offset by a small angle. Less evident is the linear dimuon SIDIS (purple) observations approaching the line of view for intermediate values of PC6. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc6/.}\label{fig:DISclusterGood}
+\caption[Snapshots of a radial manual tour exploring the contribution of PC6 for the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the contribution of PC6 for the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As PC6's contribution is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc6/.}\label{fig:DISclusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -691,7 +683,7 @@ and
 
 }
 
-\caption[A radial manual tour manipulating the contribution of PC2 within the DIS cluster]{A radial manual tour manipulating the contribution of PC2 within the DIS cluster. Points are colored by experiment type: DIS HERA1+2 in green, dimuon SIDIS in purple, and charm SIDIS in orange. The plane of cross distributed DIS HERA data (green) and a nearly orthogonal jet of dimuon SIDIS (purple) is present. This jet does extend more in the plane of view when the contribution of PC2 is full, giving insight to its orientation. However, less information about the shape of DIS HERA (green) and charm SIDIS (orange) is available compared to PC6 as the manip var. An HTML5 version can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
+\caption[Snapshots of a radial manual tour exploring the contribution of PC2 for the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the contribution of PC2 for the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As PC2's contribution is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
 \end{figure}
 \end{Schunk}
 
