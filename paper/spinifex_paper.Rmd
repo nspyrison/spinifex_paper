@@ -622,6 +622,8 @@ array2df()
 render_plotly()
 ```
 
+\noindent This will generate an html animation using plotly. Switching the renderer to `gganimate` is an option, which will also create an html animation, or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
+
 <!--
 This concludes the content of the algorithm section, however, lets cover animating paths generated in \pkg{tourr}. Animate the previously generated guided tour path via \code{play\_tour\_path()}. Utility functions can also be passed as arguments into either of the tour animation function to change the resulting graphics object, set \code{render\_type = render\_gganimate} to view the animation as a GIF.
 
@@ -634,13 +636,18 @@ play_tour_path(tour_path = f_path,
 ```
 -->
 
-### Extras
+### Making illustrations
+
+The function `view_basis` can be used to show a projection, just the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 ```{r eval=FALSE}
 view_basis(basis = f_basis, 
            data = f_data,
            labels = colnames(f_data))
 ```
+
+\noindent An illustration of the manip space (as shown in Figure \ref{fig:step2}) is made with the `view_manip_space` function, as follows: 
+
 <!-- step 2 disp code. -->
 ```{r step2CODEEXAMPLE, eval=F, echo=T}
 
@@ -649,6 +656,7 @@ view_manip_space(basis = f_basis,
                  labels = colnames(f_data))
 ```
 
+<!--
 ## Rendering and sharing
 
 The \pkg{tourr} package utilizes \pkg{base} graphics for the display of tours. \pkg{spinifex} allows tours to be rendered in \pkg{plotly} as an HTML5 object or \pkg{gganimate} as GIF or MP4 files. Sharing of animations is not trivial, especially static formats like print and PDF. Even with dynamic display capturing the correct resolution and aspect ratio can be challenging, while many formats quickly bloat file sizes limiting sharing options. Keep in mind hosting options and exporting functions offered in \pkg{plotly}, \pkg{gganimate} and \pkg{tourr}.
@@ -657,7 +665,7 @@ The \pkg{tourr} package utilizes \pkg{base} graphics for the display of tours. \
 ## Storage
 
 Storing each data point for every frame of the animation is redundant. Just as operations are performed on the bases, so too should tour paths be stored as bases and a single instance of the data. Consider a radial manual tour, we can store the salient features in 3 bases, where $\phi$ is at its starting, minimum, and maximum values. The frames in between can be interpolated by supplying angular speed. With the use of the \code{tourr::save\_history()} function, the target bases can be saved. From there geodesic interpolation can be used to populate the intermittent frames. This type of interpolation should not be used on manual tours, which have already been initialized into a 3D manip space where direct linear interpolation is appropriate.
-
+-->
 
 # Application {#sec:application}
 

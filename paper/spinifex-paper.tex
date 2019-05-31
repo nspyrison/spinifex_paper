@@ -519,8 +519,18 @@ render_plotly()
 \end{Sinput}
 \end{Schunk}
 
-\hypertarget{extras}{%
-\subsubsection{Extras}\label{extras}}
+\noindent This will generate an html animation using plotly. Switching
+the renderer to \texttt{gganimate} is an option, which will also create
+an html animation, or an animated gif. Each of these formats allows for
+the animation to be made available on a web site, or directly visible in
+an html formatted document.
+
+\hypertarget{making-illustrations}{%
+\subsubsection{Making illustrations}\label{making-illustrations}}
+
+The function \texttt{view\_basis} can be used to show a projection, just
+the basis, or with the data overlaid. For example, the plots in Figures
+\ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 \begin{Schunk}
 \begin{Sinput}
@@ -530,6 +540,10 @@ view_basis(basis = f_basis,
 \end{Sinput}
 \end{Schunk}
 
+\noindent An illustration of the manip space (as shown in Figure
+\ref{fig:step2}) is made with the \texttt{view\_manip\_space} function,
+as follows:
+
 \begin{Schunk}
 \begin{Sinput}
 
@@ -538,33 +552,6 @@ view_manip_space(basis = f_basis,
                  labels = colnames(f_data))
 \end{Sinput}
 \end{Schunk}
-
-\hypertarget{rendering-and-sharing}{%
-\subsection{Rendering and sharing}\label{rendering-and-sharing}}
-
-The \pkg{tourr} package utilizes \pkg{base} graphics for the display of
-tours. \pkg{spinifex} allows tours to be rendered in \pkg{plotly} as an
-HTML5 object or \pkg{gganimate} as GIF or MP4 files. Sharing of
-animations is not trivial, especially static formats like print and PDF.
-Even with dynamic display capturing the correct resolution and aspect
-ratio can be challenging, while many formats quickly bloat file sizes
-limiting sharing options. Keep in mind hosting options and exporting
-functions offered in \pkg{plotly}, \pkg{gganimate} and \pkg{tourr}.
-
-\hypertarget{storage}{%
-\subsection{Storage}\label{storage}}
-
-Storing each data point for every frame of the animation is redundant.
-Just as operations are performed on the bases, so too should tour paths
-be stored as bases and a single instance of the data. Consider a radial
-manual tour, we can store the salient features in 3 bases, where
-\(\phi\) is at its starting, minimum, and maximum values. The frames in
-between can be interpolated by supplying angular speed. With the use of
-the \code{tourr::save\_history()} function, the target bases can be
-saved. From there geodesic interpolation can be used to populate the
-intermittent frames. This type of interpolation should not be used on
-manual tours, which have already been initialized into a 3D manip space
-where direct linear interpolation is appropriate.
 
 \hypertarget{sec:application}{%
 \section{Application}\label{sec:application}}
