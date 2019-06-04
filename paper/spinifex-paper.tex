@@ -156,8 +156,8 @@ is as follows:
   3D rotations within the manip space, \(\textbf{M}\). 
 \end{itemize}
 
-The algorithm operates entirely on projection bases, and incorporates
-the data only when making the projected data plots.
+The algorithm operates entirely on projection bases and incorporates the
+data only when making the projected data plots.
 
 \hypertarget{steps}{%
 \subsection{Steps}\label{steps}}
@@ -176,11 +176,11 @@ start is to identify an interesting projection using a projection
 pursuit guided tour. Here the holes index is used to find a 2D
 projection of the flea data, which shows three separated groups. Figure
 \ref{fig:step0} shows the initial projection of the data. The left panel
-displays the projection basis (\(\textbf{B}\)), and can be used as a
+displays the projection basis (\(\textbf{B}\)) and can be used as a
 visual guide of the magnitude and direction that each variable
 contributes to the projection. The right panel shows the projected data,
 \(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\). The
-colour and shape of points is mapped to the flea species. This plot is
+color and shape of points are mapped to the flea species. This plot is
 made using the \code{view\_basis()} function in \CRANpkg{spinifex},
 which generates a \CRANpkg{ggplot2} (Wickham
 \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
@@ -270,7 +270,7 @@ within the projection, \(\theta\), is rotation around the \(Z\) axis.
 Out-of-projection rotation, \(\phi\), is the rotation around an axis on
 the \(XY\) plane, \(\textbf{U}\), orthogonal to \(\textbf{e}\). Given
 these axes, the rotation matrix, \(\textbf{R}\) can be written as
-follows, using Rodrigues' rotation formula (originally pubished in
+follows, using Rodrigues' rotation formula (originally published in
 Rodrigues (\protect\hyperlink{ref-rodrigues_lois_1840}{1840})):
 
 \begin{align*}
@@ -365,7 +365,7 @@ the steps \(\phi_i\).
   control the movement, is consistent with the tour algorithm as
   implemented in the \pkg{tourr}).
 \item
-  Step towards \(0\), where the manip var is a completely in the
+  Step towards \(0\), where the manip var is completely in the
   projection.
 \item
   Step towards \(\pi/2\), where the manip variable has no contribution.
@@ -374,7 +374,7 @@ the steps \(\phi_i\).
 \end{enumerate}
 
 In each of the steps 3-5, a small step may be added to ensure that the
-end points of \(\phi\) (0, \(\pi/2\)) are reached.
+endpoints of \(\phi\) (0, \(\pi/2\)) are reached.
 
 \hypertarget{sec:display}{%
 \subsubsection{Step 4) Projecting the data}\label{sec:display}}
@@ -394,7 +394,7 @@ sequence to form an animation.
 
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15
 steps. The projection axes are displayed on the top half, which
-correspond to the projected data in the bottom half. When aede2 is
+corresponds to the projected data in the bottom half. When aede2 is
 removed from the projection, the purple cluster overlaps with the green
 cluster. This suggests that aede2 is important for distinguishing this
 species.
@@ -522,7 +522,7 @@ render_plotly()
 
 \noindent This will generate an html animation using plotly. Switching
 the renderer to \texttt{gganimate} is an option, which will also create
-an html animation, or an animated gif. Each of these formats allows for
+an html animation or an animated gif. Each of these formats allows for
 the animation to be made available on a web site, or directly visible in
 an html formatted document.
 
@@ -716,14 +716,15 @@ remove variables without affecting the visible structure. Defining a
 manual rotation in high dimensions is possible using Givens rotations
 and Householder reflections as outlined in Buja et al.
 (\protect\hyperlink{ref-buja_computational_2005}{2005}). This would
-provide more flexible manual rotation, but more difficulty for a user,
+provide more flexible manual rotation, but more difficult for a user
 because they have the choice (too much choice) of which directions to
 move.
 
 Another future research topic could be to extend the algorithm for use
 on 3D projections. With the current popularity and availability of 3D
 virtual displays, this may benefit the detection and understanding of
-higher dimensional structure, or enable the examination of functions.
+the higher dimensional structure, or enable the examination of
+functions.
 
 Having a graphical user interface would be useful for making it easier
 and more accessible to a general audience. This is possible to implement
@@ -857,7 +858,7 @@ Nicholas Spyrison\\
 Monash University\\
 Faculty of Information Technology\\
 }
-\href{mailto:Nicholas.Spyrison@monash.edu}{\nolinkurl{Nicholas.Spyrison@monash.edu}}
+\href{mailto:nicholas.spyrison@monash.edu}{\nolinkurl{nicholas.spyrison@monash.edu}}
 
 \address{%
 Dianne Cook\\

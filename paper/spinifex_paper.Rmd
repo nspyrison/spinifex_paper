@@ -6,7 +6,7 @@ author:
     affiliation: Monash University 
     address:
     - Faculty of Information Technology
-    email:  Nicholas.Spyrison@monash.edu
+    email:  nicholas.spyrison@monash.edu
   - name: Dianne Cook
     affiliation: Monash University 
     address:
@@ -327,13 +327,13 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
 <!--
 - $\textbf{RM} = \textbf{M} * \textbf{R}$, the result of the manip space after the application of the rotation matrix.
-- $\textbf{P} = \textbf{X} * \textbf{RM}$, the data projection, the data as projected through the rotated manip space.
+- $\textbf{Y} = \textbf{X} * \textbf{RM}$, the data as projected through the rotated manip space.
 
-XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. The projected data should be $Y$ not $P$. 
+XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. The projected data should be $Y$, not $P$. 
 -->
 
 <!-- operate on bases -->
-The algorithm operates entirely on projection bases, and incorporates the data only when making the projected data plots.
+The algorithm operates entirely on projection bases and incorporates the data only when making the projected data plots.
 
 ## Steps
 ### Step 0) Set up
@@ -342,7 +342,7 @@ The algorithm operates entirely on projection bases, and incorporates the data o
 The flea data (@lubischew_use_1962), available in the \pkg{tourr} package, is used to illustrate the algorithm. The data contains 74 observations on 6 variables, which are physical measurements made on beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
-An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. <!--In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space.--> Here the holes index is used to find a 2D projection of the flea data, which shows three separated groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$), and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The colour and shape of points is mapped to the flea species. This plot is made using the  \code{view\_basis()} function in \CRANpkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. 
+An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. <!--In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space.--> Here the holes index is used to find a 2D projection of the flea data, which shows three separated groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the  \code{view\_basis()} function in \CRANpkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. 
 
 ```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
 ## Flea holes tour
@@ -400,7 +400,7 @@ The basis vector corresponding to the manip var (red line in Figure \ref{fig:ste
 For a radial tour, fix $\theta$, the angle describing rotation within the projection plane, and compute a sequence for $\phi$, defining movement out of the plane. This will change the initial value, $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of $0$ (manip var fully in projection), then to a minimum of $\pi/2$ (manip var out of projection), before returning to $\phi_1$. 
 
 <!-- define the rotation matrix -->
-Rotations in 3D can be defined by the axes they pivot on. Rotation within the projection, $\theta$, is rotation around the $Z$ axis. Out-of-projection rotation, $\phi$, is the rotation around an axis on the $XY$ plane, $\textbf{U}$, orthogonal to $\textbf{e}$. Given these axes, the rotation matrix, $\textbf{R}$ can be written as follows, using Rodrigues' rotation formula (originally pubished in @rodrigues_lois_1840):
+Rotations in 3D can be defined by the axes they pivot on. Rotation within the projection, $\theta$, is rotation around the $Z$ axis. Out-of-projection rotation, $\phi$, is the rotation around an axis on the $XY$ plane, $\textbf{U}$, orthogonal to $\textbf{e}$. Given these axes, the rotation matrix, $\textbf{R}$ can be written as follows, using Rodrigues' rotation formula (originally published in @rodrigues_lois_1840):
 
   \begin{align*}
     \textbf{R}_{[3,~3]} 
@@ -468,7 +468,7 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
 ### Step 4) Creating an animation of the radial rotation
 
 <!--  phi transform and animation -->
-The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$, to vary between 0 and $\pi/2$, call the steps $\phi_i$. 
+The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between 0 and $\pi/2$, call the steps $\phi_i$. 
 
 <!--Apply the transformation $\phi_i \leftarrow \phi_i-\phi_1$ such that $\phi$ is relative to the projection plane. When $\phi$ is 0, $|\textbf{B}_k| = 1$, and when $\phi$ is $\pi/2$, the manip var has no contribution to the projection.--> 
 
@@ -489,11 +489,11 @@ grid.arrange(p1, p2, p3, p4, ncol=4)
 
 1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow in $\textbf{B}$. Check that  $\phi_1$ is between 0 and $\pi/2$, and if not, transform it into this range, by subtracting or adding $\pi$. (XXX Nick needs to check this math, and the ways to check and fix if angle produced by the calculation given fall in the right range.)
 2. Set an angle increment ($\Delta_\phi$) that sets the step size for the animation, to rotate the manip var into and out of the projection. (Note: Using angle increment, rather than a number of steps, to control the movement, is consistent with the tour algorithm as implemented in the \pkg{tourr}).
-3. Step towards $0$, where the manip var is a completely in the projection.
+3. Step towards $0$, where the manip var is completely in the projection.
 4. Step towards $\pi/2$, where the manip variable has no contribution.
 5. Step back to $\phi_1$.
 
-In each of the steps 3-5, a small step may be added to ensure that the end points of $\phi$ (0, $\pi/2$) are reached. 
+In each of the steps 3-5, a small step may be added to ensure that the endpoints of $\phi$ (0, $\pi/2$) are reached. 
 
 ### Step 4) Projecting the data {#sec:display}
 
@@ -508,7 +508,7 @@ The operation of a manual tour is defined on the projection bases. Only when the
 \noindent where $\textbf{R}^{(i)}_{[3,3]}$ is the incremental rotation matrix, using $\phi_i$. To make the data plot, use the first two columns of \textbf{Y}. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
 
 <!-- Animation on flea data -->
-Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which correspond to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
+Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which corresponds to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
 
 Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
@@ -622,7 +622,7 @@ array2df()
 render_plotly()
 ```
 
-\noindent This will generate an html animation using plotly. Switching the renderer to `gganimate` is an option, which will also create an html animation, or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
+\noindent This will generate an html animation using plotly. Switching the renderer to `gganimate` is an option, which will also create an html animation or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
 
 <!--
 This concludes the content of the algorithm section, however, lets cover animating paths generated in \pkg{tourr}. Animate the previously generated guided tour path via \code{play\_tour\_path()}. Utility functions can also be passed as arguments into either of the tour animation function to change the resulting graphics object, set \code{render\_type = render\_gganimate} to view the animation as a GIF.
@@ -779,14 +779,14 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 Dynamic linear projections of numeric multivariate data, tours, play an important role in data visualization; they extend the dimensionality of visuals to peek into high-dimensional data and parameter spaces. This research has taken the manual tour algorithm, specifically the radial rotation, used in GGobi [@swayne_ggobi:_2003] to interactively rotate a variable into or out of a 2D projection, and modified it to create an animation that performs the same task. It is most useful for examining the importance of variables, and how the structure in the projection is sensitive or not to specific variables. This functionality available in package \CRANpkg{spinifex}. The work complements the methods available in the \CRANpkg{tourr} package.
 
 <!-- summary of application  -->
-This work was motivated by problems in physics, and thus the usage was illustrated on data comparing experiments of hadronic collisions, to explore the sensitivity of cluster structure to different principal components. These tools can be applied quite broadly, to many multivariate data analysis problems.  <!--The importance of selecting the correct manip var, as demonstrated by comparing tours of varying amounts of structural information. Manual tours, by controlling the contribution of the manip var on the projection, enable analysts to explore the sensitivity that variable has on the structure of the projection.This information can be used by domain experts to identify which variables are probing which parameter spaces and how sensitive structural features are to different variables. This insight can be indispensable for variable inclusion/exclusion, and in higher-level decisions, such as meta-analysis, to suggest directions of future research.--> 
+This work was motivated by problems in physics, and thus the usage was illustrated on data comparing experiments of hadronic collisions, to explore the sensitivity of cluster structure to different principal components. These tools can be applied quite broadly, to many multivariate data analysis problems.  <!--The importance of selecting the correct manip var, as demonstrated by comparing tours of varying amounts of structural information. Manual tours, by controlling the contribution of the manip var on the projection, enable analysts to explore the sensitivity that variable has on the structure of the projection. This information can be used by domain experts to identify which variables are probing which parameter spaces and how sensitive structural features are to different variables. This insight can be indispensable for variable inclusion/exclusion, and in higher-level decisions, such as meta-analysis, to suggest directions of future research.--> 
 
 <!-- Constraints -->
-The manual tour is constrained in the sense that the effect of one variable is dependent on the contributions of other variables in the manip space. However, this can be useful to simplify a projection, to remove variables without affecting the visible structure. Defining a manual rotation in high dimensions is possible using Givens rotations and Householder reflections as outlined in @buja_computational_2005. This would provide more flexible manual rotation, but more difficulty for a user, because they have the choice (too much choice) of which directions to move.  <!--Currently, Gram-Schmidt is the only form of frame interpolation used. In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes to generate rotations.-->
+The manual tour is constrained in the sense that the effect of one variable is dependent on the contributions of other variables in the manip space. However, this can be useful to simplify a projection, to remove variables without affecting the visible structure. Defining a manual rotation in high dimensions is possible using Givens rotations and Householder reflections as outlined in @buja_computational_2005. This would provide more flexible manual rotation, but more difficult for a user because they have the choice (too much choice) of which directions to move.  <!--Currently, Gram-Schmidt is the only form of frame interpolation used. In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes to generate rotations.-->
 
 
 <!-- 3D and function vis -->
-Another future research topic could be to extend the algorithm for use on 3D projections. With the current popularity and availability of 3D virtual displays, this may benefit the detection and understanding of higher dimensional structure, or enable the examination of functions.
+Another future research topic could be to extend the algorithm for use on 3D projections. With the current popularity and availability of 3D virtual displays, this may benefit the detection and understanding of the higher dimensional structure, or enable the examination of functions.
 
 <!--The addition of another dimension theoretically allows for improved perception. In some frameworks, such as the game engine **unity**, this would allow for the exploration in immersive virtual reality or mixed reality, which may further allow for a better perception of structure and aid in higher-dimensional function visualization. Functions with many parameters suffer from the same dimensionality problem as data while their possible values lie on a surface of values rather than discrete points. Occulation, or the closer surface blocking further surfaces, will likely be an issue that may be alleviated by the use of wire mesh, changing opacity, or looking at sections of the projections known as prosections [@furnas_prosection_1994].-->
 
