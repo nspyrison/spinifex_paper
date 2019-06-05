@@ -13,7 +13,7 @@ author:
     - Department of Econometrics and Business Statistics
     email:  dicook@monash.edu
 abstract: >
-  Dynamic low-dimensional linear projections of multivariate data collectively known as **tours** provide an important tool for exploring multivariate data and models. The R package \pkg{tourr} provides functions for several types of tours: grand, guided, little, local and frozen. Each of these can be viewed dynamically, or saved into a data object for animation. This paper describes a new package, \pkg{spinifex}, to provide a manual tour, that allows the coefficient for a single variable to be controlled. The variable is rotated fully into the projection, or completely out of the projection. The resulting sequence of projections can be displayed using animation, with functions from either the \pkg{plotly} and \pkg{gganimate} packages. By varying the coefficient of a single variable, it is possible to explore the sensitivity of structure in the projection to that variable. It is particularly useful when used with a projection pursuit guided tour to simplify and understand the solution. The use of the manual tour for studying the sensitivity of structure, in a projection, to specific variable contributions, is illustrated using particle physics data.
+  Dynamic low-dimensional linear projections of multivariate data collectively known as *tours* provide an important tool for exploring multivariate data and models. The R package \pkg{tourr} provides functions for several types of tours: grand, guided, little, local and frozen. Each of these can be viewed dynamically, or saved into a data object for animation. This paper describes a new package, \pkg{spinifex}, to provide a manual tour, that allows the coefficient for a single variable to be controlled. The variable is rotated fully into the projection, or completely out of the projection. The resulting sequence of projections can be displayed using animation, with functions from either the \pkg{plotly} and \pkg{gganimate} packages. By varying the coefficient of a single variable, it is possible to explore the sensitivity of structure in the projection to that variable. It is particularly useful when used with a projection pursuit guided tour to simplify and understand the solution. The use of the manual tour for studying the sensitivity of structure, in a projection, to specific variable contributions, is illustrated using particle physics data.
 
 keywords: exploratory data analysis, projection pursuit, high dimensional data, data visualization, statistical graphics, data science
 preamble: >
@@ -133,20 +133,25 @@ view_basis2 <- function(basis, labels = paste0("V", 1:nrow(basis)),
     ggplot2::theme_void() + ggplot2::theme(legend.position = "none") + 
     ggplot2::coord_fixed()
   if (axes != "off") {
-    gg <- gg + ggplot2::geom_path(
-      data = circ, mapping = ggplot2::aes(x = x, y = y), 
-      color = "grey80", size = 0.3, inherit.aes = F) + 
+    gg <- 
+      gg + ggplot2::geom_path(
+        data = circ, mapping = ggplot2::aes(x = x, y = y), 
+        color = "grey80", size = 0.3, inherit.aes = F
+      ) + 
       ggplot2::geom_segment(
-        data = basis, mapping = ggplot2::aes(x = V1, y = V2, xend = zero, yend = zero), color = col) + 
+        data = basis, color = col, 
+        mapping = ggplot2::aes(x = V1, y = V2, xend = zero, yend = zero)
+      ) + 
       ggplot2::geom_text(
         data = basis, mapping = ggplot2::aes(x = V1, y = V2, label = labels), 
-        size = 4, color = col, hjust = 1.1, vjust=.4)
+        size = 4, color = col, hjust = 1.1, vjust=.4
+      )
   }
   if (!is.null(data)) {
         proj <- as.data.frame(tourr::rescale(as.matrix(data) %*% 
             as.matrix(basis)) - 0.5)
-        gg <- gg + ggplot2::geom_point(data = proj, mapping = ggplot2::aes(x = V1, 
-            y = V2))
+        gg <- gg + ggplot2::geom_point(data = proj, 
+                                       mapping = ggplot2::aes(x = V1, y = V2))
     }
     gg
 }
@@ -327,7 +332,9 @@ XXX Clean up the notation, not all of this is needed or useful. The shadow of $e
 <!-- operate on bases -->
 The algorithm operates entirely on projection bases and incorporates the data only when making the projected data plots.
 
+
 ## Steps
+
 ### Step 0) Set up
 
 <!-- describe data. -->
@@ -455,21 +462,19 @@ The steps outlined above can be used to create any arbitrary rotation in the man
 
 
 ```{r step3, echo=F, warning=F, fig.height=2, fig.width=8, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
-f_angle <- .26
+f_angle <- .29
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
   paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
 p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1 phi=0.78")
-p2 <- view_basis2(f_mtour[,,6],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=0")
+p2 <- view_basis2(f_mtour[,,5],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=0")
 p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=1.57")
 p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle("4 phi=0.78")
 grid.arrange(p1, p2, p3, p4, ncol=4)
 ```
 
-<!--### Sequence of $\phi_i$-->
-
-1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta = \tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow on $\textbf{B}$.
-<!-- phi_1 is actually 0, rebrand phi_1 as phi_offset, phi_alpha? -->
+<!-- Sequence of $\phi_i$ -->
+1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta = \tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow in $\textbf{B}$.
 2. Set an angle increment ($\Delta_\phi$) that sets the step size for the animation, to rotate the manip var into and out of the projection. (Note: Using angle increment, rather than a number of steps, to control the movement, is consistent with the tour algorithm as implemented in the \pkg{tourr}).
 3. Step towards $0$, where the manip var is completely in the projection.
 4. Step towards $\pi/2$, where the manip variable has no contribution.
@@ -486,7 +491,7 @@ The operation of a manual tour is defined on the projection bases. Only when the
   \textbf{Y}^{(i)}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
 \end{align*}
 
-<!-- plot 2 var in seq for animation -->
+<!-- plot XY in seq for animation -->
 \noindent where $\textbf{R}^{(i)}_{[3,3]}$ is the incremental rotation matrix, using $\phi_i$. To make the data plot, use the first two columns of \textbf{Y}. Show the projected data for each frame in sequence to form an animation. <!--The remaining manip space variable can be linked to point aesthetic (such as size or color) to produce depth cues used in conjunction with the $XY$ scatterplot.-->
 
 <!-- Animation on flea data -->
@@ -503,6 +508,7 @@ array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 # Package structure and functionality {#sec:usage}
 
 This section describes the functions available in the package, and how to use them.
+
 
 ## Installation
 
@@ -524,11 +530,11 @@ vignette("spinifex_vignette")
 remotes::install_github("nspyrison/spinifex") 
 ```
 
+
 ## Functions 
-<!-- in terms of work flow. -->
 
+<!-- in terms of work flow -->
 Table \ref{tab:functionsTable} lists the primary functions and their purpose. These are grouped into four types: construction for building a tour path, render to make the plot objects, animation for running the animation, and specialty for providing illustrations used in the algorithm description.
-
 
 ```{r functionsTable, echo=F}
 library(kableExtra)
@@ -619,6 +625,7 @@ The \pkg{tourr} package utilizes \pkg{base} graphics for the display of tours. \
 Storing each data point for every frame of the animation is redundant. Just as operations are performed on the bases, so too should tour paths be stored as bases and a single instance of the data. Consider a radial manual tour, we can store the salient features in 3 bases, where $\phi$ is at its starting, minimum, and maximum values. The frames in between can be interpolated by supplying angular speed. With the use of the \code{tourr::save\_history()} function, the target bases can be saved. From there geodesic interpolation can be used to populate the intermittent frames. This type of interpolation should not be used on manual tours, which have already been initialized into a 3D manip space where direct linear interpolation is appropriate.
 -->
 
+
 # Application {#sec:application}
 
 <!-- Introduction of data and original paper -->
@@ -641,7 +648,6 @@ When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}), the d
 
 Animations for the remaining PCs can be viewed at the following links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/). It can be seen that only PC4 is important for viewing the difference in these two experiments.
 
-
 ```{r JetClusterGood, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                     fig.cap="Snapshots of a radial manual tour of PC4 focusing on the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments.  The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
 # Jet cluster, Fig 7 of cook_dynamical_2018, subset to ATLAS7old and ATLAS7new
 load("./data/JetCluster_sub.rda")
@@ -651,7 +657,7 @@ jet_bas   <- JetCluster_basis
 jet_dat   <- tourr::rescale(JetCluster_sub[, 1:4])
 jet_cat   <- factor(JetCluster_sub$exp)
 jet_mvar  <- 4
-jet_ang   <- .26
+jet_ang   <- .315
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 #dim(jet_mtour)
 
@@ -666,7 +672,6 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 # 3, *worst
 # 4, *best
 ```
-
 
 ```{r JetClusterBad, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour of PC3 focusing on the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution of PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
 # Jet cluster, Fig 7 of cook_dynalical_2018, subset to ATLAS7old and ATLAS7new
@@ -686,7 +691,6 @@ Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed an
 <!-- comparison of the DIS cluster -->
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
 
-
 ```{r DISclusterGood, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                            fig.cap = "Snapshots of a radial manual tour exploring the contribution of PC6 for the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As PC6's contribution is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
 
 ##DIS cluster, fig 8 of cook_dynamical_2018
@@ -696,7 +700,7 @@ DIS_bas   <- DIScluster_centered_basis
 DIS_dat   <- tourr::rescale(grDIScenter[, 1:6])
 DIS_cat   <- factor(grDIScenter$disID)
 DIS_mvar  <- 6
-DIS_ang   <- .27
+DIS_ang   <- .32
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 
 array2static(.m_tour = DIS_mtour, .data = DIS_dat,
@@ -712,7 +716,6 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 # 5, black and plane
 # 6, best*purple and plane
 ```
-
 
 ```{r DISclusterBad, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                            fig.cap = "Snapshots of a radial manual tour exploring the contribution of PC2 for the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As PC2's contribution is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
 ##DIS cluster, fig 8 of cook_dynamical_2018
@@ -735,7 +738,6 @@ This work was motivated by problems in physics, and thus the usage was illustrat
 <!-- Constraints -->
 The manual tour is constrained in the sense that the effect of one variable is dependent on the contributions of other variables in the manip space. However, this can be useful to simplify a projection, to remove variables without affecting the visible structure. Defining a manual rotation in high dimensions is possible using Givens rotations and Householder reflections as outlined in @buja_computational_2005. This would provide more flexible manual rotation, but more difficult for a user because they have the choice (too much choice) of which directions to move.  <!--Currently, Gram-Schmidt is the only form of frame interpolation used. In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes to generate rotations.-->
 
-
 <!-- 3D and function vis -->
 Another future research topic could be to extend the algorithm for use on 3D projections. With the current popularity and availability of 3D virtual displays, this may benefit the detection and understanding of the higher dimensional structure, or enable the examination of functions.
 
@@ -752,10 +754,10 @@ Having a graphical user interface would be useful for making it easier and more 
 
 <!--Having script-only interaction with tours causes a significant barrier to entry. To a lesser extent, \pkg{plotly} offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \pkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust the interpolation step angle, or flag/save specific frame basis sets.--> 
 
+
 # Acknowledgments
 
 This article was created in R [@r_core_team_r:_2019], using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
 # Bibliography
-
