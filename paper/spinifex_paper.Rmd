@@ -320,8 +320,8 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 -->
 - $\textbf{e}$, a 1D basis vector of length $p$, with 1 in the $k$-th position and 0 elsewhere.
 - $\textbf{M}$ is a $p \times 3$ matrix, defining the 3D subspace where data rotation occurs, and is called the manip(ulation) space. 
-- $\theta$, the angle of in-projection-plane rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
-- $\phi$, the angle of out-of-projection-plane rotation, into the manip space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
+- $\theta$, the angle of in-projection rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
+- $\phi$, the angle of out-of-projection rotation, into the manip space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
 - $\textbf{U}$, the axis of rotation for out-of-projection rotation.
 - $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
 - $\textbf{Y}$, the resulting projection of the data through the manip space, $\textbf{M}$, and rotation matrix, $\textbf{R}$.
@@ -396,7 +396,7 @@ view_manip_space2(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
 The basis vector corresponding to the manip var (red line in Figure \ref{fig:step2}), can be operated like a lever. This is the process of the manual control, that rotates the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable contribution is controlled, the manip space rotates, and the projection onto the horizontal projection plane correspondingly changes. This is a manual tour. Generating a sequence of values for the rotation angles produces a path for the rotation of the manip space.
 
 <!-- describe manip var path -->
-For a radial tour, fix $\theta$, the angle describing rotation within the projection plane, and compute a sequence for $\phi$, defining movement out of the plane. This will change the initial value, $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of $0$ (manip var fully in projection), then to a minimum of $\pi/2$ (manip var out of projection), before returning to $\phi_1$. 
+For a radial tour, fix $\theta$, the angle describing rotation within the projection plane, and compute a sequence for $\phi$, defining movement out of the plane. This will change $\phi$ from the initial value, $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of $0$ (manip var fully in projection), then to a minimum of $\pi/2$ (manip var out of projection), before returning to $\phi_1$. 
 
 <!-- define the rotation matrix -->
 Rotations in 3D can be defined by the axes they pivot on. Rotation within the projection, $\theta$, is rotation around the $Z$ axis. Out-of-projection rotation, $\phi$, is the rotation around an axis on the $XY$ plane, $\textbf{U}$, orthogonal to $\textbf{e}$. Given these axes, the rotation matrix, $\textbf{R}$ can be written as follows, using Rodrigues' rotation formula (originally published in @rodrigues_lois_1840):
@@ -741,18 +741,13 @@ The manual tour is constrained in the sense that the effect of one variable is d
 <!-- 3D and function vis -->
 Another future research topic could be to extend the algorithm for use on 3D projections. With the current popularity and availability of 3D virtual displays, this may benefit the detection and understanding of the higher dimensional structure, or enable the examination of functions.
 
-<!--The addition of another dimension theoretically allows for improved perception. In some frameworks, such as the game engine **unity**, this would allow for the exploration in immersive virtual reality or mixed reality, which may further allow for a better perception of structure and aid in higher-dimensional function visualization. Functions with many parameters suffer from the same dimensionality problem as data while their possible values lie on a surface of values rather than discrete points. Occulation, or the closer surface blocking further surfaces, will likely be an issue that may be alleviated by the use of wire mesh, changing opacity, or looking at sections of the projections known as prosections [@furnas_prosection_1994].-->
+
 
 <!-- geometric and graphics display 
 The \pkg{tourr} package provides many other geometric displays with the \code{tourr::display\_*()} family. These geometric options could be integrated into the \pkg{ggplot2} framework for display on \pkg{plotly} and \pkg{gganimate}. Additionally, the \CRANpkg{animation} package @xie_animation:_2018 could be implemented for another graphics framework. However, \pkg{animation} builds from \pkg{base} graphics while \pkg{spinifex} utilizes \pkg{ggplot2} graphics, a significant paradigm shift, which may have  a low return on investment.-->
 
-<!-- interpolation 
-The Givens rotations and Householder reflections as outlined in @buja_computational_2005 could also be added. Currently, Gram-Schmidt is the only form of frame interpolation used. In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes to generate rotations.-->
-
 <!-- dynamic interaction/gui -->
 Having a graphical user interface would be useful for making it easier and more accessible to a general audience. This is possible to implement using \CRANpkg{shiny} [@chang_shiny:_2018]. The primary purposes of the interface would be to allow the user to interactively change the manip variable easily, and the interpolation step for more or less detailed views.
-
-<!--Having script-only interaction with tours causes a significant barrier to entry. To a lesser extent, \pkg{plotly} offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \pkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust the interpolation step angle, or flag/save specific frame basis sets.--> 
 
 
 # Acknowledgments
