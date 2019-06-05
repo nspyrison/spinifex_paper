@@ -143,12 +143,12 @@ is as follows:
   \(\textbf{M}\) is a \(p \times 3\) matrix, defining the 3D subspace
   where data rotation occurs, and is called the manip(ulation) space.
 \item
-  \(\theta\), the angle of in-projection-plane rotation, for example, on
-  the reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
+  \(\theta\), the angle of in-projection rotation, for example, on the
+  reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
 \item
-  \(\phi\), the angle of out-of-projection-plane rotation, into the
-  manip space; \(c_\phi, s_\phi\) are the cosine and sine. The initial
-  value for animation purposes is \(\phi_1\).
+  \(\phi\), the angle of out-of-projection rotation, into the manip
+  space; \(c_\phi, s_\phi\) are the cosine and sine. The initial value
+  for animation purposes is \(\phi_1\).
 \item
   \(\textbf{U}\), the axis of rotation for out-of-projection rotation.
 \item
@@ -262,8 +262,8 @@ path for the rotation of the manip space.
 
 For a radial tour, fix \(\theta\), the angle describing rotation within
 the projection plane, and compute a sequence for \(\phi\), defining
-movement out of the plane. This will change the initial value,
-\(\phi_1\), the angle between \(\textbf{e}\) and its shadow in
+movement out of the plane. This will change \(\phi\) from the initial
+value, \(\phi_1\), the angle between \(\textbf{e}\) and its shadow in
 \(\textbf{B}\), to a maximum of \(0\) (manip var fully in projection),
 then to a minimum of \(\pi/2\) (manip var out of projection), before
 returning to \(\phi_1\).
@@ -644,8 +644,8 @@ these two experiments.
 Following Cook, Laa, and Valencia
 (\protect\hyperlink{ref-cook_dynamical_2018}{2018}), to explore the DIS
 cluster, PCA is recomputed and the first six principal components,
-explaining 48\% of the variation is used. The contributions of PC6 and
-PC2 are explored in Figures \ref{fig:DISclusterGood} and
+explaining 48\% of the full sample variation, is used. The contributions
+of PC6 and PC2 are explored in Figures \ref{fig:DISclusterGood} and
 \ref{fig:DISclusterBad}, respectively. Three experiments are examined:
 DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
 

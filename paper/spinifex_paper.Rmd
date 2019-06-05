@@ -326,7 +326,9 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
 - $\textbf{Y}$, the resulting projection of the data through the manip space, $\textbf{M}$, and rotation matrix, $\textbf{R}$.
 <!--
-XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. 
+XXX Clean up the notation, not all of this is needed or useful. 
+- The shadow of $e$ in the projection may need some notation. 
+- R is really an unconstrained rotation? (constrained rotation mentioned twice, what is the differenece?
 -->
 
 <!-- operate on bases -->
@@ -686,7 +688,7 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 ## DIS cluster
 
 <!-- introduce DIS cluster -->
-Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed and the first six principal components, explaining 48% of the variation is used. The contributions of PC6 and PC2 are explored in Figures \ref{fig:DISclusterGood} and  \ref{fig:DISclusterBad}, respectively. Three experiments are examined: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
+Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed and the first six principal components, explaining 48% of the full sample variation, is used. The contributions of PC6 and PC2 are explored in Figures \ref{fig:DISclusterGood} and  \ref{fig:DISclusterBad}, respectively. Three experiments are examined: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
 
 <!-- comparison of the DIS cluster -->
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
