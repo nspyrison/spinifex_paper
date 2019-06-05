@@ -301,14 +301,8 @@ The algorithm to conduct a manual tour interactively, by recording mouse/cursor 
 - *angular*: fix the magnitude, and allow the angle or direction of the contribution to vary.
 - *horizontal*, *vertical*: allow rotation only around the horizontal or vertical axis of the current 2D projection.
 
-The algorithm described here produces a **radial** tour as an *animation sequence*. It takes the current contribution of the chosen variable, and using rotation brings this variable fully into the projection, completely removes it, and then returns to the original position. <!--This is an overview of the steps:
+The algorithm described here produces a **radial** tour as an *animation sequence*. It takes the current contribution of the chosen variable, and using rotation brings this variable fully into the projection, completely removes it, and then returns to the original position. 
 
-1. Provided with a 2D projection, choose a variable to manipulate. This is called the "manip var".
-2. Create a 3D manip space, where the manip variable has the full contribution.
-3. Generate a rotation sequence which increases the norm of the coefficient to 1 and zeros it.
-
-More detail is provided in the following sections. Function names are provided, but code structure and usage is discussed in section \ref{sec:usage}.
--->
 
 ## Notation
 
@@ -325,11 +319,9 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\phi$, the angle of out-of-projection-plane rotation, into the manip space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
 - $\textbf{U}$, the axis of rotation for out-of-projection rotation.
 - $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
+- $\textbf{Y}$, the resulting projection of the data through the manip space, $\textbf{M}$, and rotation matrix, $\textbf{R}$.
 <!--
-- $\textbf{RM} = \textbf{M} * \textbf{R}$, the result of the manip space after the application of the rotation matrix.
-- $\textbf{Y} = \textbf{X} * \textbf{RM}$, the data as projected through the rotated manip space.
-
-XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. The projected data should be $Y$, not $P$. 
+XXX Clean up the notation, not all of this is needed or useful. The shadow of $e$ in the projection may need some notation. 
 -->
 
 <!-- operate on bases -->
@@ -342,7 +334,7 @@ The algorithm operates entirely on projection bases and incorporates the data on
 The flea data (@lubischew_use_1962), available in the \pkg{tourr} package, is used to illustrate the algorithm. The data contains 74 observations on 6 variables, which are physical measurements made on beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
-An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. <!--In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space.--> Here the holes index is used to find a 2D projection of the flea data, which shows three separated groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the  \code{view\_basis()} function in \CRANpkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. 
+An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. <!--In a guided tour, the projection sequence is selected by optimizing an index function via hill-climbing on the projection space.--> Here the holes index is used to find a 2D projection of the flea data, which shows three separated groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the \code{view\_basis()} function in \pkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. 
 
 ```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
 ## Flea holes tour
@@ -378,7 +370,7 @@ Initialize the coordinate basis vector as a zero vector $\textbf{e}$ of length $
 
 \begin{align*}
   e_k &\leftarrow 1 \\ 
-  \textbf{e}^*   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
+  \textbf{e}^*_{[p,~1]} &= \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e}^*)
 \end{align*}
 
@@ -394,7 +386,7 @@ view_manip_space2(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
 ### Step 3) Defining a 3D rotation
 
 <!-- illustration of axis manip -->
-The basis vector corresponding to the manip var (red line in Figure \ref{fig:step2}), can be operated like a lever. This is the process of the manual control, that rotates the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable contribution is controlled, the manip space rotates, and the projection onto the horizontal projection plane correspondingly changes. This is a manual tour. Generating a sequence of values for the rotation angles produces a path for the rotation of the manip space. <!--This defines the (orthonormally-constrained) rotation on the basis coefficients.-->
+The basis vector corresponding to the manip var (red line in Figure \ref{fig:step2}), can be operated like a lever. This is the process of the manual control, that rotates the manip variable into and out of the 2D projection (Figure \ref{fig:step3}). As the variable contribution is controlled, the manip space rotates, and the projection onto the horizontal projection plane correspondingly changes. This is a manual tour. Generating a sequence of values for the rotation angles produces a path for the rotation of the manip space.
 
 <!-- describe manip var path -->
 For a radial tour, fix $\theta$, the angle describing rotation within the projection plane, and compute a sequence for $\phi$, defining movement out of the plane. This will change the initial value, $\phi_1$, the angle between $\textbf{e}$ and its shadow in $\textbf{B}$, to a maximum of $0$ (manip var fully in projection), then to a minimum of $\pi/2$ (manip var out of projection), before returning to $\phi_1$. 
@@ -407,9 +399,9 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
         &=
     \begin{bmatrix}
-      1&0&0 \\ 
-      0&1&0 \\ 
-      0&0&1 \\
+      1 & 0 & 0 \\ 
+      0 & 1 & 0 \\ 
+      0 & 0 & 1 \\
     \end{bmatrix} +
     \begin{bmatrix}
       0 & 0 & c_\theta s_\phi \\
@@ -455,22 +447,11 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
   
 <!-- The term $(1-c_\phi)$ is used by convention, but $2sin^2(\phi/2)$ is more computationally robust. -->
 
-<!-- rotate manip space -->
-<!--Defining the axis of rotation for $\phi$ and the application of Rodrigues' rotation formula results in the rotation matrix, the rotation group SO(3). Continue with the rotation of the manip space, post-multiply the space by the above rotation matrix producing **RM**, the rotated manip space. This is basis values, the linear combination of variables, for one frame of the animation, repeat this process over a sequence of values for $\phi$ to produce an animation.
--->
-
-<!-- **For each value of ** $\phi_i$ **:** -->
-
-<!-- \begin{align*} -->
-<!--   \textbf{RM}_{[p,~3,~i]} &= \textbf{M}_{[p,~3]} ~*~ \textbf{R}_{[3,~3,~i]}  -->
-<!-- \end{align*} -->
 
 ### Step 4) Creating an animation of the radial rotation
 
 <!--  phi transform and animation -->
-The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between 0 and $\pi/2$, call the steps $\phi_i$. 
-
-<!--Apply the transformation $\phi_i \leftarrow \phi_i-\phi_1$ such that $\phi$ is relative to the projection plane. When $\phi$ is 0, $|\textbf{B}_k| = 1$, and when $\phi$ is $\pi/2$, the manip var has no contribution to the projection.--> 
+The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between $0$ and $\pi/2$, call the steps $\phi_i$. 
 
 
 ```{r step3, echo=F, warning=F, fig.height=2, fig.width=8, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
@@ -487,21 +468,22 @@ grid.arrange(p1, p2, p3, p4, ncol=4)
 
 <!--### Sequence of $\phi_i$-->
 
-1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow in $\textbf{B}$. Check that  $\phi_1$ is between 0 and $\pi/2$, and if not, transform it into this range, by subtracting or adding $\pi$. (XXX Nick needs to check this math, and the ways to check and fix if angle produced by the calculation given fall in the right range.)
+1. Set initial value of $\phi_1$ and $\theta$: $\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}$, $\theta = \tan^{-1}\frac{B_{k2}}{B_{k1}}$. $\phi_1$ is the angle between $\textbf{e}$ and its shadow on $\textbf{B}$.
+<!-- phi_1 is actually 0, rebrand phi_1 as phi_offset, phi_alpha? -->
 2. Set an angle increment ($\Delta_\phi$) that sets the step size for the animation, to rotate the manip var into and out of the projection. (Note: Using angle increment, rather than a number of steps, to control the movement, is consistent with the tour algorithm as implemented in the \pkg{tourr}).
 3. Step towards $0$, where the manip var is completely in the projection.
 4. Step towards $\pi/2$, where the manip variable has no contribution.
 5. Step back to $\phi_1$.
 
-In each of the steps 3-5, a small step may be added to ensure that the endpoints of $\phi$ (0, $\pi/2$) are reached. 
+In each of the steps 3-5, a small step may be added to ensure that the endpoints of $\phi$ ($0$, $\pi/2$) are reached. 
 
-### Step 4) Projecting the data {#sec:display}
+### Step 5) Projecting the data {#sec:display}
 
 <!-- the reminder of basis operation and now apply data -->
 The operation of a manual tour is defined on the projection bases. Only when the data plot needs to be made is the data projected into the relevant basis. 
 
 \begin{align*}
-  \textbf{Y}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
+  \textbf{Y}^{(i)}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
 \end{align*}
 
 <!-- plot 2 var in seq for animation -->
@@ -510,20 +492,12 @@ The operation of a manual tour is defined on the projection bases. Only when the
 <!-- Animation on flea data -->
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which corresponds to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing this species. 
 
-Tours are typically viewed as an animation. The animation of this tour can be viewed online at https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
+Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
 ```{r step4, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                                                fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This affects the separatiion between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
 #play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
 array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
 ```
-
-<!--
-### Checks that need to be made
-
-The initial value of $\phi$ is determined by the angle between $\textbf{e}$ and its shadow in $\textbf{B}$. 
-
-relative to its initial value. The transformation $\phi_i$ - $\phi_1$ is useful to think about $\phi$ relative to the basis plane. Additionally, the value of $\phi$ may be out of phase by a factor of $\pi$. If the rotation does not behave as expected these are the first places to check.
--->
 
 
 # Package structure and functionality {#sec:usage}
@@ -532,7 +506,7 @@ This section describes the functions available in the package, and how to use th
 
 ## Installation
 
-The \CRANpkg{spinifex} is available from CRAN, and can be installed by: 
+The \pkg{spinifex} is available from CRAN, and can be installed by: 
 ```{r installCODEEXAMPLE, eval=F, echo=T}
 install.package("spinifex")
 library("spinifex")
@@ -555,8 +529,6 @@ remotes::install_github("nspyrison/spinifex")
 
 Table \ref{tab:functionsTable} lists the primary functions and their purpose. These are grouped into four types: construction for building a tour path, render to make the plot objects, animation for running the animation, and specialty for providing illustrations used in the algorithm description.
 
-<!--
-The primary functions that will aid users in performing their own manual tours are broken into the following groupings: tour preparation, tour animation, and utility. In the following section describes and demonstrates the usage of the above functions following the order in the algorithm. The utility functions are called by the tour animation functions, passed to the argument \code{render\_type}. Usage is demonstrated below and in the example documentation.-->
 
 ```{r functionsTable, echo=F}
 library(kableExtra)
@@ -574,8 +546,6 @@ funcs <- rbind(
   c("animation", "play_tour_path", "animates given tour path"),
   c("animation", "play_manual_tour", "animates the manual tour algorithm"),
   c("", "", ""),
-  # c("utility", "col_of", "maps a variable to the point color"),
-  # c("utility", "pch_of", "maps a variable to the point character (shape)"),
   c("specialty", "view_basis", "displays the reference frame of a given basis"),
   c("specialty", "view_manip_space", "illustrative display of any manip space")
 )
@@ -587,10 +557,8 @@ kable(funcs, "latex", caption = "Summary of available functions.", booktabs = T,
 
 ## Usage
 
-Using the `flea` data from the \CRANpkg{tourr} package, we will illustrate generating a manual tour to explore the sensitivity of the cluster structure is to the variable `aede2`. 
+Using the \code{flea} data from the \pkg{tourr} package, we will illustrate generating a manual tour to explore the sensitivity of the cluster structure is to the variable aede2. 
 
-<!--
-We'll start by initializing values including a standardized data set (numeric columns only), a starting basis, a categorical variable for point aesthetics (optional), and a manip var. To get bearings on the projection, start by observing the reference axes of the basis with \code{view\_basis()} producing Figure \ref{fig:step0}.-->
 
 <!-- setup -->
 ```{r step0CODEEXAMPLE, eval=F, echo=T}
@@ -609,12 +577,7 @@ play_manual_tour(data = f_data,                           ## Generates animation
                  pch = f_cat)
 ```
 
-<!--After becoming familiar with this space, select a manip var, the variable to change the contributions of. Use \code{view\_manip\_space()} to view the new space with a dimension orthogonal to the projection plane where the manip var has a full contribution. This illustrates how the manip var is manipulated with the addition of the manip space as shown in Figure \ref{fig:step2}.
-
-
-Now we are ready to perform a manual tour on the selected variable. Use \code{play\_manual\_tour()} to perform the algorithm as discussed above, in section \ref{sec:algorithm}. This is the animated equivalent of Figure \ref{fig:step3}. -->
-
-The `play_manual_tour` function is a composite function for user convenience that does these operations:
+The \code{play\_manual\_tour()} function is a composite function for user convenience that does these operations:
 
 ```{r eval=FALSE, echo=TRUE}
 manual_tour()
@@ -622,19 +585,8 @@ array2df()
 render_plotly()
 ```
 
-\noindent This will generate an html animation using plotly. Switching the renderer to `gganimate` is an option, which will also create an html animation or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
+\noindent This will generate an html animation using plotly. Switching the renderer to \code{gganimate} is an option, which will also create an html animation or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
 
-<!--
-This concludes the content of the algorithm section, however, lets cover animating paths generated in \pkg{tourr}. Animate the previously generated guided tour path via \code{play\_tour\_path()}. Utility functions can also be passed as arguments into either of the tour animation function to change the resulting graphics object, set \code{render\_type = render\_gganimate} to view the animation as a GIF.
-
-```{r guidedTourCODEEXAMPLE, eval=F, echo=T}
-play_tour_path(tour_path = f_path,
-               data = f_data,
-               render_type = render_gganimate, 
-               angle = angle_speed
-)
-```
--->
 
 ### Making illustrations
 
@@ -683,11 +635,10 @@ The data has a hierarchical structure with top-level clusters; DIS, VBP, and jet
 
 <!-- jet cluster, explain dimensionality -->
 The jet cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is further subsetted, to ATLAS7old and ATLAS7new, in order to focus on two groups, with a reasonable number of observations, that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in Figures \ref{fig:JetClusterGood} and  \ref{fig:JetClusterBad}, respectively. The difference in shape can be interpreted as the experiments probing different phase-spaces. Back-transforming the principal components to the original variables can be done for more detailed interpretation.
-<!--These variables are selected to contrast the information conveyed by different manip variables. Links to dynamic HTML5 animations controlling each of the four variables are also provided.--> 
 
 <!-- discussion of findings and which is more insightful -->
 When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}), the difference between the two groups is removed, indicating that it is important for distinguishing experiments. However, removing PC3 from the projection (Figure \ref{fig:JetClusterBad}), has no effect on the structure, indicating it is not important for distinguishing experiments. 
-<!--, there is a clear difference in the parameter space spanned by the experiment types ATLAS7new and ATLAS7old. Specifically, the variation of ATLAS7new (green) becomes more singular. The experiments are probing different parameter space and PC4 is important to demonstrate this. Yet, when PC3 is manipulated there is no clear indication that the different experiments probe different parameter space. Performing a radial manual tour on PC4 is more insightful than for PC3.-->
+
 Animations for the remaining PCs can be viewed at the following links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/). It can be seen that only PC4 is important for viewing the difference in these two experiments.
 
 
@@ -776,10 +727,10 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 # Discussion {#sec:discussion}
 
 <!-- summary of spinifex  -->
-Dynamic linear projections of numeric multivariate data, tours, play an important role in data visualization; they extend the dimensionality of visuals to peek into high-dimensional data and parameter spaces. This research has taken the manual tour algorithm, specifically the radial rotation, used in GGobi [@swayne_ggobi:_2003] to interactively rotate a variable into or out of a 2D projection, and modified it to create an animation that performs the same task. It is most useful for examining the importance of variables, and how the structure in the projection is sensitive or not to specific variables. This functionality available in package \CRANpkg{spinifex}. The work complements the methods available in the \CRANpkg{tourr} package.
+Dynamic linear projections of numeric multivariate data, tours, play an important role in data visualization; they extend the dimensionality of visuals to peek into high-dimensional data and parameter spaces. This research has taken the manual tour algorithm, specifically the radial rotation, used in GGobi [@swayne_ggobi:_2003] to interactively rotate a variable into or out of a 2D projection, and modified it to create an animation that performs the same task. It is most useful for examining the importance of variables, and how the structure in the projection is sensitive or not to specific variables. This functionality available in package \pkg{spinifex}. The work complements the methods available in the \pkg{tourr} package.
 
 <!-- summary of application  -->
-This work was motivated by problems in physics, and thus the usage was illustrated on data comparing experiments of hadronic collisions, to explore the sensitivity of cluster structure to different principal components. These tools can be applied quite broadly, to many multivariate data analysis problems.  <!--The importance of selecting the correct manip var, as demonstrated by comparing tours of varying amounts of structural information. Manual tours, by controlling the contribution of the manip var on the projection, enable analysts to explore the sensitivity that variable has on the structure of the projection. This information can be used by domain experts to identify which variables are probing which parameter spaces and how sensitive structural features are to different variables. This insight can be indispensable for variable inclusion/exclusion, and in higher-level decisions, such as meta-analysis, to suggest directions of future research.--> 
+This work was motivated by problems in physics, and thus the usage was illustrated on data comparing experiments of hadronic collisions, to explore the sensitivity of cluster structure to different principal components. These tools can be applied quite broadly, to many multivariate data analysis problems.
 
 <!-- Constraints -->
 The manual tour is constrained in the sense that the effect of one variable is dependent on the contributions of other variables in the manip space. However, this can be useful to simplify a projection, to remove variables without affecting the visible structure. Defining a manual rotation in high dimensions is possible using Givens rotations and Householder reflections as outlined in @buja_computational_2005. This would provide more flexible manual rotation, but more difficult for a user because they have the choice (too much choice) of which directions to move.  <!--Currently, Gram-Schmidt is the only form of frame interpolation used. In a Givens rotation, the $x$ and $y$ components (for example $\theta~= 0,~pi/2$) of the in-plane rotation are calculated separately and would be applied sequentially to produce the radial rotation. Householder reflections define reflection axes to project points on to the axes to generate rotations.-->
@@ -799,11 +750,11 @@ The Givens rotations and Householder reflections as outlined in @buja_computatio
 <!-- dynamic interaction/gui -->
 Having a graphical user interface would be useful for making it easier and more accessible to a general audience. This is possible to implement using \CRANpkg{shiny} [@chang_shiny:_2018]. The primary purposes of the interface would be to allow the user to interactively change the manip variable easily, and the interpolation step for more or less detailed views.
 
-<!--Having script-only interaction with tours causes a significant barrier to entry. To a lesser extent, \pkg{plotly} offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \CRANpkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust the interpolation step angle, or flag/save specific frame basis sets.--> 
+<!--Having script-only interaction with tours causes a significant barrier to entry. To a lesser extent, \pkg{plotly} offers some static interactions with the contained object, such as tooltips, brushing, and linking without communicating back to the R console. The development of a dynamic graphical user interface, perhaps with the use of a \pkg{shiny} [@chang_shiny:_2018] application, would mitigate the barrier to entry, allow for more rapid analysis, and offer an approachable demo tool. The user could easily switch between variables to control, adjust the interpolation step angle, or flag/save specific frame basis sets.--> 
 
 # Acknowledgments
 
-This article was created in R [@r_core_team_r:_2018], using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
+This article was created in R [@r_core_team_r:_2019], using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
 # Bibliography

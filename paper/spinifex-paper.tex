@@ -153,7 +153,10 @@ is as follows:
   \(\textbf{U}\), the axis of rotation for out-of-projection rotation.
 \item
   \(\textbf{R}\), the 3D rotation matrix, for performing unconstrained
-  3D rotations within the manip space, \(\textbf{M}\). 
+  3D rotations within the manip space, \(\textbf{M}\).
+\item
+  \(\textbf{Y}\), the resulting projection of the data through the manip
+  space, \(\textbf{M}\), and rotation matrix, \(\textbf{R}\). 
 \end{itemize}
 
 The algorithm operates entirely on projection bases and incorporates the
@@ -181,8 +184,8 @@ visual guide of the magnitude and direction that each variable
 contributes to the projection. The right panel shows the projected data,
 \(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\). The
 color and shape of points are mapped to the flea species. This plot is
-made using the \code{view\_basis()} function in \CRANpkg{spinifex},
-which generates a \CRANpkg{ggplot2} (Wickham
+made using the \code{view\_basis()} function in \pkg{spinifex}, which
+generates a \CRANpkg{ggplot2} (Wickham
 \protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
 
 \begin{Schunk}
@@ -220,7 +223,7 @@ the original 2D projection to describe a 3D manip space, \(\textbf{M}\).
 
 \begin{align*}
   e_k &\leftarrow 1 \\ 
-  \textbf{e}^*   &\leftarrow \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
+  \textbf{e}^*_{[p,~1]} &= \textbf{e} - \langle \textbf{e}, \textbf{B}_1 \rangle \textbf{B}_1 - \langle \textbf{e}, \textbf{B}_2 \rangle \textbf{B}_2 \\ 
   \textbf{M}_{[p,~3]} &= (\textbf{B}_1,\textbf{B}_2,\textbf{e}^*)
 \end{align*}
 
@@ -278,9 +281,9 @@ Rodrigues (\protect\hyperlink{ref-rodrigues_lois_1840}{1840})):
     &= \textbf{I}_3 + s_\phi\*\textbf{U} + (1-c_\phi)\*\textbf{U}^2 \\
         &=
     \begin{bmatrix}
-      1&0&0 \\ 
-      0&1&0 \\ 
-      0&0&1 \\
+      1 & 0 & 0 \\ 
+      0 & 1 & 0 \\ 
+      0 & 0 & 1 \\
     \end{bmatrix} +
     \begin{bmatrix}
       0 & 0 & c_\theta s_\phi \\
@@ -332,8 +335,8 @@ The steps outlined above can be used to create any arbitrary rotation in
 the manip space. To use these for sensitivity analysis, the radial
 rotation is built into an animation where the manip var is rotated fully
 into the projection, completely out, and then back to the initial value.
-This involves allowing \(\phi\), to vary between 0 and \(\pi/2\), call
-the steps \(\phi_i\).
+This involves allowing \(\phi\) to vary between \(0\) and \(\pi/2\),
+call the steps \(\phi_i\).
 
 \begin{Schunk}
 \begin{figure}
@@ -352,12 +355,8 @@ the steps \(\phi_i\).
 \item
   Set initial value of \(\phi_1\) and \(\theta\):
   \(\phi_1 = \cos^{-1}{\sqrt{B_{k1}^2+B_{k2}^2}}\),
-  \(\theta=\tan^{-1}\frac{B_{k2}}{B_{k1}}\). \(\phi_1\) is the angle
-  between \(\textbf{e}\) and its shadow in \(\textbf{B}\). Check that
-  \(\phi_1\) is between 0 and \(\pi/2\), and if not, transform it into
-  this range, by subtracting or adding \(\pi\). (XXX Nick needs to check
-  this math, and the ways to check and fix if angle produced by the
-  calculation given fall in the right range.)
+  \(\theta = \tan^{-1}\frac{B_{k2}}{B_{k1}}\). \(\phi_1\) is the angle
+  between \(\textbf{e}\) and its shadow on \(\textbf{B}\). 
 \item
   Set an angle increment (\(\Delta_\phi\)) that sets the step size for
   the animation, to rotate the manip var into and out of the projection.
@@ -374,17 +373,17 @@ the steps \(\phi_i\).
 \end{enumerate}
 
 In each of the steps 3-5, a small step may be added to ensure that the
-endpoints of \(\phi\) (0, \(\pi/2\)) are reached.
+endpoints of \(\phi\) (\(0\), \(\pi/2\)) are reached.
 
 \hypertarget{sec:display}{%
-\subsubsection{Step 4) Projecting the data}\label{sec:display}}
+\subsubsection{Step 5) Projecting the data}\label{sec:display}}
 
 The operation of a manual tour is defined on the projection bases. Only
 when the data plot needs to be made is the data projected into the
 relevant basis.
 
 \begin{align*}
-  \textbf{Y}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
+  \textbf{Y}^{(i)}_{[n,~3]} &= \textbf{X}_{[n,~p]} \textbf{M}_{[p,~3]} \textbf{R}^{(i)}_{[3,3]}
 \end{align*}
 
 \noindent where \(\textbf{R}^{(i)}_{[3,3]}\) is the incremental rotation
@@ -425,7 +424,7 @@ to use them.
 \hypertarget{installation}{%
 \subsection{Installation}\label{installation}}
 
-The \CRANpkg{spinifex} is available from CRAN, and can be installed by:
+The \pkg{spinifex} is available from CRAN, and can be installed by:
 
 \begin{Schunk}
 \begin{Sinput}
@@ -487,9 +486,9 @@ specialty & view\_manip\_space & illustrative display of any manip space\\
 \hypertarget{usage}{%
 \subsection{Usage}\label{usage}}
 
-Using the \texttt{flea} data from the \CRANpkg{tourr} package, we will
+Using the \code{flea} data from the \pkg{tourr} package, we will
 illustrate generating a manual tour to explore the sensitivity of the
-cluster structure is to the variable \texttt{aede2}.
+cluster structure is to the variable aede2.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -509,7 +508,7 @@ play_manual_tour(data = f_data,                           ## Generates animation
 \end{Sinput}
 \end{Schunk}
 
-The \texttt{play\_manual\_tour} function is a composite function for
+The \code{play\_manual\_tour()} function is a composite function for
 user convenience that does these operations:
 
 \begin{Schunk}
@@ -521,10 +520,10 @@ render_plotly()
 \end{Schunk}
 
 \noindent This will generate an html animation using plotly. Switching
-the renderer to \texttt{gganimate} is an option, which will also create
-an html animation or an animated gif. Each of these formats allows for
-the animation to be made available on a web site, or directly visible in
-an html formatted document.
+the renderer to \code{gganimate} is an option, which will also create an
+html animation or an animated gif. Each of these formats allows for the
+animation to be made available on a web site, or directly visible in an
+html formatted document.
 
 \hypertarget{making-illustrations}{%
 \subsubsection{Making illustrations}\label{making-illustrations}}
@@ -606,8 +605,9 @@ When PC4 is removed from the projection (Figure
 removed, indicating that it is important for distinguishing experiments.
 However, removing PC3 from the projection (Figure
 \ref{fig:JetClusterBad}), has no effect on the structure, indicating it
-is not important for distinguishing experiments. Animations for the
-remaining PCs can be viewed at the following links:
+is not important for distinguishing experiments.
+
+Animations for the remaining PCs can be viewed at the following links:
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/}{PC1},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/}{PC2},
 \href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/}{PC3},
@@ -700,8 +700,8 @@ rotate a variable into or out of a 2D projection, and modified it to
 create an animation that performs the same task. It is most useful for
 examining the importance of variables, and how the structure in the
 projection is sensitive or not to specific variables. This functionality
-available in package \CRANpkg{spinifex}. The work complements the
-methods available in the \CRANpkg{tourr} package.
+available in package \pkg{spinifex}. The work complements the methods
+available in the \pkg{tourr} package.
 
 This work was motivated by problems in physics, and thus the usage was
 illustrated on data comparing experiments of hadronic collisions, to
@@ -738,7 +738,7 @@ detailed views.
 \section{Acknowledgments}\label{acknowledgments}}
 
 This article was created in R (R Core Team
-\protect\hyperlink{ref-r_core_team_r:_2018}{2018}), using
+\protect\hyperlink{ref-r_core_team_r:_2019}{2019}), using
 \CRANpkg{knitr} (Xie \protect\hyperlink{ref-stodden_knitr:_2014}{2014})
 and \CRANpkg{rmarkdown} (Xie, Allaire, and Grolemund
 \protect\hyperlink{ref-xie_r_2018}{2018}), with code generating the
@@ -801,8 +801,8 @@ Pedersen, Thomas Lin, and David Robinson. 2019. \emph{Gganimate: A
 Grammar of Animated Graphics}.
 \url{http://github.com/thomasp85/gganimate}.
 
-\leavevmode\hypertarget{ref-r_core_team_r:_2018}{}%
-R Core Team. 2018. \emph{R: A Language and Environment for Statistical
+\leavevmode\hypertarget{ref-r_core_team_r:_2019}{}%
+R Core Team. 2019. \emph{R: A Language and Environment for Statistical
 Computing}. Vienna, Austria: R Foundation for Statistical Computing.
 \url{https://www.R-project.org/}.
 
