@@ -319,7 +319,7 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 <!--- $|\textbf{B}_k|$, the norm of the manip var, $k$, the length of this basis vector between 0 and 1 inclusive.
 -->
 - $\textbf{e}$, a 1D basis vector of length $p$, with 1 in the $k$-th position and 0 elsewhere.
-- $\textbf{M}$ is a $p \times 3$ matrix, defining the 3D subspace where data rotation occurs, and is called the manip(ulation) space. 
+- $\textbf{M}$ is a $p \times 3$ matrix, defining the 3D subspace where data rotation occurs and is called the manip(ulation) space. 
 - $\theta$, the angle of in-projection rotation, for example, on the reference axes; $c_\theta, s_\theta$ are the cosine and sine.
 - $\phi$, the angle of out-of-projection rotation, into the manip space; $c_\phi, s_\phi$ are the cosine and sine. The initial value for animation purposes is $\phi_1$.
 - $\textbf{U}$, the axis of rotation for out-of-projection rotation.
@@ -328,7 +328,7 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 <!--
 XXX Clean up the notation, not all of this is needed or useful. 
 - The shadow of $e$ in the projection may need some notation. 
-- R is really an unconstrained rotation? (constrained rotation mentioned twice, what is the differenece?
+- R is really an unconstrained rotation? (constrained rotation mentioned twice, what is the difference?
 -->
 
 <!-- operate on bases -->
@@ -535,7 +535,7 @@ remotes::install_github("nspyrison/spinifex")
 
 ## Functions 
 
-<!-- in terms of work flow -->
+<!-- in terms of workflow -->
 Table \ref{tab:functionsTable} lists the primary functions and their purpose. These are grouped into four types: construction for building a tour path, render to make the plot objects, animation for running the animation, and specialty for providing illustrations used in the algorithm description.
 
 ```{r functionsTable, echo=F}
@@ -631,7 +631,7 @@ Storing each data point for every frame of the animation is redundant. Just as o
 # Application {#sec:application}
 
 <!-- Introduction of data and original paper -->
-@wang_mapping_2018 introduce a new tool, PDFSense, to visualize the sensitivity of hadronic experiments to nucleon structure. The parameter-space of these experiments lies in 56 dimensions, $\delta \in \mathbb{R}^{56}$, and are visualized as 3D subspaces of the 10 first principal components in linear (PCA) and non-linear (t-SNE) embeddings. 
+@wang_mapping_2018 introduces a new tool, PDFSense, to visualize the sensitivity of hadronic experiments to nucleon structure. The parameter-space of these experiments lies in 56 dimensions, $\delta \in \mathbb{R}^{56}$, and are visualized as 3D subspaces of the 10 first principal components in linear (PCA) and non-linear (t-SNE) embeddings. 
 
 <!-- grand tours on the same data -->
 @cook_dynamical_2018 illustrates how to learn more about the structures using a grand tour. Tours are able to better resolve the shape of clusters, intra-cluster detail, and better outlier detection than PDFSense & TFEP (TensorFlow embedded projections) or traditional static embeddings. This example builds from here, illustrating how the manual tour can be used to examine the sensitivity of structure in a projection to different parameters. The specific 2D projections passed to the manual tour were provided from @cook_dynamical_2018. 
