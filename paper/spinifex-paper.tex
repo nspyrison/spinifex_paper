@@ -143,6 +143,9 @@ is as follows:
   \(\textbf{M}\) is a \(p \times 3\) matrix, defining the 3D subspace
   where data rotation occurs and is called the manip(ulation) space.
 \item
+  \(\textbf{R}\), the 3D rotation matrix, for performing unconstrained
+  3D rotations within the manip space, \(\textbf{M}\).
+\item
   \(\theta\), the angle of in-projection rotation, for example, on the
   reference axes; \(c_\theta, s_\theta\) are the cosine and sine.
 \item
@@ -150,10 +153,8 @@ is as follows:
   space; \(c_\phi, s_\phi\) are the cosine and sine. The initial value
   for animation purposes is \(\phi_1\).
 \item
-  \(\textbf{U}\), the axis of rotation for out-of-projection rotation.
-\item
-  \(\textbf{R}\), the 3D rotation matrix, for performing unconstrained
-  3D rotations within the manip space, \(\textbf{M}\).
+  \(\textbf{U}\), the axis of rotation for out-of-projection rotation
+  orthogonal to \(\textbf{e}\).
 \item
   \(\textbf{Y}\), the resulting projection of the data through the manip
   space, \(\textbf{M}\), and rotation matrix, \(\textbf{R}\). 
