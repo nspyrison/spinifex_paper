@@ -4,7 +4,6 @@
 .Ruserdata
 /example_papers/*
 /sandbox/*
-*91-appB*
 /paper/spinifex_paper_files/*
 /paper/spinifex_paper.log
-/paper/spinifex_paper.tex
+

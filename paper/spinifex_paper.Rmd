@@ -30,9 +30,14 @@ output: rticles::rjournal_article
 <!-- note that Di/Ursula have different setup and options and use static images.  -->
 ```{r setup_paper, include=FALSE}
 knitr::opts_chunk$set(
-  fig.align = "center", echo = TRUE, collapse = TRUE,
-  message = FALSE, warning = FALSE, error = FALSE,
-  cache = F, cache.lazy = FALSE
+  fig.align = "center", 
+  echo = TRUE, 
+  collapse = TRUE,
+  message = FALSE, 
+  warning = FALSE, 
+  error = FALSE,
+  cache = FALSE, 
+  cache.lazy = FALSE
 )
 library(spinifex)
 library(ggplot2)
@@ -50,7 +55,7 @@ array2static <- function(.m_tour, .data, .m_var, .cat, .mag =2.2)
   data_slides  <- slides$data_slides
   n_slides     <- max(basis_slides$slide)
   if (n_slides != 15) 
-    stop(paste0("stop: n_slides !=15 !!!!! n_slides = ", n_slides))
+    stop(paste0("stop: n_slides !=15 !!! Check the angle step size. n_slides = ", n_slides))
   
   # Initialize
   ## manip var asethetics
@@ -350,8 +355,12 @@ An initial 2D projection basis must be provided. A suggested way to start is to 
 set.seed(20190425)
 f_dat  <- tourr::rescale(flea[,1:6])
 f_cat  <- factor(flea$species)
-f_path <- save_history(f_dat, guided_tour(holes()))
-f_bas  <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
+## hard code a basis. tourr doesn't fix results with set.seed().
+f_path <-  c(.693, -.022, .082, -.119, .706, .023, 
+             -.070, .438, .405, .515, .103, .604)
+f_bas <- matrix(f_path, ncol=2)
+# f_path <- save_history(f_dat, guided_tour(holes()))
+# f_bas  <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
 f_mvar <- 5
 f_msp  <- create_manip_space(basis = f_bas, manip_var = f_mvar)
 f_proj <- data.frame(tourr::rescale(f_dat %*% f_msp[, 1:2]))
@@ -467,7 +476,7 @@ The steps outlined above can be used to create any arbitrary rotation in the man
 f_angle <- .29
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
-  paste0("!!!!! step3 n_slides != 15 !!!!! Please knit again. n_slides = ", dim(f_mtour)[3]))
+  paste0("!!! n_slides != 15 !!! Check angle step size. n_slides = ", dim(f_mtour)[3], ". angle = ", f_angle))
 p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1 phi=0.78")
 p2 <- view_basis2(f_mtour[,,5],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=0")
 p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=1.57")
