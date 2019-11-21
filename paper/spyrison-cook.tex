@@ -26,6 +26,20 @@ illustrate the sensitivity of structure in a projection to specific
 variable contributions.
 }
 
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 
 \bibliography{spinifex_paper}
 
@@ -45,8 +59,8 @@ projections. Tours can be considered to extend the dimensionality of
 visualization, which is important as data and models exist in more than
 3D. The package \CRANpkg{tourr} (Wickham et al.
 \protect\hyperlink{ref-wickham_tourr_2011}{2011}) provides a platform
-for generating tours. It can produce a variety of tours, each paried
-with a varitey of possible displays. A user can make a grand, guided,
+for generating tours. It can produce a variety of tours, each paired
+with a variety of possible displays. A user can make a grand, guided,
 little, local or frozen tour, and display the resulting projected data
 as a scatterplot, density plot, histogram, or even as Chernoff faces if
 the projection dimension is more than 3.
@@ -63,13 +77,13 @@ particularly useful once a feature of interest has been identified.
 One way to identify ``interesting'' features is with the use of a guided
 tour (Cook et al. \protect\hyperlink{ref-cook_grand_1995}{1995}). Guided
 tours select a very specific path, which approaches a projection that
-optimizes an objective-function. The optimization is conducted in a
-manner similar to simulated annealing (Kirkpatrick, Gelatt, and Vecchi
+optimizes an objective function. The optimization used to guide the tour
+is simulated annealing (Kirkpatrick, Gelatt, and Vecchi
 \protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
 optimization of a function allows guided tours to rapidly identify
 interesting projection features given the relatively large
 parameter-space. After a projection of interest is identified, an
-analyst can then use the ``finer brush'' of the manual tour to controll
+analyst can then use the ``finer brush'' of the manual tour to control
 the contributions of individual variables to explore the sensitivity
 they have on the structure visible in the projection.
 
@@ -151,14 +165,14 @@ is as follows:
   reference axes; \(c_\theta, s_\theta\) are its cosine and sine.
 \item
   \(\phi\), the angle of out-of-projection rotation, into the manip
-  space; \(c_\phi, s_\phi\) are itscosine and sine. The initial value
+  space; \(c_\phi, s_\phi\) are its cosine and sine. The initial value
   for animation purposes is \(\phi_1\).
 \item
   \(\textbf{U}\), the axis of rotation for out-of-projection rotation
   orthogonal to \(\textbf{e}\).
 \item
   \(\textbf{Y}\), the resulting projection of the data through the manip
-  space, \(\textbf{M}\), and rotation matrix, \(\textbf{R}\). 
+  space, \(\textbf{M}\), and rotation matrix, \(\textbf{R}\).
 \end{itemize}
 
 The algorithm operates entirely on projection bases and incorporates the
@@ -232,8 +246,8 @@ the original 2D projection to describe a 3D manip space, \(\textbf{M}\).
 
 The manip space provides a 3D projection from \(p\)-dimensional space,
 where the coefficient of the manip var can range completely between
-{[}0, 1{]}. This 3D space serves as the medium that to rotate the
-projection basis relative to the selected manipulation variable. Figure
+{[}0, 1{]}. This 3D space serves as the medium to rotate the projection
+basis relative to the selected manipulation variable. Figure
 \ref{fig:step2} illustrates this 3D manip space with the manip var
 highlighted. This representation is produced by calling the
 \code{view\_manip\_space()} function. This diagram is purely used to
@@ -246,7 +260,7 @@ help explain the algorithm.
 
 }
 
-\caption[Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data]{Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this effects the variable contribution back onto the projection plane. The other variables are omited from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \code{view\_manip\_space()} function.}\label{fig:step2}
+\caption[Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data]{Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \code{view\_manip\_space()} function.}\label{fig:step2}
 \end{figure}
 \end{Schunk}
 
@@ -568,15 +582,14 @@ linear (PCA) and non-linear (t-SNE) embeddings.
 
 Cook, Laa, and Valencia
 (\protect\hyperlink{ref-cook_dynamical_2018}{2018}) illustrates how to
-learn more about the structures using a grand tour. Tours are able to
-better resolve the shape of clusters, intra-cluster detail, and better
-outlier detection than PDFSense \& TFEP (TensorFlow embedded
-projections) or traditional static embeddings. This example builds from
-here, illustrating how the manual tour can be used to examine the
-sensitivity of structure in a projection to different parameters. The
-specific 2D projections passed to the manual tour were provided from
-Cook, Laa, and Valencia
-(\protect\hyperlink{ref-cook_dynamical_2018}{2018}).
+learn more about the structures using a grand tour. Tours can better
+resolve the shape of clusters, intra-cluster detail, and better outlier
+detection than PDFSense \& TFEP (TensorFlow embedded projections) or
+traditional static embeddings. This example builds from here,
+illustrating how the manual tour can be used to examine the sensitivity
+of structure in a projection to different parameters. The specific 2D
+projections passed to the manual tour were provided from Cook, Laa, and
+Valencia (\protect\hyperlink{ref-cook_dynamical_2018}{2018}).
 
 The data has a hierarchical structure with top-level clusters; DIS, VBP,
 and jet. Each cluster is a particular class of experiments, each with
@@ -601,13 +614,13 @@ contributions from PC4 and PC3 are shown in Figures
 \ref{fig:JetClusterGood} and \ref{fig:JetClusterBad}, respectively. The
 difference in shape can be interpreted as the experiments probing
 different phase-spaces. Back-transforming the principal components to
-the original variables can be done for more detailed interpretation.
+the original variables can be done for a more detailed interpretation.
 
 When PC4 is removed from the projection (Figure
 \ref{fig:JetClusterGood}), the difference between the two groups is
 removed, indicating that it is important for distinguishing experiments.
 However, removing PC3 from the projection (Figure
-\ref{fig:JetClusterBad}), has no effect on the structure, indicating it
+\ref{fig:JetClusterBad}), does not affect the structure, indicating it
 is not important for distinguishing experiments.
 
 Animations for the remaining PCs can be viewed at the following links:
@@ -647,10 +660,11 @@ these two experiments.
 Following Cook, Laa, and Valencia
 (\protect\hyperlink{ref-cook_dynamical_2018}{2018}), to explore the DIS
 cluster, PCA is recomputed and the first six principal components,
-explaining 48\% of the full sample variation, is used. The contributions
-of PC6 and PC2 are explored in Figures \ref{fig:DISclusterGood} and
-\ref{fig:DISclusterBad}, respectively. Three experiments are examined:
-DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
+explaining 48\% of the full sample variation, are used. The
+contributions of PC6 and PC2 are explored in Figures
+\ref{fig:DISclusterGood} and \ref{fig:DISclusterBad}, respectively.
+Three experiments are examined: DIS HERA1+2 (green), dimuon SIDIS
+(purple), and charm SIDIS (orange).
 
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is
 rotated into the projection, variation in the DIS HERA1+2 is greatly
