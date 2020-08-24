@@ -1,6 +1,6 @@
 ---
 title: > 
-  spinifex: An R Package for Creating a Manual Tour of Low-dimensional  Projections of Multivariate Data
+  spinifex: An R Package for Creating a Manual Tour of Low-dimensional Projections of Multivariate Data
 author:
   - name: Nicholas Spyrison
     affiliation: Monash University 
@@ -14,7 +14,6 @@ author:
     email:  dicook@monash.edu
 abstract: >
   Dynamic low-dimensional linear projections of multivariate data collectively known as *tours* provide an important tool for exploring multivariate data and models. The R package \pkg{tourr} provides functions for several types of tours: grand, guided, little, local and frozen. Each of these can be viewed dynamically, or saved into a data object for animation. This paper describes a new package, \pkg{spinifex}, which provides a manual tour of multivariate data where the projection coefficient of a single variable is controlled. The variable is rotated fully into the projection, or completely out of the projection. The resulting sequence of projections can be displayed as an animation, with functions from either the \pkg{plotly} or \pkg{gganimate} packages. By varying the coefficient of a single variable, it is possible to explore the sensitivity of structure in the projection to that variable. This is particularly useful when used with a projection pursuit guided tour to simplify and understand the solution. The use of the manual tour is applied particle physics data to illustrate the sensitivity of structure in a projection to specific variable contributions.
-
 keywords: exploratory data analysis, projection pursuit, high dimensional data, data visualization, statistical graphics, data science
 preamble: >
   % preamble packages
@@ -23,23 +22,25 @@ fig_caption: yes
 toc: false
 bibliography: spyrison-cook.bib
 output: rticles::rjournal_article
-  #bookdown::pdf_book:
-   # base_format: rticles::rjournal_article #see sandbox for hard code solution.
+  #bookdown::pdf_book ## alternative
 ---
-\bibliography{spinifex_paper}
-<!-- tourrd3 example has different setup and options and uses static images.  -->
 ```{r setup_paper, include=FALSE}
 knitr::opts_chunk$set(
-  fig.align = "center", 
-  echo = TRUE, 
-  collapse = TRUE,
-  message = FALSE, 
-  warning = FALSE, 
-  error = FALSE,
-  cache = TRUE, # needed for log and figure out?
+  fig.align  = "center", 
+  echo       = TRUE, 
+  collapse   = TRUE,
+  message    = FALSE, 
+  warning    = FALSE, 
+  error      = FALSE,
+  cache      = TRUE, # needed for log and figure out?
   cache.lazy = FALSE
 )
-library(spinifex)
+if (F){ ## From reproducing, please use this dev ver:
+  remotes::install_github("nspyrison/spinifex", 
+                          ref = "da75976588dc008e21f01ce6a57d9778d0ed6933")
+}
+library(tourr)
+library(spinifex) ## Use dev version listed above!
 library(ggplot2)
 library(gridExtra)
 library(dplyr)
@@ -47,259 +48,190 @@ library(dplyr)
 
 ```{r paperFunctions, include=FALSE}
 ## FUNCTION FOR STATIC OUTPPUT, 
-# going to facets loses control of output size, simpler to just live with this.
-array2static <- function(.m_tour, .data, .m_var, .cat, .mag = 2.2){
-  ##' for @EXAMPLE 
-  if (F){ #Example run:
-    set.seed(20190425); f_dat <- tourr::rescale(flea[,1:6]); f_cat <- factor(flea$species);
-    f_path <- c(.693, -.022, .082, -.119, .706, .023, -.070, .438, .405, .515, .103, .604); 
-    f_bas <- matrix(f_path, ncol=2); f_mvar <- 5; f_angle <- .29;
-    f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle);
-    .m_tour <- f_mtour; .data <- f_dat; .m_var <- f_mvar; .cat <- f_cat; .mag = 2.2;
-  }
+# going to facets loses control of multiple geoms and output size, simpler to just live with this.
+array2ggfacets <- function(tour_array, data, m_var, class, margin = 2.2){
+  n_frames <- dim(tour_array)[3]
+  if (n_frames != 15) 
+    stop(paste0("stop: n_frames != 15!!! Check the angle step size. n_frames = ", n_frames))
   
-  slides       <- array2df(array = .m_tour, data = .data)
-  basis_slides <- slides$basis_slides
-  data_slides  <- slides$data_slides
-  n_slides     <- max(basis_slides$slide)
-  if (n_slides != 15) 
-    stop(paste0("stop: n_slides !=15 !!! Check the angle step size. n_slides = ", n_slides))
+  ## Initialize
+  frames       <- array2df(array = tour_array, data = data)
+  basis_frames <- frames$basis_frames
+  data_frames  <- frames$data_frames
+  p            <- nrow(basis_frames) / n_frames
   
-  # Initialize
   ## manip var asethetics
-  p             <- nrow(basis_slides) / n_slides
-  col_v         <- rep("grey80", p)
-  col_v[.m_var] <- "blue"
-  col_v         <- rep(col_v, n_slides)
-  siz_v         <- rep(0.3, p)
-  siz_v[.m_var] <- 1
-  siz_v         <- rep(siz_v, n_slides)
-  cat           <- rep(as.factor(.cat), n_slides)
+  col_v        <- rep("grey80", p)
+  col_v[m_var] <- "blue"
+  col_v        <- rep(col_v, n_frames)
+  siz_v        <- rep(0.3, p)
+  siz_v[m_var] <- 1
+  siz_v        <- rep(siz_v, n_frames)
+  cat          <- rep(as.factor(class), n_frames)
 
   ## circle
   angle <- seq(0, 2 * pi, length = 180)
   circ  <- data.frame(c_x = cos(angle), c_y = sin(angle))
   circ[nrow(circ)+1, ] <- NA
-  ## data asethetics
-  data_slides <- data.frame(data_slides, cat = rep(.cat, n_slides))
-  
-  grid_b <- grid_t <-
-    data.frame(slide = 1:n_slides, 
-               x = .mag*rep(1:5, 3), y = .mag*rep(3:1, each = 5))
+  ## Data asethetics
+  data_frames <- data.frame(data_frames, class = rep(class, n_frames))
+  grid_b <- grid_t <- data.frame(
+    frame = 1:n_frames, x = margin * rep(1:5, 3), y = margin * rep(3:1, each = 5))
   grid_t$y <- grid_t$y + max(grid_t$y)
-  # OUTER JOIN
-  basis_grid <- merge(x = basis_slides, y = grid_t, by = "slide", all = TRUE)
-  ## grid_t$x becomes x.y . ie. colname.tbl
-  # CROSS JOIN
+  ## OUTER JOIN
+  basis_grid <- merge(x = basis_frames, y = grid_t, by = "frame", all = TRUE)
+  ## CROSS JOIN
   circ_grid  <- merge(x = circ, y = grid_t, by = NULL)
-  # OUTER JOIN
-  data_grid  <- merge(x = data_slides, y = grid_b, by = "slide", all = TRUE)
+  ## OUTER JOIN
+  data_grid  <- merge(x = data_frames, y = grid_b, by = "frame", all = TRUE)
   
-  # BASIS AXES
-  gg1 <-
-    ggplot(data = basis_grid) +
-    # AXES LINE SEGMETNS
+  ##### RENDER
+  ## SETUP
+  gg <- ggplot(data = basis_grid) +
+    ## AXES LINE SEGMETNS
     geom_segment(aes(x = x.x + x.y, y = y.x + y.y, xend = x.y, yend = y.y),
                  color = col_v, size = siz_v) +
-    # AXES TEXT LABELS
+    ## AXES TEXT LABELS
     geom_text(aes(x = x.x + x.y, y = y.x + y.y, label = lab),
               color = col_v, vjust = "outward", hjust = "outward") +
-    # AXES FRAME NUM
+    ## AXES FRAME NUM
     geom_text(aes(x = x.y - .7, y = y.y + 1.1, 
-                  label = paste0("frame: ",slide)), color = "grey50") +
-    # AXES CIRCLE PATH
+                  label = paste0("frame: ",frame)), color = "grey50") +
+    ## AXES CIRCLE PATH
     suppressWarnings( # Suppress for "Removed 1 rows containing missing values."
-      geom_path(data = circ_grid, color = "grey80",
-                mapping = aes(x = x+c_x, y = y+c_y))
+      geom_path(data = circ_grid, color = "grey50",
+                mapping = aes(x = x + c_x, y = y + c_y))
     )
   
-  # PROJECTION
-  gg2 <- gg1 +
-    # PROJ DATA POINTS
+  ## PROJECTION
+  gg <- gg +
+    ## PROJ DATA POINTS
     geom_point(data = data_grid, size = .7,
-               mapping = aes(x = x.x + x.y, y = y.x + y.y, color = cat),
-               shape = as.integer(cat) + 15) +
-    # PROJ DATA FRAME NUM
+               mapping = aes(x = x.x + x.y, y = y.x + y.y, 
+                             color = class, shape = class)) +
+    ## FACET FRAME NUM
     geom_text(data = data_grid, color = "grey50",
               mapping = aes(x = x.y - .7, y = y.y + 1.1, 
-                            label = paste0("frame: ",slide))) +
-    # OPTIONS
+                            label = paste0("frame: ",frame))) +
     theme_void() +
     scale_color_brewer(palette = "Dark2") + 
-    theme(legend.position="none")
-          #,panel.border = element_rect(colour = "black", fill = NA))
+    theme(legend.position = "none") 
   
-  gg2
+  ## Return
+  gg
 }
 
-view_basis2 <- function(basis, labels = paste0("V", 1:nrow(basis)),
-                        manip_var, data = NULL, axes = "center"){
-  basis <- as.data.frame(basis)
-  angle <- seq(0, 2 * pi, length = 360)
-  circ <- data.frame(x = cos(angle), y = sin(angle))
-  zero <- set_axes_position(0, axes)
-  basis <- set_axes_position(basis, axes)
-  circ <- set_axes_position(circ, axes)
-  col <- rep("black", nrow(basis))
-  col[manip_var] <- "blue"
-  
-  gg <- ggplot2::ggplot() + ggplot2::scale_color_brewer(palette = "Dark2") + 
-    ggplot2::theme_void() + ggplot2::theme(legend.position = "none") + 
-    ggplot2::coord_fixed()
-  if (axes != "off") {
-    gg <- 
-      gg + ggplot2::geom_path(
-        data = circ, mapping = ggplot2::aes(x = x, y = y), 
-        color = "grey80", size = 0.3, inherit.aes = F
-      ) + 
-      ggplot2::geom_segment(
-        data = basis, color = col, 
-        mapping = ggplot2::aes(x = V1, y = V2, xend = zero, yend = zero)
-      ) + 
-      ggplot2::geom_text(
-        data = basis, mapping = ggplot2::aes(x = V1, y = V2, label = labels), 
-        size = 4, color = col, hjust = 1.1, vjust=.4
-      )
-  }
-  if (!is.null(data)) {
-        proj <- as.data.frame(tourr::rescale(as.matrix(data) %*% 
-            as.matrix(basis)) - 0.5)
-        gg <- gg + ggplot2::geom_point(data = proj, 
-                                       mapping = ggplot2::aes(x = V1, y = V2))
-    }
-    gg
-}
+
 
 view_manip_space2 <- function (basis,
                                manip_var,
                                manip_col = "blue",
-                               tilt = pi *
-                                 5 / 12,
+                               tilt = pi * 5 / 12,
                                z_col = "red",
                                labels = paste0("V", 1:nrow(basis)))
 {
-    find_angle <-
-      function(a, b)
-        acos(sum(a * b) / (sqrt(sum(a * a)) * sqrt(sum(b * b))) )
-    make_curve <-
-      function(ang_st = 0,
-               ang_stop = 2 * pi) {
-        # angle is atan(y/x)
-        angle <- seq(ang_st, ang_stop,
-                     length = round(360 / (2 * pi) * abs(ang_st - ang_stop)) )
-        data.frame(x = cos(angle), y = sin(angle), z = sin(angle))
-      }
-    xyz <- function(x) { colnames(x)<-c("x","y","z");x }
-
-    p <- nrow(basis)
-    col_v <- rep("grey80", p)
-    col_v[manip_var] <- manip_col
-    siz_v <- rep(0.3, p)
-    siz_v[manip_var] <- 1
-
-    circ_r <- make_curve() %>%
-      mutate( y=y*cos(tilt), z=z*sin(tilt))
-    m_sp   <- xyz(as.data.frame(create_manip_space(basis, manip_var)))
-    m_sp_r <- m_sp %>% mutate( y=y*cos(tilt), z=z*sin(tilt))
-    mvar   <- m_sp[manip_var, ]
-    mvar_r <- m_sp_r[manip_var, ]
-
-    phi_ang     <- find_angle(c(m_sp_r$x, m_sp_r$y), c(m_sp_r$x, m_sp_r$z))
-    phi_offset  <- find_angle(c(mvar_r$x, mvar_r$y), c(1,0))
-    phi_curve_r <- .4*make_curve(ang_st = phi_offset, ang_stop = phi_ang) %>%
-      mutate( y=y*cos(tilt), z=z*sin(tilt))
-
-    thata_ang     <- find_angle(c(mvar$x, mvar$y),c(1, 0))
-    theta_curve_r <- .5*make_curve(ang_st = 0, ang_stop = thata_ang) %>%
-      mutate( y=y*cos(tilt), z=z*sin(tilt))
-
-    gg <-
-      ggplot2::ggplot() + ggplot2::scale_color_brewer(palette = "Dark2") +
-      ggplot2::theme_void() + ggplot2::theme(legend.position = "none") +
-      ggplot2::coord_fixed() +
-        ggplot2::geom_path(data = circ_r,
-                           mapping = ggplot2::aes(x = x, y = y),
-                           color = manip_col,
-                           size = 0.3,
-                           inherit.aes = F
-        ) +
-        #projection plane:
-        ggplot2::geom_segment(data = m_sp_r,
-                              mapping = ggplot2::aes(
-                                x = x,
-                                y = y,
-                                xend = 0,
-                                yend = 0
-                              ),
-                              size = siz_v,
-                              colour = col_v
-        ) +
-        ggplot2::geom_text(data = m_sp_r,
-                           mapping = ggplot2::aes(x = x, y = y, label = labels),
-                           size = 4,
-                           colour = col_v,
-                           vjust = "outward",
-                           hjust = "outward"
-        ) +
-        #Z direction
-        ggplot2::geom_path(data = circ_r,
-                           mapping = ggplot2::aes(x = x, y = z),
-                           color = z_col,
-                           size = 0.3,
-                           inherit.aes = F
-        ) +
-        ggplot2::geom_segment(data = mvar_r,
-                              mapping = ggplot2::aes(x = x,y = z,
-                                                     xend = 0,yend = 0),
-                              size = 1,
-                              colour = z_col
-        ) +
-        ggplot2::geom_segment(data = mvar_r,
-                              mapping = ggplot2::aes(x = x, y = z,
-                                                     xend = x,yend = y),
-                              size = 0.3,
-                              colour = "grey80",
-                              linetype = 2
-        ) +
-        ggplot2::geom_text(data = mvar_r,
-                           mapping = ggplot2::aes(x = x, y = z, label = labels[manip_var]),
-                           size = 4,
-                           colour = z_col,
-                           vjust = "outward",
-                           hjust = "outward"
-        ) +
-        # label angles
-        geom_path(data = phi_curve_r,
-                  mapping = aes(x=x, y=z),
-                  color = z_col,
-                  size = 0.2
-        ) +
-        geom_text(data = 1.2 * phi_curve_r[ceiling(nrow(phi_curve_r)/2), ],
-                  mapping = ggplot2::aes(x=x, y=z, label = "phi"),
-                  color = z_col,
-                  parse = T,
-                  size = 4
-        ) +
-        geom_path(data = theta_curve_r,
-                  mapping = aes(x, y),
-                  color = manip_col,
-                  size = 0.2
-        ) +
-        geom_text(data = 1.2 * theta_curve_r[ceiling(nrow(theta_curve_r)/2), ],
-                  mapping = ggplot2::aes(x=x, y=y-.02, label = "theta"),
-                  color = manip_col,
-                  parse = T,
-                  size = 4
-        )
-    gg
-  }
+  #### Finds the angle between two vectors
+  find_angle <- function(a, b)
+    acos(sum(a * b) / (sqrt(sum(a * a)) * sqrt(sum(b * b))) )
+  #### Makes a df semi-circle, with 1 row per degree
+  make_curve <- function(ang_st = 0,
+                         ang_stop = 2 * pi) {
+      degrees <- round(360 / (2 * pi) * abs(ang_st - ang_stop))
+      angle <- seq(ang_st, ang_stop, length = degrees)
+      data.frame(x = cos(angle), y = sin(angle), z = sin(angle))
+    }
+  
+  ## Initialize
+  p <- nrow(basis)
+  m_sp   <- as.data.frame(create_manip_space(basis, manip_var))
+  colnames(m_sp) <- c("x", "y", "z")
+  m_sp_r <- m_sp %>% mutate(y = y * cos(tilt), z = z * sin(tilt))
+  mvar   <- m_sp[manip_var, ]
+  mvar_r <- m_sp_r[manip_var, ]
+  
+  col_v <- rep("grey80", p)
+  col_v[manip_var] <- manip_col
+  siz_v <- rep(0.3, p)
+  siz_v[manip_var] <- 1
+  
+  circ_r <- make_curve() %>%
+    mutate(y = y * cos(tilt), z = z * sin(tilt))
+  
+  phi_ang     <- find_angle(c(m_sp_r$x, m_sp_r$y), c(m_sp_r$x, m_sp_r$z))
+  phi_offset  <- find_angle(c(mvar_r$x, mvar_r$y), c(1,0))
+  phi_curve_r <- .4 * make_curve(ang_st = phi_offset, ang_stop = phi_ang) %>%
+    mutate(y = y * cos(tilt), z = z * sin(tilt))
+  
+  thata_ang     <- find_angle(c(mvar$x, mvar$y),c(1, 0))
+  theta_curve_r <- .5 * make_curve(ang_st = 0, ang_stop = thata_ang) %>%
+    mutate( y=y*cos(tilt), z=z*sin(tilt))
+  
+  ## Render
+  gg <-
+    ggplot2::ggplot() + ggplot2::scale_color_brewer(palette = "Dark2") +
+    ggplot2::theme_void() + ggplot2::theme(legend.position = "none") +
+    ggplot2::coord_fixed() +
+    ## Circle
+    ggplot2::geom_path(data = circ_r,
+                       mapping = ggplot2::aes(x = x, y = y),
+                       color = manip_col, size = 0.3, inherit.aes = FALSE) +
+    ## Projection plane:
+    ggplot2::geom_segment(data = m_sp_r,
+                          mapping = ggplot2::aes(
+                            x = x,
+                            y = y,
+                            xend = 0,
+                            yend = 0
+                          ),
+                          size = siz_v, colour = col_v) +
+    ggplot2::geom_text(data = m_sp_r,
+                       mapping = ggplot2::aes(x = x, y = y, label = labels),
+                       size = 4, colour = col_v,
+                       vjust = "outward", hjust = "outward") +
+    ## Z direction
+    ggplot2::geom_path(data = circ_r,
+                       mapping = ggplot2::aes(x = x, y = z),
+                       color = z_col, size = 0.3, inherit.aes = FALSE) +
+    ggplot2::geom_segment(data = mvar_r,
+                          mapping = ggplot2::aes(x = x,y = z,
+                                                 xend = 0,yend = 0),
+                          size = 1, colour = z_col) +
+    ggplot2::geom_segment(data = mvar_r,
+                          mapping = ggplot2::aes(x = x, y = z,
+                                                 xend = x,yend = y),
+                          size = 0.3, colour = "grey80", linetype = 2) +
+    ggplot2::geom_text(data = mvar_r,
+                       mapping = ggplot2::aes(x = x, y = z, 
+                                              label = labels[manip_var]),
+                       size = 4, colour = z_col,
+                       vjust = "outward",
+                       hjust = "outward"
+    ) +
+    ## Label angles
+    geom_path(data = phi_curve_r,
+              mapping = aes(x=x, y=z),
+              color = z_col, size = 0.2) +
+    geom_text(data = 1.2 * phi_curve_r[ceiling(nrow(phi_curve_r)/2), ],
+              mapping = ggplot2::aes(x=x, y=z, label = "phi"),
+              color = z_col, size = 4, parse = TRUE) +
+    geom_path(data = theta_curve_r,
+              mapping = aes(x, y),
+              color = manip_col,
+              size = 0.2) +
+    geom_text(data = 1.2 * theta_curve_r[ceiling(nrow(theta_curve_r)/2), ],
+              mapping = ggplot2::aes(x=x, y=y-.02, label = "theta"),
+              color = z_col, size = 4, parse = TRUE)
+  
+  ## Return
+  gg
+}
 ```
 
 
 # Introduction
 
 <!-- Tours -->
-Exploring multivariate spaces is a challenging task, increasingly so as dimensionality increases. Traditionally, static low-dimensional projections are used to display multivariate data in two dimensions including principal component analysis, linear discriminant spaces or projection pursuit. These are useful for finding relationships between multiple variables, but they are limited because they show only a glimpse of the high-dimensional space. An alternative approach is to use a tour [@asimov_grand_1985] of dynamic linear projections to look at many different low-dimensional projections. Tours can be considered to extend the dimensionality of visualization, which is important as data and models exist in more than 3D. The package \CRANpkg{tourr} [@wickham_tourr_2011] provides a platform for generating tours. It can produce a variety of tours, each paired with a variety of possible displays. A user can make a grand, guided, little, local or frozen tour, and display the resulting projected data as a scatterplot, density plot, histogram, or even as Chernoff faces if the projection dimension is more than 3.  
+Exploring multivariate spaces is a challenging task, increasingly so as dimensionality increases. Traditionally, static low-dimensional projections are used to display multivariate data in two dimensions including principal component analysis, linear discriminant spaces or projection pursuit. These are useful for finding relationships between multiple variables, but they are limited because they show only a glimpse of the high-dimensional space. An alternative approach is to use a tour [@asimov_grand_1985] of dynamic linear projections to look at many different low-dimensional projections. Tours can be considered to extend the dimensionality of visualization, which is important as data and models exist in more than 3D. The package \CRANpkg{tourr} [@wickham_tourr:_2011] provides a platform for generating tours. It can produce a variety of tours, each paired with a variety of possible displays. A user can make a grand, guided, little, local or frozen tour, and display the resulting projected data as a scatterplot, density plot, histogram, or even as Chernoff faces if the projection dimension is more than 3.  
 
 <!-- Manual tour -->
 This work adds a manual tour to the collection. The manual tour was described in @cook_manual_1997 and allows a user to control the projection coefficients of a selected variable in a 2D projection. The manipulation of these coefficients allows the analyst to explore their sensitivity to the structure within the projection. As manual tours operate on only one variable at a time, they are particularly useful once a feature of interest has been identified. 
@@ -308,7 +240,7 @@ This work adds a manual tour to the collection. The manual tour was described in
 One way to identify "interesting" features is with the use of a guided tour [@cook_grand_1995]. Guided tours select a very specific path, which approaches a projection that optimizes an objective function. The optimization used to guide the tour is simulated annealing [@kirkpatrick_optimization_1983]. The direct optimization of a function allows guided tours to rapidly identify interesting projection features given the relatively large parameter-space. After a projection of interest is identified, an analyst can then use the "finer brush" of the manual tour to control the contributions of individual variables to explore the sensitivity they have on the structure visible in the projection.
 
 <!-- Paper outline -->
-The paper is organized as follows. Section \ref{sec:algorithm} describes the algorithm used to perform a radial manual tour as implemented in the package \CRANpkg{spinifex}. Section \ref{sec:display} explains how to generate an animation of the manual tour using the animation frameworks offered by \CRANpkg{plotly} [@sievert_plotly_2018] and \CRANpkg{gganimate} [@pedersen_gganimate:_2019]. Package functionality and code usage following the order applied in the algorithm follows in section \ref{sec:usage}. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to multivariate data collected on high energy physics experiments [@wang_mapping_2018]. Section \ref{sec:discussion} summarizes this paper and discusses potential future directions.
+The paper is organized as follows. Section \ref{sec:algorithm} describes the algorithm used to perform a radial manual tour as implemented in the package \CRANpkg{spinifex}. Section \ref{sec:display} explains how to generate an animation of the manual tour using the animation frameworks offered by \CRANpkg{plotly} [@sievert_interactive_2020] and \CRANpkg{gganimate} [@pedersen_gganimate_2020]. Package functionality and code usage following the order applied in the algorithm follows in section \ref{sec:usage}. Section \ref{sec:application} illustrates how this can be used for sensitivity analysis applied to multivariate data collected on high energy physics experiments [@wang_mapping_2018]. Section \ref{sec:discussion} summarizes this paper and discusses potential future directions.
 
 
 <!-- Algorithm outline -->
@@ -352,30 +284,28 @@ The algorithm operates entirely on projection bases and incorporates the data on
 The flea data (@lubischew_use_1962), available in the \pkg{tourr} package, is used to illustrate the algorithm. The data contains 74 observations on 6 variables, which are physical measurements made on flea beetles. Each observation belongs to one of three species.
 
 <!-- Projection basis -->
-An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. Here the holes index is used to find a 2D projection of the flea data, which shows three separated species groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the \code{view\_basis()} function in \pkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2:_2016] object. 
+An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. Here the holes index is used to find a 2D projection of the flea data, which shows three separated species groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the \code{view\_basis()} function in \pkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2_2016] object. 
 
-```{r step0, echo=F, results='hide', out.width='70%',                             fig.cap = "Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
+```{r step0, echo=F, results='hide', out.width='70%',                        fig.cap = "Initial 2D projection: representation of the basis (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
 ## Flea holes tour
 set.seed(20190425)
 f_dat  <- tourr::rescale(flea[,1:6])
 f_cat  <- factor(flea$species)
 ## hard code a basis. tourr doesn't fix results with set.seed().
-f_path <-  c(.693, -.022, .082, -.119, .706, .023, 
-             -.070, .438, .405, .515, .103, .604)
-f_bas <- matrix(f_path, ncol=2)
-# f_path <- save_history(f_dat, guided_tour(holes()))
-# f_bas  <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
+f_bas <-  c(.693, -.022, .082, -.119, .706, .023, 
+             -.070, .438, .405, .515, .103, .604) %>% 
+  matrix( ncol=2) %>% 
+  tourr::orthonormalise()
 f_mvar <- 5
 f_msp  <- create_manip_space(basis = f_bas, manip_var = f_mvar)
 f_proj <- data.frame(tourr::rescale(f_dat %*% f_msp[, 1:2]))
 
 # step0, output
 # Adjust centering to make axes and data side by side
-view_basis(f_bas, lab = colnames(f_dat)) +
-  geom_point(data = f_proj,
-             mapping = aes(x = X1 + .75, y = X2 - .5, color = f_cat),
-             pch = as.integer(f_cat) + 15) +
-  theme(panel.border = element_rect(colour = "black", fill = NA))
+oblique_frame(f_bas, data = f_dat, manip_var = f_mvar, lab = colnames(f_dat),
+              color = f_cat, shape = f_cat) + 
+  coord_fixed() + theme_void() + 
+  theme(legend.position = "none")
 ```
 
 
@@ -399,9 +329,8 @@ Initialize the coordinate basis vector as a zero vector, $\textbf{e}$, of length
 <!-- What the manip space provides -->
 The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [0, 1]. This 3D space serves as the medium to rotate the projection basis relative to the selected manipulation variable. Figure \ref{fig:step2} illustrates this 3D manip space with the manip var highlighted. This representation is produced by calling the \code{view\_manip\_space()} function. This diagram is purely used to help explain the algorithm.
 
-```{r step2, echo=F, out.width='70%',                                           fig.cap = "Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
-view_manip_space2(basis = f_bas, manip_var = f_mvar, labels = colnames(f_dat)) +
-    theme(panel.border = element_rect(colour = "black", fill = NA))
+```{r step2, echo=F, out.width='70%',                                                fig.cap = "Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
+view_manip_space2(basis = f_bas, manip_var = f_mvar, lab = colnames(f_dat))
 ```
 
 
@@ -476,16 +405,25 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
 The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between $0$ and $\pi/2$, call the steps $\phi_i$. 
 
 
-```{r step3, echo=F, warning=F, fig.height=2, fig.width=8, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
+```{r step3, echo=F, warning=F, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
 f_angle <- .29
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
-  paste0("!!! n_slides != 15 !!! Check angle step size. n_slides = ", dim(f_mtour)[3], ". angle = ", f_angle))
-p1 <- view_basis2(f_mtour[,,1],  colnames(f_dat), manip_var = f_mvar) + ggtitle("1 phi=0.78")
-p2 <- view_basis2(f_mtour[,,5],  colnames(f_dat), manip_var = f_mvar) + ggtitle("2  phi=0")
-p3 <- view_basis2(f_mtour[,,12], colnames(f_dat), manip_var = f_mvar) + ggtitle("3 phi=1.57")
-p4 <- view_basis2(f_mtour[,,15], colnames(f_dat), manip_var = f_mvar) + ggtitle("4 phi=0.78")
-grid.arrange(p1, p2, p3, p4, ncol=4)
+  paste0("!!! n_frames != 15 !!! Check angle step size. n_frames = ", dim(f_mtour)[3], ". angle = ", f_angle))
+
+p1 <- oblique_frame(f_mtour[,, 1],  lab = colnames(f_dat), manip_var = f_mvar) +
+  ggtitle("(1) phi = 0.78") + coord_fixed() +
+  theme_void() + theme(legend.position = "none")
+p2 <- oblique_frame(f_mtour[,, 5],  lab = colnames(f_dat), manip_var = f_mvar) +
+  ggtitle("(2) phi = 0") + coord_fixed() +
+  theme_void() + theme(legend.position = "none")
+p3 <- oblique_frame(f_mtour[,, 12], lab = colnames(f_dat), manip_var = f_mvar) +
+  ggtitle("(3) phi = 1.57") + coord_fixed() +
+  theme_void() + theme(legend.position = "none")
+p4 <- oblique_frame(f_mtour[,, 15], lab = colnames(f_dat), manip_var = f_mvar) +
+  ggtitle("(4) phi = 0.78") + coord_fixed() +
+  theme_void() + theme(legend.position = "none")
+grid.arrange(p1, p2, p3, p4, ncol = 4)
 ```
 
 <!-- Sequence of $\phi_i$ -->
@@ -514,13 +452,13 @@ Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The p
 
 Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
-```{r step4, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                             fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
+```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in',                                           fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
 #play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
-array2static(.m_tour = f_mtour, .data = f_dat, .m_var = f_mvar, .cat = f_cat)
+array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_cat)
 ```
 
 
-# Package structure and functionality {#sec:usage}
+# Package structure and functionality
 
 This section describes the functions available in the package, and how to use them.
 
@@ -529,20 +467,26 @@ This section describes the functions available in the package, and how to use th
 
 The \pkg{spinifex} is available from CRAN, and can be installed by: 
 ```{r installCODEEXAMPLE, eval=F, echo=T}
+## Install from CRAN
 install.package("spinifex")
+## Load into session
 library("spinifex")
 ```
 
-\noindent Also see the vignette for examples of usage: 
+\noindent Also see the shiny app for understandign and the vignette for basic usage: 
 
-```
+```{r installCODEEXAMPLE2, eval=F, echo=T}
+## Shiny app for visualizing basic application
+run_app("intro")
+## View the code vignette
 vignette("spinifex_vignette")
 ```
 
 \noindent The development version can be installed from github:
 
-```
-remotes::install_github("nspyrison/spinifex") 
+```{r installCODEEXAMPLE3, eval=F, echo=T}
+## Optionally install latest developmention version from GitHub
+remotes::install_github("nspyrison/spinifex")
 ```
 
 
@@ -567,7 +511,8 @@ funcs <- rbind(
   c("animation", "play_tour_path", "composite function animating the specified tour path"),
   c("animation", "play_manual_tour", "composite function animating the specified manual tour"),
   c("", "", ""),
-  c("specialty", "view_basis", "display the reference frame of a given basis"),
+  c("specialty", "oblique_basis", "table of the rotated basis and manip space"),
+  c("specialty", "oblique_frame", "display the reference axes of a given basis"),
   c("specialty", "view_manip_space", "illustrative display of any manip space")
 )
 colnames(funcs) <- c("Type", "Function", "Description")
@@ -576,37 +521,36 @@ kable(funcs, "latex", caption = "Summary of available functions.", booktabs = T,
 ```
 
 
-## Usage
+## Usage {#sec:usage}
 
-Using the \code{flea} data from the \pkg{tourr} package, we will illustrate generating a manual tour to explore the sensitivity of the cluster structure is to the variable aede2. 
+Using the \code{flea} data from the \pkg{tourr} package, we will illustrate generating a manual tour to explore the sensitivity of the cluster structure is to the variable aede2.
 
 
 <!-- setup -->
 ```{r step0CODEEXAMPLE, eval=F, echo=T}
 library(spinifex)
-f_data  <- tourr::rescale(flea[, 1:6])                    ## standardized flea data
-f_path  <- save_history(f_data, guided_tour(holes()))     ## guided tour path, holes index
-f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## optimal projection
-f_cat   <- factor(flea$species)                           ## categorical var
-f_mvar  <- 5                                              ## set manip var number
-angle_speed <- .26                                        ## anglular dist between slides
-play_manual_tour(data = f_data,                           ## generates animation
-                 basis = f_basis,                         ##   plotly obj (default)
+## Standardized flea data
+f_data <- tourr::rescale(flea[, 1:6])
+## Guided tour path, holes index
+f_path <- save_history(f_data, guided_tour(holes()))
+## Local extrema found
+f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
+## Categorical class variable
+f_cat <- factor(flea$species)
+## Manip var, number of the variable to alter
+f_mvar <- 5
+## Anglular dist between frames (radians)
+step_size <- .26
+## Render and play animate, as plotly object by default
+play_manual_tour(data = f_data,
+                 basis = f_basis,
                  manip_var = f_mvar, 
-                 angle = angle_speed,
+                 angle = step_size,
                  col = f_cat,
                  pch = f_cat)
 ```
 
-\noindent The \code{play\_manual\_tour()} function is a composite function for user convenience that does these operations:
-
-```{r eval=FALSE, echo=TRUE}
-manual_tour()
-array2df()
-render_plotly()
-```
-
-\noindent This will generate an html animation using plotly. Switching the renderer to \code{gganimate} is an option, which will also create an html animation or an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
+\noindent The \code{play\_manual\_tour()} function is a composite function handling interaction between \code{manual\_tour()}, \code{array2df()}, and \code{render\_plotly()}. This will generate an html animation using plotly. Switching the renderer to \code{render\_gganimate()} alternatively creates an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
 
 
 ### Making illustrations
@@ -614,18 +558,21 @@ render_plotly()
 The function `view_basis` can be used to show a projection of the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 ```{r eval=FALSE}
-view_basis(basis = f_basis, 
-           data = f_data,
-           labels = colnames(f_data))
+## View a basis and projected data 
+oblique_frame(basis = f_basis, 
+              data = f_data,
+              color = f_cat,
+              shape = f_cat)
 ```
 
 \noindent An illustration of the manip space (as shown in Figure \ref{fig:step2}) is made with the `view_manip_space` function, as follows: 
 
 <!-- step 2 disp code. -->
 ```{r step2CODEEXAMPLE, eval=F, echo=T}
+## Displays the projection plane and manipulation space for the 
 view_manip_space(basis = f_basis, 
                  manip_var = f_mvar, 
-                 labels = colnames(f_data))
+                 lab = colnames(f_data))
 ```
 
 
@@ -649,7 +596,7 @@ The jet cluster resides in a smaller dimensionality than the full set of experim
 <!-- discussion of findings and which is more insightful -->
 When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}) the difference between the two groups is removed, indicating that it is important for distinguishing experiments. However, removing PC3 from the projection (Figure \ref{fig:JetClusterBad}) does not affect the structure, indicating it is not important for distinguishing experiments. Animations for the remaining PCs can be viewed at the following links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/). It can be seen that only PC4 is important for viewing the difference in these two experiments.
 
-```{r JetClusterGood, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                     fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments.  The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
+```{r JetClusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',                                    fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
 # Jet cluster, Fig 7 of cook_dynamical_2018, subset to ATLAS7old and ATLAS7new
 load("./data/JetCluster_sub.rda")
 load("./data/JetCluster_basis.rda")
@@ -662,8 +609,8 @@ jet_ang   <- .315
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 #dim(jet_mtour)
 
-array2static(.m_tour = jet_mtour, .data = jet_dat,
-             .m_var = jet_mvar, .cat = jet_cat)
+array2ggfacets(tour_array = jet_mtour, data = jet_dat,
+             m_var = jet_mvar, class = jet_cat)
 # play_manual_tour(data = jet_dat, basis = jet_bas, manip_var = jet_mvar,
 #                  angle = jet_ang, axes = "bottomleft", col = jet_cat)
 
@@ -674,13 +621,13 @@ array2static(.m_tour = jet_mtour, .data = jet_dat,
 # 4, *best
 ```
 
-```{r JetClusterBad, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
+```{r JetClusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
 # Jet cluster, Fig 7 of cook_dynalical_2018, subset to ATLAS7old and ATLAS7new
 jet_mvar  <- 3
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 
-array2static(.m_tour = jet_mtour, .data = jet_dat,
-             .m_var = jet_mvar, .cat = jet_cat)
+array2ggfacets(tour_array = jet_mtour, data = jet_dat,
+             m_var = jet_mvar, class = jet_cat)
 ```
 
 
@@ -692,7 +639,7 @@ Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed an
 <!-- comparison of the DIS cluster -->
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
 
-```{r DISclusterGood, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                            fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
+```{r DISclusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',                                          fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
 
 ##DIS cluster, fig 8 of cook_dynamical_2018
 load("./data/grDIScenter.rda")
@@ -704,8 +651,8 @@ DIS_mvar  <- 6
 DIS_ang   <- .32
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 
-array2static(.m_tour = DIS_mtour, .data = DIS_dat,
-             .m_var = DIS_mvar, .cat = DIS_cat)
+array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
+             m_var = DIS_mvar, class = DIS_cat)
 # play_manual_tour(data = DIS_dat, basis = DIS_bas, manip_var = DIS_mvar,
 #                  angle = DIS_ang, axes="bottomleft", col = DIS_cat)
 
@@ -718,13 +665,13 @@ array2static(.m_tour = DIS_mtour, .data = DIS_dat,
 # 6, best*purple and plane
 ```
 
-```{r DISclusterBad, echo=F, warning=F, fig.height=7.0, fig.width=5.83, out.height='7in', out.width='5.83in',                                            fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
+```{r DISclusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
 ##DIS cluster, fig 8 of cook_dynamical_2018
 DIS_mvar  <- 2
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 
-array2static(.m_tour = DIS_mtour, .data = DIS_dat,
-             .m_var = DIS_mvar, .cat = DIS_cat)
+array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
+             m_var = DIS_mvar, class = DIS_cat)
 ```
 
 
@@ -742,17 +689,13 @@ The manual tour is constrained in the sense that the effect of one variable is d
 <!-- 3D and function vis -->
 Another future research topic could be to extend the algorithm for use on 3D projections. With the current popularity and availability of 3D virtual displays, this may benefit the detection and understanding of the higher dimensional structure, or enable the examination of functions.
 
-<!-- geometric and graphics display 
-The \pkg{tourr} package provides many other geometric displays with the \code{tourr::display\_*()} family. These geometric options could be integrated into the \pkg{ggplot2} framework for display on \pkg{plotly} and \pkg{gganimate}. Additionally, the \CRANpkg{animation} package @xie_animation:_2018 could be implemented for another graphics framework. However, \pkg{animation} builds from \pkg{base} graphics while \pkg{spinifex} utilizes \pkg{ggplot2} graphics, a significant paradigm shift, which may have  a low return on investment.-->
-
 <!-- dynamic interaction/gui -->
-Having a graphical user interface would be useful for making it easier and more accessible to a general audience. This is possible to implement using \CRANpkg{shiny} [@chang_shiny:_2018]. The primary purposes of the interface would be to allow the user to interactively change the manip variable easily, and the interpolation step for more or less detailed views.
+Having a graphical user interface would be useful for making it easier and more accessible to a general audience. This is possible to implement using \CRANpkg{shiny} [@chang_shiny_2020]. The primary purposes of the interface would be to allow the user to interactively change the manip variable easily, and the interpolation step for more or less detailed views.
 
 
 # Acknowledgments
 
-<!-- removed [@r_core_team_r:_2019], as per journal reqs -->
-This article was created in R, using \CRANpkg{knitr} [@stodden_knitr:_2014] and \CRANpkg{rmarkdown} [@xie_r_2018], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
+This article was created in R, using \CRANpkg{knitr} [@xie_knitr_2020] and \CRANpkg{rmarkdown} [@allaire_rmarkdown_2020], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
 # Bibliography

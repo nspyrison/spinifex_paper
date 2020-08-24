@@ -26,23 +26,6 @@ illustrate the sensitivity of structure in a projection to specific
 variable contributions.
 }
 
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{multirow}
-\usepackage{wrapfig}
-\usepackage{float}
-\usepackage{colortbl}
-\usepackage{pdflscape}
-\usepackage{tabu}
-\usepackage{threeparttable}
-\usepackage{threeparttablex}
-\usepackage[normalem]{ulem}
-\usepackage{makecell}
-\usepackage{xcolor}
-
-\bibliography{spinifex_paper}
-
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
@@ -53,64 +36,57 @@ including principal component analysis, linear discriminant spaces or
 projection pursuit. These are useful for finding relationships between
 multiple variables, but they are limited because they show only a
 glimpse of the high-dimensional space. An alternative approach is to use
-a tour (Asimov \protect\hyperlink{ref-asimov_grand_1985}{1985}) of
-dynamic linear projections to look at many different low-dimensional
-projections. Tours can be considered to extend the dimensionality of
-visualization, which is important as data and models exist in more than
-3D. The package \CRANpkg{tourr} (Wickham et al.
-\protect\hyperlink{ref-wickham_tourr_2011}{2011}) provides a platform
-for generating tours. It can produce a variety of tours, each paired
-with a variety of possible displays. A user can make a grand, guided,
-little, local or frozen tour, and display the resulting projected data
-as a scatterplot, density plot, histogram, or even as Chernoff faces if
-the projection dimension is more than 3.
+a tour \citep{asimov_grand_1985} of dynamic linear projections to look
+at many different low-dimensional projections. Tours can be considered
+to extend the dimensionality of visualization, which is important as
+data and models exist in more than 3D. The package \CRANpkg{tourr}
+\citep{wickham_tourr:_2011} provides a platform for generating tours. It
+can produce a variety of tours, each paired with a variety of possible
+displays. A user can make a grand, guided, little, local or frozen tour,
+and display the resulting projected data as a scatterplot, density plot,
+histogram, or even as Chernoff faces if the projection dimension is more
+than 3.
 
 This work adds a manual tour to the collection. The manual tour was
-described in Cook and Buja
-(\protect\hyperlink{ref-cook_manual_1997}{1997}) and allows a user to
-control the projection coefficients of a selected variable in a 2D
-projection. The manipulation of these coefficients allows the analyst to
-explore their sensitivity to the structure within the projection. As
-manual tours operate on only one variable at a time, they are
-particularly useful once a feature of interest has been identified.
+described in \citet{cook_manual_1997} and allows a user to control the
+projection coefficients of a selected variable in a 2D projection. The
+manipulation of these coefficients allows the analyst to explore their
+sensitivity to the structure within the projection. As manual tours
+operate on only one variable at a time, they are particularly useful
+once a feature of interest has been identified.
 
 One way to identify ``interesting'' features is with the use of a guided
-tour (Cook et al. \protect\hyperlink{ref-cook_grand_1995}{1995}). Guided
-tours select a very specific path, which approaches a projection that
-optimizes an objective function. The optimization used to guide the tour
-is simulated annealing (Kirkpatrick, Gelatt, and Vecchi
-\protect\hyperlink{ref-kirkpatrick_optimization_1983}{1983}). The direct
-optimization of a function allows guided tours to rapidly identify
-interesting projection features given the relatively large
-parameter-space. After a projection of interest is identified, an
-analyst can then use the ``finer brush'' of the manual tour to control
-the contributions of individual variables to explore the sensitivity
-they have on the structure visible in the projection.
+tour \citep{cook_grand_1995}. Guided tours select a very specific path,
+which approaches a projection that optimizes an objective function. The
+optimization used to guide the tour is simulated annealing
+\citep{kirkpatrick_optimization_1983}. The direct optimization of a
+function allows guided tours to rapidly identify interesting projection
+features given the relatively large parameter-space. After a projection
+of interest is identified, an analyst can then use the ``finer brush''
+of the manual tour to control the contributions of individual variables
+to explore the sensitivity they have on the structure visible in the
+projection.
 
 The paper is organized as follows. Section \ref{sec:algorithm} describes
 the algorithm used to perform a radial manual tour as implemented in the
 package \CRANpkg{spinifex}. Section \ref{sec:display} explains how to
 generate an animation of the manual tour using the animation frameworks
-offered by \CRANpkg{plotly} (Sievert
-\protect\hyperlink{ref-sievert_plotly_2018}{2018}) and
-\CRANpkg{gganimate} (Pedersen and Robinson
-\protect\hyperlink{ref-pedersen_gganimate:_2019}{2019}). Package
+offered by \CRANpkg{plotly} \citep{sievert_interactive_2020} and
+\CRANpkg{gganimate} \citep{pedersen_gganimate_2020}. Package
 functionality and code usage following the order applied in the
 algorithm follows in section \ref{sec:usage}. Section
 \ref{sec:application} illustrates how this can be used for sensitivity
 analysis applied to multivariate data collected on high energy physics
-experiments (Wang et al.
-\protect\hyperlink{ref-wang_mapping_2018}{2018}). Section
-\ref{sec:discussion} summarizes this paper and discusses potential
-future directions.
+experiments \citep{wang_mapping_2018}. Section \ref{sec:discussion}
+summarizes this paper and discusses potential future directions.
 
 \hypertarget{sec:algorithm}{%
 \section{Algorithm}\label{sec:algorithm}}
 
 The algorithm to conduct a manual tour interactively, by recording
-mouse/cursor motion, is described in detail in Cook and Buja
-(\protect\hyperlink{ref-cook_manual_1997}{1997}). Movement can be in any
-direction and magnitude, but it can also be constrained in several ways:
+mouse/cursor motion, is described in detail in \citet{cook_manual_1997}.
+Movement can be in any direction and magnitude, but it can also be
+constrained in several ways:
 
 \begin{itemize}
 \tightlist
@@ -184,11 +160,10 @@ data only when making the projected data plots, in light of efficiency.
 \hypertarget{step-0-set-up}{%
 \subsubsection{Step 0) Set up}\label{step-0-set-up}}
 
-The flea data (Lubischew
-(\protect\hyperlink{ref-lubischew_use_1962}{1962})), available in the
-\pkg{tourr} package, is used to illustrate the algorithm. The data
-contains 74 observations on 6 variables, which are physical measurements
-made on flea beetles. Each observation belongs to one of three species.
+The flea data (\citet{lubischew_use_1962}), available in the \pkg{tourr}
+package, is used to illustrate the algorithm. The data contains 74
+observations on 6 variables, which are physical measurements made on
+flea beetles. Each observation belongs to one of three species.
 
 An initial 2D projection basis must be provided. A suggested way to
 start is to identify an interesting projection using a projection
@@ -201,8 +176,7 @@ contributes to the projection. The right panel shows the projected data,
 \(\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}\). The
 color and shape of points are mapped to the flea species. This plot is
 made using the \code{view\_basis()} function in \pkg{spinifex}, which
-generates a \CRANpkg{ggplot2} (Wickham
-\protect\hyperlink{ref-wickham_ggplot2:_2016}{2016}) object.
+generates a \CRANpkg{ggplot2} \citep{wickham_ggplot2_2016} object.
 
 \begin{Schunk}
 \begin{figure}
@@ -211,7 +185,7 @@ generates a \CRANpkg{ggplot2} (Wickham
 
 }
 
-\caption[Initial 2D projection]{Initial 2D projection: representation of the basis  (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \code{view\_basis()}.}\label{fig:step0}
+\caption[Initial 2D projection]{Initial 2D projection: representation of the basis (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \code{view\_basis()}.}\label{fig:step0}
 \end{figure}
 \end{Schunk}
 
@@ -291,7 +265,7 @@ Out-of-projection rotation, \(\phi\), is the rotation around an axis on
 the \(XY\) plane, \(\textbf{U}\), orthogonal to \(\textbf{e}\). Given
 these axes, the rotation matrix, \(\textbf{R}\) can be written as
 follows, using Rodrigues' rotation formula (originally published in
-Rodrigues (\protect\hyperlink{ref-rodrigues_lois_1840}{1840})):
+\citet{rodrigues_lois_1840}):
 
 \begin{align*}
     \textbf{R}_{[3,~3]} 
@@ -433,8 +407,9 @@ function \code{play\_manual\_tour()}.
 \end{figure}
 \end{Schunk}
 
-\hypertarget{sec:usage}{%
-\section{Package structure and functionality}\label{sec:usage}}
+\hypertarget{package-structure-and-functionality}{%
+\section{Package structure and
+functionality}\label{package-structure-and-functionality}}
 
 This section describes the functions available in the package, and how
 to use them.
@@ -446,22 +421,33 @@ The \pkg{spinifex} is available from CRAN, and can be installed by:
 
 \begin{Schunk}
 \begin{Sinput}
+## Install from CRAN
 install.package("spinifex")
+## Load into session
 library("spinifex")
 \end{Sinput}
 \end{Schunk}
 
-\noindent Also see the vignette for examples of usage:
+\noindent Also see the shiny app for understandign and the vignette for
+basic usage:
 
-\begin{verbatim}
+\begin{Schunk}
+\begin{Sinput}
+## Shiny app for visualizing basic application
+run_app("intro")
+## View the code vignette
 vignette("spinifex_vignette")
-\end{verbatim}
+\end{Sinput}
+\end{Schunk}
 
 \noindent The development version can be installed from github:
 
-\begin{verbatim}
-remotes::install_github("nspyrison/spinifex") 
-\end{verbatim}
+\begin{Schunk}
+\begin{Sinput}
+## Optionally install latest developmention version from GitHub
+remotes::install_github("nspyrison/spinifex")
+\end{Sinput}
+\end{Schunk}
 
 \hypertarget{functions}{%
 \subsection{Functions}\label{functions}}
@@ -493,7 +479,8 @@ render & render\_gganimate & render the animation as a gganimate object\\
 animation & play\_tour\_path & composite function animating the specified tour path\\
 animation & play\_manual\_tour & composite function animating the specified manual tour\\
  &  & \\
-specialty & view\_basis & display the reference frame of a given basis\\
+specialty & oblique\_basis & table of the rotated basis and manip space\\
+specialty & oblique\_frame & display the reference axes of a given basis\\
 specialty & view\_manip\_space & illustrative display of any manip space\\
 \bottomrule
 \end{tabular}
@@ -501,8 +488,8 @@ specialty & view\_manip\_space & illustrative display of any manip space\\
 
 \end{Schunk}
 
-\hypertarget{usage}{%
-\subsection{Usage}\label{usage}}
+\hypertarget{sec:usage}{%
+\subsection{Usage}\label{sec:usage}}
 
 Using the \code{flea} data from the \pkg{tourr} package, we will
 illustrate generating a manual tour to explore the sensitivity of the
@@ -511,37 +498,35 @@ cluster structure is to the variable aede2.
 \begin{Schunk}
 \begin{Sinput}
 library(spinifex)
-f_data  <- tourr::rescale(flea[, 1:6])                    ## standardized flea data
-f_path  <- save_history(f_data, guided_tour(holes()))     ## guided tour path, holes index
-f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2) ## optimal projection
-f_cat   <- factor(flea$species)                           ## categorical var
-f_mvar  <- 5                                              ## set manip var number
-angle_speed <- .26                                        ## anglular dist between slides
-play_manual_tour(data = f_data,                           ## generates animation
-                 basis = f_basis,                         ##   plotly obj (default)
+## Standardized flea data
+f_data <- tourr::rescale(flea[, 1:6])
+## Guided tour path, holes index
+f_path <- save_history(f_data, guided_tour(holes()))
+## Local extrema found
+f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
+## Categorical class variable
+f_cat <- factor(flea$species)
+## Manip var, number of the variable to alter
+f_mvar <- 5
+## Anglular dist between frames (radians)
+step_size <- .26
+## Render and play animate, as plotly object by default
+play_manual_tour(data = f_data,
+                 basis = f_basis,
                  manip_var = f_mvar, 
-                 angle = angle_speed,
+                 angle = step_size,
                  col = f_cat,
                  pch = f_cat)
 \end{Sinput}
 \end{Schunk}
 
 \noindent The \code{play\_manual\_tour()} function is a composite
-function for user convenience that does these operations:
-
-\begin{Schunk}
-\begin{Sinput}
-manual_tour()
-array2df()
-render_plotly()
-\end{Sinput}
-\end{Schunk}
-
-\noindent This will generate an html animation using plotly. Switching
-the renderer to \code{gganimate} is an option, which will also create an
-html animation or an animated gif. Each of these formats allows for the
-animation to be made available on a web site, or directly visible in an
-html formatted document.
+function handling interaction between \code{manual\_tour()},
+\code{array2df()}, and \code{render\_plotly()}. This will generate an
+html animation using plotly. Switching the renderer to
+\code{render\_gganimate()} alternatively creates an animated gif. Each
+of these formats allows for the animation to be made available on a web
+site, or directly visible in an html formatted document.
 
 \hypertarget{making-illustrations}{%
 \subsubsection{Making illustrations}\label{making-illustrations}}
@@ -552,9 +537,11 @@ the basis, or with the data overlaid. For example, the plots in Figures
 
 \begin{Schunk}
 \begin{Sinput}
-view_basis(basis = f_basis, 
-           data = f_data,
-           labels = colnames(f_data))
+## View a basis and projected data 
+oblique_frame(basis = f_basis, 
+              data = f_data,
+              color = f_cat,
+              shape = f_cat)
 \end{Sinput}
 \end{Schunk}
 
@@ -564,31 +551,31 @@ as follows:
 
 \begin{Schunk}
 \begin{Sinput}
+## Displays the projection plane and manipulation space for the 
 view_manip_space(basis = f_basis, 
                  manip_var = f_mvar, 
-                 labels = colnames(f_data))
+                 lab = colnames(f_data))
 \end{Sinput}
 \end{Schunk}
 
 \hypertarget{sec:application}{%
 \section{Application}\label{sec:application}}
 
-Wang et al. (\protect\hyperlink{ref-wang_mapping_2018}{2018}) introduces
-a new tool, PDFSense, to visualize the sensitivity of hadronic
-experiments to nucleon structure. The parameter-space of these
-experiments lies in 56 dimensions, \(\delta \in \mathbb{R}^{56}\), and
-are visualized as 3D subspaces of the 10 first principal components in
-linear (PCA) and non-linear (t-SNE) embeddings.
+\citet{wang_mapping_2018} introduces a new tool, PDFSense, to visualize
+the sensitivity of hadronic experiments to nucleon structure. The
+parameter-space of these experiments lies in 56 dimensions,
+\(\delta \in \mathbb{R}^{56}\), and are visualized as 3D subspaces of
+the 10 first principal components in linear (PCA) and non-linear (t-SNE)
+embeddings.
 
-Cook, Laa, and Valencia
-(\protect\hyperlink{ref-cook_dynamical_2018}{2018}) illustrates how to
-learn more about the structures using a grand tour. Tours can better
-resolve the shape of clusters, intra-cluster detail, and better outlier
-detection than PDFSense \& TFEP (TensorFlow embedded projections) or
-traditional static embeddings. This example builds from here,
-illustrating how the manual tour can be used to examine the sensitivity
-of structure in a projection to different parameters. The specific 2D
-projections passed to the manual tour were provided in their work.
+\citet{cook_dynamical_2018} illustrates how to learn more about the
+structures using a grand tour. Tours can better resolve the shape of
+clusters, intra-cluster detail, and better outlier detection than
+PDFSense \& TFEP (TensorFlow embedded projections) or traditional static
+embeddings. This example builds from here, illustrating how the manual
+tour can be used to examine the sensitivity of structure in a projection
+to different parameters. The specific 2D projections passed to the
+manual tour were provided in their work.
 
 The data has a hierarchical structure with top-level clusters; DIS, VBP,
 and jet. Each cluster is a particular class of experiments, each with
@@ -604,15 +591,15 @@ dimensionality of the clusters and describing the span of the clusters.
 
 The jet cluster resides in a smaller dimensionality than the full set of
 experiments with four principal components explaining 95\% of the
-variation in the cluster (Cook, Laa, and Valencia
-\protect\hyperlink{ref-cook_dynamical_2018}{2018}). The data within this
-4D embedding is further subsetted, to ATLAS7old and ATLAS7new, to focus
-on two groups that occupy different parts of the subspace. Radial manual
-tours controlling contributions from PC4 and PC3 are shown in Figures
-\ref{fig:JetClusterGood} and \ref{fig:JetClusterBad}, respectively. The
-difference in shape can be interpreted as the experiments probing
-different phase-spaces. Back-transforming the principal components to
-the original variables can be done for a more detailed interpretation.
+variation in the cluster \citep{cook_dynamical_2018}. The data within
+this 4D embedding is further subsetted, to ATLAS7old and ATLAS7new, to
+focus on two groups that occupy different parts of the subspace. Radial
+manual tours controlling contributions from PC4 and PC3 are shown in
+Figures \ref{fig:JetClusterGood} and \ref{fig:JetClusterBad},
+respectively. The difference in shape can be interpreted as the
+experiments probing different phase-spaces. Back-transforming the
+principal components to the original variables can be done for a more
+detailed interpretation.
 
 When PC4 is removed from the projection (Figure
 \ref{fig:JetClusterGood}) the difference between the two groups is
@@ -636,7 +623,7 @@ these two experiments.
 
 }
 
-\caption[Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments.  The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
+\caption[Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -654,14 +641,12 @@ these two experiments.
 \hypertarget{dis-cluster}{%
 \subsection{DIS cluster}\label{dis-cluster}}
 
-Following Cook, Laa, and Valencia
-(\protect\hyperlink{ref-cook_dynamical_2018}{2018}), to explore the DIS
-cluster, PCA is recomputed and the first six principal components,
-explaining 48\% of the full sample variation, are used. The
-contributions of PC6 and PC2 are explored in Figures
-\ref{fig:DISclusterGood} and \ref{fig:DISclusterBad}, respectively.
-Three experiments are examined: DIS HERA1+2 (green), dimuon SIDIS
-(purple), and charm SIDIS (orange).
+Following \citet{cook_dynamical_2018}, to explore the DIS cluster, PCA
+is recomputed and the first six principal components, explaining 48\% of
+the full sample variation, are used. The contributions of PC6 and PC2
+are explored in Figures \ref{fig:DISclusterGood} and
+\ref{fig:DISclusterBad}, respectively. Three experiments are examined:
+DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
 
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is
 rotated into the projection, variation in the DIS HERA1+2 is greatly
@@ -697,7 +682,7 @@ and
 
 }
 
-\caption[Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important.  The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
+\caption[Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
 \end{figure}
 \end{Schunk}
 
@@ -708,8 +693,7 @@ Dynamic linear projections of numeric multivariate data, tours, play an
 important role in data visualization; they extend the dimensionality of
 visuals to peek into high-dimensional data and parameter spaces. This
 research has taken the manual tour algorithm, specifically the radial
-rotation, used in GGobi (Swayne et al.
-\protect\hyperlink{ref-swayne_ggobi:_2003}{2003}) to interactively
+rotation, used in GGobi \citep{swayne_ggobi:_2003} to interactively
 rotate a variable into or out of a 2D projection, and modified it to
 create an animation that performs the same task. It is most useful for
 examining the importance of variables, and how the structure in the
@@ -728,11 +712,10 @@ variable is dependent on the contributions of other variables in the
 manip space. However, this can be useful to simplify a projection by
 removing variables without affecting the visible structure. Defining a
 manual rotation in high dimensions is possible using Givens rotations
-and Householder reflections as outlined in Buja et al.
-(\protect\hyperlink{ref-buja_computational_2005}{2005}). This would
-provide more flexible manual rotation, but more difficult for a user
-because they have the choice (too much choice) of which directions to
-move.
+and Householder reflections as outlined in
+\citet{buja_computational_2005}. This would provide more flexible manual
+rotation, but more difficult for a user because they have the choice
+(too much choice) of which directions to move.
 
 Another future research topic could be to extend the algorithm for use
 on 3D projections. With the current popularity and availability of 3D
@@ -742,122 +725,21 @@ functions.
 
 Having a graphical user interface would be useful for making it easier
 and more accessible to a general audience. This is possible to implement
-using \CRANpkg{shiny} (Chang et al.
-\protect\hyperlink{ref-chang_shiny:_2018}{2018}). The primary purposes
-of the interface would be to allow the user to interactively change the
+using \CRANpkg{shiny} \citep{chang_shiny_2020}. The primary purposes of
+the interface would be to allow the user to interactively change the
 manip variable easily, and the interpolation step for more or less
 detailed views.
 
 \hypertarget{acknowledgments}{%
 \section{Acknowledgments}\label{acknowledgments}}
 
-This article was created in R, using \CRANpkg{knitr} (Xie
-\protect\hyperlink{ref-stodden_knitr:_2014}{2014}) and
-\CRANpkg{rmarkdown} (Xie, Allaire, and Grolemund
-\protect\hyperlink{ref-xie_r_2018}{2018}), with code generating the
-examples inline. The source files for this article be found at
+This article was created in R, using \CRANpkg{knitr}
+\citep{xie_knitr_2020} and \CRANpkg{rmarkdown}
+\citep{allaire_rmarkdown_2020}, with code generating the examples
+inline. The source files for this article be found at
 \href{https://github.com/nspyrison/spinifex_paper/}{github.com/nspyrison/spinifex\_paper/}.
 The source code for the \pkg{spinifex} package can be found at
 \href{https://github.com/nspyrison/spinifex/}{github.com/nspyrison/spinifex/}.
-
-\hypertarget{bibliography}{%
-\section*{Bibliography}\label{bibliography}}
-\addcontentsline{toc}{section}{Bibliography}
-
-\hypertarget{refs}{}
-\leavevmode\hypertarget{ref-asimov_grand_1985}{}%
-Asimov, Daniel. 1985. ``The Grand Tour: A Tool for Viewing
-Multidimensional Data.'' \emph{SIAM Journal on Scientific and
-Statistical Computing} 6 (1): 128--43.
-\url{https://doi.org/https://doi.org/10.1137/0906011}.
-
-\leavevmode\hypertarget{ref-buja_computational_2005}{}%
-Buja, Andreas, Dianne Cook, Daniel Asimov, and Catherine Hurley. 2005.
-``Computational Methods for High-Dimensional Rotations in Data
-Visualization.'' In \emph{Handbook of Statistics}, 24:391--413.
-Elsevier. \url{https://doi.org/10.1016/S0169-7161(04)24014-7}.
-
-\leavevmode\hypertarget{ref-chang_shiny:_2018}{}%
-Chang, Winston, Joe Cheng, J. J. Allaire, Yihui Xie, and Jonathan
-McPherson. 2018. \emph{Shiny: Web Application Framework for R}.
-\url{https://CRAN.R-project.org/package=shiny}.
-
-\leavevmode\hypertarget{ref-cook_manual_1997}{}%
-Cook, Dianne, and Andreas Buja. 1997. ``Manual Controls for
-High-Dimensional Data Projections.'' \emph{Journal of Computational and
-Graphical Statistics} 6 (4): 464--80.
-\url{https://doi.org/10.2307/1390747}.
-
-\leavevmode\hypertarget{ref-cook_grand_1995}{}%
-Cook, Dianne, Andreas Buja, Javier Cabrera, and Catherine Hurley. 1995.
-``Grand Tour and Projection Pursuit.'' \emph{Journal of Computational
-and Graphical Statistics} 4 (3): 155.
-\url{https://doi.org/10.2307/1390844}.
-
-\leavevmode\hypertarget{ref-cook_dynamical_2018}{}%
-Cook, Dianne, Ursula Laa, and German Valencia. 2018. ``Dynamical
-Projections for the Visualization of PDFSense Data.'' \emph{Eur. Phys.
-J. C} 78 (9): 742. \url{https://doi.org/10.1140/epjc/s10052-018-6205-2}.
-
-\leavevmode\hypertarget{ref-kirkpatrick_optimization_1983}{}%
-Kirkpatrick, Scott, C. Daniel Gelatt, and Mario P. Vecchi. 1983.
-``Optimization by Simulated Annealing.'' \emph{Science} 220 (4598):
-671--80. \url{https://doi.org/10.1126/science.220.4598.671}.
-
-\leavevmode\hypertarget{ref-lubischew_use_1962}{}%
-Lubischew, Alexander A. 1962. ``On the Use of Discriminant Functions in
-Taxonomy.'' \emph{Biometrics}, 455--77.
-\url{https://doi.org/10.2307/2527894}.
-
-\leavevmode\hypertarget{ref-pedersen_gganimate:_2019}{}%
-Pedersen, Thomas Lin, and David Robinson. 2019. \emph{Gganimate: A
-Grammar of Animated Graphics}.
-\url{http://github.com/thomasp85/gganimate}.
-
-\leavevmode\hypertarget{ref-rodrigues_lois_1840}{}%
-Rodrigues, Olinde. 1840. \emph{Des Lois Géométriques Qui Régissent Les
-Déplacements d'un Système Solide Dans L'espace: Et de La Variation Des
-Cordonnées Provenant de Ces Déplacements Considérés Indépendamment Des
-Causes Qui Peuvent Les Produire}.
-
-\leavevmode\hypertarget{ref-sievert_plotly_2018}{}%
-Sievert, Carson. 2018. \emph{Plotly for R}.
-\url{https://plotly-book.cpsievert.me}.
-
-\leavevmode\hypertarget{ref-swayne_ggobi:_2003}{}%
-Swayne, Deborah F, Duncan Temple Lang, Andreas Buja, and Dianne Cook.
-2003. ``GGobi: Evolving from XGobi into an Extensible Framework for
-Interactive Data Visualization.'' \emph{Computational Statistics \& Data
-Analysis}, Data Visualization, 43 (4): 423--44.
-\url{https://doi.org/10.1016/S0167-9473(02)00286-4}.
-
-\leavevmode\hypertarget{ref-wang_mapping_2018}{}%
-Wang, Bo-Ting, T. J. Hobbs, Sean Doyle, Jun Gao, Tie-Jiun Hou, Pavel M.
-Nadolsky, and Fredrick I. Olness. 2018. ``Mapping the Sensitivity of
-Hadronic Experiments to Nucleon Structure.'' \emph{Physical Review D} 98
-(9): 094030. \url{https://doi.org/10.1103/PhysRevD.98.094030}.
-
-\leavevmode\hypertarget{ref-wickham_ggplot2:_2016}{}%
-Wickham, Hadley. 2016. \emph{Ggplot2: Elegant Graphics for Data
-Analysis}. Springer-Verlag New York. \url{http://ggplot2.org}.
-
-\leavevmode\hypertarget{ref-wickham_tourr_2011}{}%
-Wickham, Hadley, Dianne Cook, Heike Hofmann, and Andreas Buja. 2011.
-``\textbf{Tourr} : An \emph{R} Package for Exploring Multivariate Data
-with Projections.'' \emph{Journal of Statistical Software} 40 (2).
-\url{https://doi.org/10.18637/jss.v040.i02}.
-
-\leavevmode\hypertarget{ref-stodden_knitr:_2014}{}%
-Xie, Yihui. 2014. ``Knitr: A Comprehensive Tool for Reproducible
-Research in R.'' In \emph{Implementing Reproducible Computational
-Research}, edited by Victoria Stodden, Friedrich Leisch, and Roger D.
-Peng. Chapman; Hall/CRC.
-\url{http://www.crcpress.com/product/isbn/9781466561595}.
-
-\leavevmode\hypertarget{ref-xie_r_2018}{}%
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. \emph{R
-Markdown: The Definitive Guide}. Boca Raton, Florida: Chapman; Hall/CRC.
-\url{https://bookdown.org/yihui/rmarkdown}.
 
 \bibliography{spyrison-cook.bib}
 

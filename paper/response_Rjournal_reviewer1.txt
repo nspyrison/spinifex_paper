@@ -1,0 +1,32 @@
+> Overall recommendation: accept, giving the authors the opportunity for final wordsmithing for clarity.
+
+The paper has been has been revised including: simplifying sentance structure, minor changes for clarity, typos corrected. Some details comment in line below.
+
+
+> I like the organization of the paper.  It seems like about the right amount of detail in terms of the background, discussion of the algorithm (with nice supporting figures), the basic package description, and examples.  The examples, in particular, are important and difficult for a paper of this type; I appreciate the care that went into the presentation.  The animations on the web were also appreciated.
+
+Thank you, glad to hear the work is appreciated.
+
+
+> I like the Github repository, and glanced through the package source.  It does conform to recommended package design/standards, including roxygen, etc…
+
+Thanks for the brief review. 
+
+
+> I think the paper is generally well-written.  I found myself occasionally distracted by sentence structure. Some sentences are complex with qualifiers and additional phrases added with lots of commas (,).  As an example from the abstract, “This paper describes a new package, spinifex, to provide a manual tour, that allows the coefficient for a single variable to be controlled.”
+
+> I can’t really argue it’s wrong, but it caused me to stop reading and think. I’d argue such a distraction doesn’t help.  Something like, “This paper describes a new package, spinifex, which provides manual tours of multivariate data by allowing the coefficient for a single variable to be controlled.” I can’t argue it’s a big deal and won’t argue that my proposal works or is that much better.  But as a reader, I’m interested in the subject matter and find it frustrating if I have to spend effort parsing a sentence.  Basically, any sentence with more than 3-4 commas could be studied.
+
+> Here’s another: it really feels awkward to me.  I’d be inclined to use a comma after “identified” and do something else or eliminate the comma after “tour”.      “After a projection of interest is identified an analyst can then use the “finer brush” of the manual tour, by controlling the contributions of individual variables to explore the sensitivity they have on the structure visible in the projection. “
+
+Ageed, these instances have been fixed and the whole paper has been reviewed with an eye out for sentance structure and over-use of commas.
+
+
+
+> These are just examples.  Not a big deal, and frankly this is FAR better-written and presented than most papers I review: thank you!  Any further tightening before publication would help, but the subject and scholarship seems appropriate for publication in the R Journal.
+
+Thank you for reviewing and offering the suggestions with examples. The feel as this round of edits did improve clarity, and simplfy sentances and clean up a few typos.
+
+> Note a typo on the Github instructions: library(“spinifiex”) of course won’t work.
+
+Corrected along with a few other typos.
