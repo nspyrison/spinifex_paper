@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
   message    = FALSE, 
   warning    = FALSE, 
   error      = FALSE,
-  cache      = TRUE, # needed for log and figure out?
+  cache      = FALSE, # needed for log and figure out?
   cache.lazy = FALSE
 )
 if (F){ ## From reproducing, please use this dev ver:
@@ -128,7 +128,7 @@ view_manip_space2 <- function (basis,
                                manip_col = "blue",
                                tilt = pi * 5 / 12,
                                z_col = "red",
-                               labels = paste0("V", 1:nrow(basis)))
+                               lab = paste0("V", 1:nrow(basis)))
 {
   #### Finds the angle between two vectors
   find_angle <- function(a, b)
@@ -185,7 +185,7 @@ view_manip_space2 <- function (basis,
                           ),
                           size = siz_v, colour = col_v) +
     ggplot2::geom_text(data = m_sp_r,
-                       mapping = ggplot2::aes(x = x, y = y, label = labels),
+                       mapping = ggplot2::aes(x = x, y = y, label = lab),
                        size = 4, colour = col_v,
                        vjust = "outward", hjust = "outward") +
     ## Z direction
@@ -202,16 +202,16 @@ view_manip_space2 <- function (basis,
                           size = 0.3, colour = "grey80", linetype = 2) +
     ggplot2::geom_text(data = mvar_r,
                        mapping = ggplot2::aes(x = x, y = z, 
-                                              label = labels[manip_var]),
+                                              label = lab[manip_var]),
                        size = 4, colour = z_col,
                        vjust = "outward",
                        hjust = "outward"
     ) +
     ## Label angles
     geom_path(data = phi_curve_r,
-              mapping = aes(x=x, y=z),
+              mapping = aes(x = x, y = z),
               color = z_col, size = 0.2) +
-    geom_text(data = 1.2 * phi_curve_r[ceiling(nrow(phi_curve_r)/2), ],
+    geom_text(data = 1.2 * phi_curve_r[ceiling(nrow(phi_curve_r) / 2), ],
               mapping = ggplot2::aes(x=x, y=z, label = "phi"),
               color = z_col, size = 4, parse = TRUE) +
     geom_path(data = theta_curve_r,
@@ -219,8 +219,8 @@ view_manip_space2 <- function (basis,
               color = manip_col,
               size = 0.2) +
     geom_text(data = 1.2 * theta_curve_r[ceiling(nrow(theta_curve_r)/2), ],
-              mapping = ggplot2::aes(x=x, y=y-.02, label = "theta"),
-              color = z_col, size = 4, parse = TRUE)
+              mapping = ggplot2::aes(x = x, y = y - .02, label = "theta"),
+              color = manip_col, size = 4, parse = TRUE)
   
   ## Return
   gg
@@ -555,7 +555,7 @@ play_manual_tour(data = f_data,
 
 ### Making illustrations
 
-The function `view_basis` can be used to show a projection of the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
+The function `oblique_frame` can be used to show a projection of the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 ```{r eval=FALSE}
 ## View a basis and projected data 
