@@ -114,7 +114,6 @@ The notation used to describe the algorithm for a 2D radial manual tour
 is as follows:
 
 \begin{itemize}
-\tightlist
 \item
   \(\textbf{X}\), the data, an \(n \times p\) numeric matrix to be
   projected to 2D.
@@ -126,7 +125,7 @@ is as follows:
   manual tour.
 \item
   \(k\), is the index of the variable to manipulate, called the ``manip
-  var''. 
+  var''.
 \item
   \(\textbf{e}\), a 1D basis vector of length \(p\), with 1 in the
   \(k\)-th position and 0 elsewhere.
@@ -505,7 +504,7 @@ f_path <- save_history(f_data, guided_tour(holes()))
 ## Local extrema found
 f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
 ## Categorical class variable
-f_cat <- factor(flea$species)
+f_clas <- factor(flea$species)
 ## Manip var, number of the variable to alter
 f_mvar <- 5
 ## Anglular dist between frames (radians)
@@ -515,8 +514,8 @@ play_manual_tour(data = f_data,
                  basis = f_basis,
                  manip_var = f_mvar, 
                  angle = step_size,
-                 col = f_cat,
-                 pch = f_cat)
+                 col = f_clas,
+                 pch = f_clas)
 \end{Sinput}
 \end{Schunk}
 
@@ -540,8 +539,8 @@ the basis, or with the data overlaid. For example, the plots in Figures
 ## View a basis and projected data 
 oblique_frame(basis = f_basis, 
               data = f_data,
-              color = f_cat,
-              shape = f_cat)
+              color = f_clas,
+              shape = f_clas)
 \end{Sinput}
 \end{Schunk}
 

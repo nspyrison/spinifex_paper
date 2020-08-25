@@ -3,12 +3,12 @@ title: >
   spinifex: An R Package for Creating a Manual Tour of Low-dimensional Projections of Multivariate Data
 author:
   - name: Nicholas Spyrison
-    affiliation: Monash University 
+    affiliation: Monash University
     address:
     - Faculty of Information Technology
     email:  nicholas.spyrison@monash.edu
   - name: Dianne Cook
-    affiliation: Monash University 
+    affiliation: Monash University
     address:
     - Department of Econometrics and Business Statistics
     email:  dicook@monash.edu
@@ -26,18 +26,18 @@ output: rticles::rjournal_article
 ---
 ```{r setup_paper, include=FALSE}
 knitr::opts_chunk$set(
-  fig.align  = "center", 
-  echo       = TRUE, 
+  fig.align  = "center",
+  echo       = TRUE,
   collapse   = TRUE,
-  message    = FALSE, 
-  warning    = FALSE, 
+  message    = FALSE,
+  warning    = FALSE,
   error      = FALSE,
-  cache      = FALSE, # needed for log and figure out?
+  cache      = FALSE,
   cache.lazy = FALSE
 )
 if (F){ ## From reproducing, please use this dev ver:
   remotes::install_github("nspyrison/spinifex", 
-                          ref = "da75976588dc008e21f01ce6a57d9778d0ed6933")
+                          ref = "dc8244c7e3f470fe3eee86f5c577c0dae21136c3")
 }
 library(tourr)
 library(spinifex) ## Use dev version listed above!
@@ -262,8 +262,7 @@ The notation used to describe the algorithm for a 2D radial manual tour is as fo
 - $\textbf{X}$, the data, an $n \times p$ numeric matrix to be projected to 2D.
 - $\textbf{B} = (B_1,~ B_2)$, any 2D orthonormal projection basis, $p \times 2$ matrix, describing the projection from $\mathbb{R}^p \Rightarrow \mathbb{R}^2$. This is called this the "original projection" because it is the starting point for the manual tour.
 - $k$, is the index of the variable to manipulate, called the "manip var".
-<!--- $|\textbf{B}_k|$, the norm of the manip var, $k$, the length of this basis vector between 0 and 1 inclusive.
--->
+
 - $\textbf{e}$, a 1D basis vector of length $p$, with 1 in the $k$-th position and 0 elsewhere.
 - $\textbf{M}$ is a $p \times 3$ matrix, defining the 3D subspace where data rotation occurs and is called the manip(ulation) space.
 - $\textbf{R}$, the 3D rotation matrix, for performing unconstrained 3D rotations within the manip space, $\textbf{M}$.
@@ -286,24 +285,24 @@ The flea data (@lubischew_use_1962), available in the \pkg{tourr} package, is us
 <!-- Projection basis -->
 An initial 2D projection basis must be provided. A suggested way to start is to identify an interesting projection using a projection pursuit guided tour. Here the holes index is used to find a 2D projection of the flea data, which shows three separated species groups. Figure \ref{fig:step0} shows the initial projection of the data. The left panel displays the projection basis ($\textbf{B}$) and can be used as a visual guide of the magnitude and direction that each variable contributes to the projection. The right panel shows the projected data, $\textbf{Y}_{[n,~2]} ~=~ \textbf{X}_{[n,~p]} \textbf{B}_{[p,~2]}$. The color and shape of points are mapped to the flea species. This plot is made using the \code{view\_basis()} function in \pkg{spinifex}, which generates a \CRANpkg{ggplot2} [@wickham_ggplot2_2016] object. 
 
-```{r step0, echo=F, results='hide', out.width='70%',                        fig.cap = "Initial 2D projection: representation of the basis (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
+```{r step0, echo=F, results='hide', out.width='70%',                                 fig.cap="Initial 2D projection: representation of the basis (left) and resulting data projection (right) of standardized flea data. The color and shape of data points are mapped to beetle species. The basis was identified using a projection pursuit guided tour, with the holes index. The contribution of the variables aede2 and tars1 approximately contrasts the other variables. The visible structure in the projection are the three clusters corresponding to the three species. Produced with the function \\code{view\\_basis()}."}
 ## Flea holes tour
 set.seed(20190425)
-f_dat  <- tourr::rescale(flea[,1:6])
-f_cat  <- factor(flea$species)
+f_dat <- tourr::rescale(flea[,1:6])
+f_clas <- factor(flea$species)
 ## hard code a basis. tourr doesn't fix results with set.seed().
-f_bas <-  c(.693, -.022, .082, -.119, .706, .023, 
-             -.070, .438, .405, .515, .103, .604) %>% 
+f_bas <- c(.693, -.022, .082, -.119, .706, .023, 
+           -.070, .438, .405, .515, .103, .604) %>% 
   matrix( ncol=2) %>% 
   tourr::orthonormalise()
 f_mvar <- 5
-f_msp  <- create_manip_space(basis = f_bas, manip_var = f_mvar)
+f_msp <- create_manip_space(basis = f_bas, manip_var = f_mvar)
 f_proj <- data.frame(tourr::rescale(f_dat %*% f_msp[, 1:2]))
 
 # step0, output
 # Adjust centering to make axes and data side by side
 oblique_frame(f_bas, data = f_dat, manip_var = f_mvar, lab = colnames(f_dat),
-              color = f_cat, shape = f_cat) + 
+              color = f_clas, shape = f_clas) + 
   coord_fixed() + theme_void() + 
   theme(legend.position = "none")
 ```
@@ -329,7 +328,7 @@ Initialize the coordinate basis vector as a zero vector, $\textbf{e}$, of length
 <!-- What the manip space provides -->
 The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [0, 1]. This 3D space serves as the medium to rotate the projection basis relative to the selected manipulation variable. Figure \ref{fig:step2} illustrates this 3D manip space with the manip var highlighted. This representation is produced by calling the \code{view\_manip\_space()} function. This diagram is purely used to help explain the algorithm.
 
-```{r step2, echo=F, out.width='70%',                                                fig.cap = "Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
+```{r step2, echo=F, out.width='70%',                                                fig.cap="Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
 view_manip_space2(basis = f_bas, manip_var = f_mvar, lab = colnames(f_dat))
 ```
 
@@ -405,7 +404,7 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
 The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between $0$ and $\pi/2$, call the steps $\phi_i$. 
 
 
-```{r step3, echo=F, warning=F, out.width='100%',  fig.cap = "Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
+```{r step3, echo=F, warning=F, out.width='100%',                                     fig.cap="Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
 f_angle <- .29
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
@@ -452,9 +451,21 @@ Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The p
 
 Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
-```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in',                                           fig.cap = "Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
-#play_manual_tour(f_dat, f_bas, f_mvar, col = f_cat, angle = f_angle)
-array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_cat)
+```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in',                 fig.cap="Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
+## Figure
+array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_clas)
+
+## Saving gif for the supplementary material:
+if (FALSE){
+  play_manual_tour(basis = f_bas, data = f_dat, manip_var = f_mvar,
+                   color = f_clas, shape = f_clas,
+                   ggtheme = list(theme_void(), 
+                                  ggtitle("flea data, radial tour of aede2")),
+                   fps = 8, start_pause = .5, end_pause = 1,
+                   render_type = render_gganimate,
+                   gif_filename = "flea_manualtour_mvar5.gif", 
+                   gif_path = "./output")
+}
 ```
 
 
@@ -536,7 +547,7 @@ f_path <- save_history(f_data, guided_tour(holes()))
 ## Local extrema found
 f_basis <- matrix(f_path[,, max(dim(f_path)[3])], ncol=2)
 ## Categorical class variable
-f_cat <- factor(flea$species)
+f_clas <- factor(flea$species)
 ## Manip var, number of the variable to alter
 f_mvar <- 5
 ## Anglular dist between frames (radians)
@@ -546,8 +557,8 @@ play_manual_tour(data = f_data,
                  basis = f_basis,
                  manip_var = f_mvar, 
                  angle = step_size,
-                 col = f_cat,
-                 pch = f_cat)
+                 col = f_clas,
+                 pch = f_clas)
 ```
 
 \noindent The \code{play\_manual\_tour()} function is a composite function handling interaction between \code{manual\_tour()}, \code{array2df()}, and \code{render\_plotly()}. This will generate an html animation using plotly. Switching the renderer to \code{render\_gganimate()} alternatively creates an animated gif. Each of these formats allows for the animation to be made available on a web site, or directly visible in an html formatted document.
@@ -561,8 +572,8 @@ The function `oblique_frame` can be used to show a projection of the basis, or w
 ## View a basis and projected data 
 oblique_frame(basis = f_basis, 
               data = f_data,
-              color = f_cat,
-              shape = f_cat)
+              color = f_clas,
+              shape = f_clas)
 ```
 
 \noindent An illustration of the manip space (as shown in Figure \ref{fig:step2}) is made with the `view_manip_space` function, as follows: 
@@ -596,23 +607,33 @@ The jet cluster resides in a smaller dimensionality than the full set of experim
 <!-- discussion of findings and which is more insightful -->
 When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}) the difference between the two groups is removed, indicating that it is important for distinguishing experiments. However, removing PC3 from the projection (Figure \ref{fig:JetClusterBad}) does not affect the structure, indicating it is not important for distinguishing experiments. Animations for the remaining PCs can be viewed at the following links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/). It can be seen that only PC4 is important for viewing the difference in these two experiments.
 
-```{r JetClusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',                                    fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
+```{r JetClusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',        fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
 # Jet cluster, Fig 7 of cook_dynamical_2018, subset to ATLAS7old and ATLAS7new
 load("./data/JetCluster_sub.rda")
 load("./data/JetCluster_basis.rda")
 
 jet_bas   <- JetCluster_basis
 jet_dat   <- tourr::rescale(JetCluster_sub[, 1:4])
-jet_cat   <- factor(JetCluster_sub$exp)
+jet_clas   <- factor(JetCluster_sub$exp)
 jet_mvar  <- 4
 jet_ang   <- .315
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
-#dim(jet_mtour)
 
+## Figure
 array2ggfacets(tour_array = jet_mtour, data = jet_dat,
-             m_var = jet_mvar, class = jet_cat)
-# play_manual_tour(data = jet_dat, basis = jet_bas, manip_var = jet_mvar,
-#                  angle = jet_ang, axes = "bottomleft", col = jet_cat)
+               m_var = jet_mvar, class = jet_clas)
+
+## Saving gif for the supplementary material:
+if (FALSE){
+  play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
+                   color = jet_clas, shape = jet_clas,
+                   ggtheme = list(theme_void(), 
+                                  ggtitle("jet cluster, radial tour of PC4")),
+                   fps = 8, start_pause = .5, end_pause = 1,
+                   render_type = render_gganimate,
+                   gif_filename = "jetcluster_manualtour_pc4.gif", 
+                   gif_path = "./output")
+}
 
 ##M_VAR, RESULT
 # 1, good
@@ -621,13 +642,26 @@ array2ggfacets(tour_array = jet_mtour, data = jet_dat,
 # 4, *best
 ```
 
-```{r JetClusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
+```{r JetClusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',         fig.cap="Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
 # Jet cluster, Fig 7 of cook_dynalical_2018, subset to ATLAS7old and ATLAS7new
 jet_mvar  <- 3
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 
+## Figure
 array2ggfacets(tour_array = jet_mtour, data = jet_dat,
-             m_var = jet_mvar, class = jet_cat)
+               m_var = jet_mvar, class = jet_clas)
+
+## Saving gif for the supplementary material:
+if (FALSE){
+  play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
+                   color = jet_clas, shape = jet_clas,
+                   ggtheme = list(theme_void(), 
+                                 ggtitle("jet cluster, radial tour of PC3")),
+                   fps = 8, start_pause = .5, end_pause = 1,
+                   render_type = render_gganimate,
+                   gif_filename = "jetcluster_manualtour_pc3.gif", 
+                   gif_path = "./output")
+}
 ```
 
 
@@ -639,22 +673,33 @@ Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed an
 <!-- comparison of the DIS cluster -->
 Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
 
-```{r DISclusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',                                          fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
+```{r DISclusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',        fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
 
 ##DIS cluster, fig 8 of cook_dynamical_2018
 load("./data/grDIScenter.rda")
 load("./data/DIScluster_centered_basis.rda")
 DIS_bas   <- DIScluster_centered_basis
 DIS_dat   <- tourr::rescale(grDIScenter[, 1:6])
-DIS_cat   <- factor(grDIScenter$disID)
+DIS_clas   <- factor(grDIScenter$disID)
 DIS_mvar  <- 6
 DIS_ang   <- .32
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 
+## Figure
 array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
-             m_var = DIS_mvar, class = DIS_cat)
-# play_manual_tour(data = DIS_dat, basis = DIS_bas, manip_var = DIS_mvar,
-#                  angle = DIS_ang, axes="bottomleft", col = DIS_cat)
+               m_var = DIS_mvar, class = DIS_clas)
+
+## Saving gif for the supplementary material
+if (FALSE){
+  play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = DIS_mvar,
+                   color = DIS_clas, shape = DIS_clas,
+                   ggtheme = list(theme_void(), 
+                                  ggtitle("DIS cluster, radial tour of PC6")),
+                   fps = 8, start_pause = .5, end_pause = 1,
+                   render_type = render_gganimate,
+                   gif_filename = "discluster_manualtour_pc6.gif", 
+                   gif_path = "./output")
+}
 
 ##M_VAR, RESULT
 # 1, purple jet
@@ -665,13 +710,26 @@ array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
 # 6, best*purple and plane
 ```
 
-```{r DISclusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',                                       fig.cap = "Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
+```{r DISclusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',         fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
 ##DIS cluster, fig 8 of cook_dynamical_2018
 DIS_mvar  <- 2
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 
+## Figure
 array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
-             m_var = DIS_mvar, class = DIS_cat)
+               m_var = DIS_mvar, class = DIS_clas)
+
+## Saving gif for the supplementary material
+if (FALSE){
+  play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = DIS_mvar,
+                   color = DIS_clas, shape = DIS_clas,
+                   ggtheme = list(theme_void(), 
+                                  ggtitle("jet cluster, radial tour of PC2")),
+                   fps = 8, start_pause = .5, end_pause = 1,
+                   render_type = render_gganimate,
+                   gif_filename = "discluster_manualtour_pc2.gif", 
+                   gif_path = "./output")
+}
 ```
 
 
