@@ -37,7 +37,7 @@ knitr::opts_chunk$set(
 )
 if (F){ ## From reproducing, please use this dev ver:
   remotes::install_github("nspyrison/spinifex", 
-                          ref = "dc8244c7e3f470fe3eee86f5c577c0dae21136c3")
+                          ref = "176a5e9184e794109579e741cddc82931ceb0dfb")
 }
 library(tourr)
 library(spinifex) ## Use dev version listed above!
@@ -301,7 +301,7 @@ f_proj <- data.frame(tourr::rescale(f_dat %*% f_msp[, 1:2]))
 
 # step0, output
 # Adjust centering to make axes and data side by side
-oblique_frame(f_bas, data = f_dat, manip_var = f_mvar, lab = colnames(f_dat),
+view_frame(f_bas, data = f_dat, manip_var = f_mvar, lab = colnames(f_dat),
               color = f_clas, shape = f_clas) + 
   coord_fixed() + theme_void() + 
   theme(legend.position = "none")
@@ -410,16 +410,16 @@ f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
   paste0("!!! n_frames != 15 !!! Check angle step size. n_frames = ", dim(f_mtour)[3], ". angle = ", f_angle))
 
-p1 <- oblique_frame(f_mtour[,, 1],  lab = colnames(f_dat), manip_var = f_mvar) +
+p1 <- view_frame(f_mtour[,, 1],  lab = colnames(f_dat), manip_var = f_mvar) +
   ggtitle("(1) phi = 0.78") + coord_fixed() +
   theme_void() + theme(legend.position = "none")
-p2 <- oblique_frame(f_mtour[,, 5],  lab = colnames(f_dat), manip_var = f_mvar) +
+p2 <- view_frame(f_mtour[,, 5],  lab = colnames(f_dat), manip_var = f_mvar) +
   ggtitle("(2) phi = 0") + coord_fixed() +
   theme_void() + theme(legend.position = "none")
-p3 <- oblique_frame(f_mtour[,, 12], lab = colnames(f_dat), manip_var = f_mvar) +
+p3 <- view_frame(f_mtour[,, 12], lab = colnames(f_dat), manip_var = f_mvar) +
   ggtitle("(3) phi = 1.57") + coord_fixed() +
   theme_void() + theme(legend.position = "none")
-p4 <- oblique_frame(f_mtour[,, 15], lab = colnames(f_dat), manip_var = f_mvar) +
+p4 <- view_frame(f_mtour[,, 15], lab = colnames(f_dat), manip_var = f_mvar) +
   ggtitle("(4) phi = 0.78") + coord_fixed() +
   theme_void() + theme(legend.position = "none")
 grid.arrange(p1, p2, p3, p4, ncol = 4)
@@ -459,12 +459,11 @@ array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_cla
 if (FALSE){
   play_manual_tour(basis = f_bas, data = f_dat, manip_var = f_mvar,
                    color = f_clas, shape = f_clas,
-                   ggtheme = list(theme_void(), 
-                                  ggtitle("flea data, radial tour of aede2")),
+                   ggtheme = list(theme_void(), theme(legend.position = "none")),
                    fps = 8, start_pause = .5, end_pause = 1,
                    render_type = render_gganimate,
-                   gif_filename = "flea_manualtour_mvar5.gif", 
-                   gif_path = "./output")
+                   gif_filename = "flea_radialtour_mvar5.gif", 
+                   gif_path = "./gifs")
 }
 ```
 
@@ -522,8 +521,8 @@ funcs <- rbind(
   c("animation", "play_tour_path", "composite function animating the specified tour path"),
   c("animation", "play_manual_tour", "composite function animating the specified manual tour"),
   c("", "", ""),
-  c("specialty", "oblique_basis", "table of the rotated basis and manip space"),
-  c("specialty", "oblique_frame", "display the reference axes of a given basis"),
+  c("specialty", "print_manip_space", "table of the rotated basis and manip space"),
+  c("specialty", "view_frame", "display the reference axes of a given basis"),
   c("specialty", "view_manip_space", "illustrative display of any manip space")
 )
 colnames(funcs) <- c("Type", "Function", "Description")
@@ -566,11 +565,11 @@ play_manual_tour(data = f_data,
 
 ### Making illustrations
 
-The function `oblique_frame` can be used to show a projection of the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
+The function `view_frame` can be used to show a projection of the basis, or with the data overlaid. For example, the plots in Figures \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 ```{r eval=FALSE}
 ## View a basis and projected data 
-oblique_frame(basis = f_basis, 
+view_frame(basis = f_basis, 
               data = f_data,
               color = f_clas,
               shape = f_clas)
@@ -627,12 +626,11 @@ array2ggfacets(tour_array = jet_mtour, data = jet_dat,
 if (FALSE){
   play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
                    color = jet_clas, shape = jet_clas,
-                   ggtheme = list(theme_void(), 
-                                  ggtitle("jet cluster, radial tour of PC4")),
+                   ggtheme = list(theme_void(), theme(legend.position = "none")),
                    fps = 8, start_pause = .5, end_pause = 1,
                    render_type = render_gganimate,
-                   gif_filename = "jetcluster_manualtour_pc4.gif", 
-                   gif_path = "./output")
+                   gif_filename = "jetcluster_radialtour_pc4.gif", 
+                   gif_path = "./gifs")
 }
 
 ##M_VAR, RESULT
@@ -655,12 +653,11 @@ array2ggfacets(tour_array = jet_mtour, data = jet_dat,
 if (FALSE){
   play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
                    color = jet_clas, shape = jet_clas,
-                   ggtheme = list(theme_void(), 
-                                 ggtitle("jet cluster, radial tour of PC3")),
+                   ggtheme = list(theme_void(), theme(legend.position = "none")),
                    fps = 8, start_pause = .5, end_pause = 1,
                    render_type = render_gganimate,
-                   gif_filename = "jetcluster_manualtour_pc3.gif", 
-                   gif_path = "./output")
+                   gif_filename = "jetcluster_radialtour_pc3.gif", 
+                   gif_path = "./gifs")
 }
 ```
 
@@ -680,7 +677,7 @@ load("./data/grDIScenter.rda")
 load("./data/DIScluster_centered_basis.rda")
 DIS_bas   <- DIScluster_centered_basis
 DIS_dat   <- tourr::rescale(grDIScenter[, 1:6])
-DIS_clas   <- factor(grDIScenter$disID)
+DIS_clas  <- factor(grDIScenter$disID)
 DIS_mvar  <- 6
 DIS_ang   <- .32
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
@@ -693,12 +690,11 @@ array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
 if (FALSE){
   play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = DIS_mvar,
                    color = DIS_clas, shape = DIS_clas,
-                   ggtheme = list(theme_void(), 
-                                  ggtitle("DIS cluster, radial tour of PC6")),
+                   ggtheme = list(theme_void(), theme(legend.position = "none")),
                    fps = 8, start_pause = .5, end_pause = 1,
                    render_type = render_gganimate,
-                   gif_filename = "discluster_manualtour_pc6.gif", 
-                   gif_path = "./output")
+                   gif_filename = "discluster_radialtour_pc6.gif", 
+                   gif_path = "./gifs")
 }
 
 ##M_VAR, RESULT
@@ -723,12 +719,11 @@ array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
 if (FALSE){
   play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = DIS_mvar,
                    color = DIS_clas, shape = DIS_clas,
-                   ggtheme = list(theme_void(), 
-                                  ggtitle("jet cluster, radial tour of PC2")),
+                   ggtheme = list(theme_void(), theme(legend.position = "none")),
                    fps = 8, start_pause = .5, end_pause = 1,
                    render_type = render_gganimate,
-                   gif_filename = "discluster_manualtour_pc2.gif", 
-                   gif_path = "./output")
+                   gif_filename = "discluster_radialtour_pc2.gif", 
+                   gif_path = "./gifs")
 }
 ```
 

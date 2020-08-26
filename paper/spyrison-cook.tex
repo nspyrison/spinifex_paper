@@ -478,8 +478,8 @@ render & render\_gganimate & render the animation as a gganimate object\\
 animation & play\_tour\_path & composite function animating the specified tour path\\
 animation & play\_manual\_tour & composite function animating the specified manual tour\\
  &  & \\
-specialty & oblique\_basis & table of the rotated basis and manip space\\
-specialty & oblique\_frame & display the reference axes of a given basis\\
+specialty & print\_manip\_space & table of the rotated basis and manip space\\
+specialty & view\_frame & display the reference axes of a given basis\\
 specialty & view\_manip\_space & illustrative display of any manip space\\
 \bottomrule
 \end{tabular}
@@ -530,14 +530,14 @@ site, or directly visible in an html formatted document.
 \hypertarget{making-illustrations}{%
 \subsubsection{Making illustrations}\label{making-illustrations}}
 
-The function \texttt{oblique\_frame} can be used to show a projection of
+The function \texttt{view\_frame} can be used to show a projection of
 the basis, or with the data overlaid. For example, the plots in Figures
 \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 \begin{Schunk}
 \begin{Sinput}
 ## View a basis and projected data 
-oblique_frame(basis = f_basis, 
+view_frame(basis = f_basis, 
               data = f_data,
               color = f_clas,
               shape = f_clas)
