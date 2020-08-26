@@ -1,0 +1,8 @@
+---
+title: "Supplemental material -- jet cluster, radial tour of PC1"
+output: html_document
+---
+
+```{r, echo=FALSE, fig.cap="Radial manual tour of PC1 for the jet cluster data. Radial tour for this component is not featured in the paper."}
+knitr::include_graphics("../gifs/jetcluster_radialtour_pc1.gif")
+```

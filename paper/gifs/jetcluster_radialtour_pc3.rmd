@@ -1,5 +1,5 @@
 ---
-title: "Supplemental material -- figure 6 animation: jet cluster, radial tour on PC3"
+title: "Supplemental material -- figure 6 animation: jet cluster, radial tour of PC3"
 output: html_document
 ---
 

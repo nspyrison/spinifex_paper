@@ -1,5 +1,5 @@
 ---
-title: "Supplemental material -- figure 7 animation: DIS cluster, radial tour on PC6"
+title: "Supplemental material -- figure 7 animation: DIS cluster, radial tour of PC6"
 output: html_document
 ---
 

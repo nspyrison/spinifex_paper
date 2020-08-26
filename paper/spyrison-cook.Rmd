@@ -613,7 +613,7 @@ load("./data/JetCluster_basis.rda")
 
 jet_bas   <- JetCluster_basis
 jet_dat   <- tourr::rescale(JetCluster_sub[, 1:4])
-jet_clas   <- factor(JetCluster_sub$exp)
+jet_clas  <- factor(JetCluster_sub$exp)
 jet_mvar  <- 4
 jet_ang   <- .315
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
@@ -622,15 +622,18 @@ jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 array2ggfacets(tour_array = jet_mtour, data = jet_dat,
                m_var = jet_mvar, class = jet_clas)
 
-## Saving gif for the supplementary material:
+## Saving gif of radial tour for each PC; for the supplementary material
 if (FALSE){
-  play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
-                   color = jet_clas, shape = jet_clas,
-                   ggtheme = list(theme_void(), theme(legend.position = "none")),
-                   fps = 8, start_pause = .5, end_pause = 1,
-                   render_type = render_gganimate,
-                   gif_filename = "jetcluster_radialtour_pc4.gif", 
-                   gif_path = "./gifs")
+  for(i in 1:ncol(jet_dat)){
+    fn <- paste0("jetcluster_radialtour_pc", i, ".gif")
+    play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = i,
+                     color = jet_clas, shape = jet_clas,
+                     ggtheme = list(theme_void(), theme(legend.position = "none")),
+                     fps = 8, start_pause = .5, end_pause = 1,
+                     render_type = render_gganimate,
+                     gif_filename = fn, 
+                     gif_path = "./gifs")
+  }
 }
 
 ##M_VAR, RESULT
@@ -648,17 +651,6 @@ jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
 ## Figure
 array2ggfacets(tour_array = jet_mtour, data = jet_dat,
                m_var = jet_mvar, class = jet_clas)
-
-## Saving gif for the supplementary material:
-if (FALSE){
-  play_manual_tour(basis = jet_bas, data = jet_dat, manip_var = jet_mvar,
-                   color = jet_clas, shape = jet_clas,
-                   ggtheme = list(theme_void(), theme(legend.position = "none")),
-                   fps = 8, start_pause = .5, end_pause = 1,
-                   render_type = render_gganimate,
-                   gif_filename = "jetcluster_radialtour_pc3.gif", 
-                   gif_path = "./gifs")
-}
 ```
 
 
@@ -686,15 +678,18 @@ DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
 array2ggfacets(tour_array = DIS_mtour, data = DIS_dat,
                m_var = DIS_mvar, class = DIS_clas)
 
-## Saving gif for the supplementary material
+## Saving gif of radial tour for each PC; for the supplementary material
 if (FALSE){
-  play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = DIS_mvar,
-                   color = DIS_clas, shape = DIS_clas,
-                   ggtheme = list(theme_void(), theme(legend.position = "none")),
-                   fps = 8, start_pause = .5, end_pause = 1,
-                   render_type = render_gganimate,
-                   gif_filename = "discluster_radialtour_pc6.gif", 
-                   gif_path = "./gifs")
+  for(i in 1:ncol(DIS_dat)){
+    fn <- paste0("discluster_radialtour_pc", i, ".gif")
+    play_manual_tour(basis = DIS_bas, data = DIS_dat, manip_var = i,
+                     color = DIS_clas, shape = DIS_clas,
+                     ggtheme = list(theme_void(), theme(legend.position = "none")),
+                     fps = 8, start_pause = .5, end_pause = 1,
+                     render_type = render_gganimate,
+                     gif_filename = fn, 
+                     gif_path = "./gifs")
+  }
 }
 
 ##M_VAR, RESULT
