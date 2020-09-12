@@ -1,8 +1,0 @@
----
-title: "Supplemental material -- figure 6 animation: jet cluster, radial tour of PC3"
-output: html_document
----
-
-```{r, echo=FALSE, fig.cap="Animation of figure 6. Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments."}
-knitr::include_graphics("../gifs/jetcluster_radialtour_pc3.gif")
-```

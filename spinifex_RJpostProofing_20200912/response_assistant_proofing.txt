@@ -1,0 +1,26 @@
+> Examples CANNOT be reproduced using the code within the article or the ‘filename.R’ script
+
+Fixed; Added version speciefic install for replication, and rebased paper code, removing redundancies with recent function.
+
+
+> \section* and \subsection* commands have been used, instead of \section or \subsection
+
+Fixed; Removed alterative \bibliography function cauing the only \section*
+
+
+> DOES NOT use example environment for code examples
+
+Improved, issue unclear; The code examples (primarily on pages 7 and 8) are formated with proper nesting and spacing as described in author-guide.pdf. It is unclear what is not in allignment with the suggestions, but has been touched up. 
+
+
+> includes a citation of R itself
+
+Fixed
+
+> DOES NOT include the DOI bibtex field using “url = {https://doi.org/. . . }”
+
+Fixed; The 7 citiations with out DOI donot have DOIs. 6 have been updated to reflect current citation() documentation, several now have new ISSNs included. 
+
+> IS NOT minimal BibTeX file without unnecessary fields such as abstracts
+
+Fixed
