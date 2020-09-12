@@ -329,6 +329,38 @@ This involves allowing \(\phi\) to vary between \(0\) and \(\pi/2\),
 call the steps \(\phi_i\).
 
 \begin{Schunk}
+\begin{Soutput}
+#> function (`_class` = NULL, `_inherit` = NULL, ...) 
+#> {
+#>     e <- new.env(parent = emptyenv())
+#>     members <- list(...)
+#>     if (length(members) != sum(nzchar(names(members)))) {
+#>         abort("All members of a ggproto object must be named.")
+#>     }
+#>     if (length(members) > 0) {
+#>         list2env(members, envir = e)
+#>     }
+#>     `_inherit` <- substitute(`_inherit`)
+#>     env <- parent.frame()
+#>     find_super <- function() {
+#>         eval(`_inherit`, env, NULL)
+#>     }
+#>     super <- find_super()
+#>     if (!is.null(super)) {
+#>         if (!is.ggproto(super)) {
+#>             abort("`_inherit` must be a ggproto object.")
+#>         }
+#>         e$super <- find_super
+#>         class(e) <- c(`_class`, class(super))
+#>     }
+#>     else {
+#>         class(e) <- c(`_class`, "ggproto", "gg")
+#>     }
+#>     e
+#> }
+#> <bytecode: 0x000000001d298b08>
+#> <environment: namespace:ggplot2>
+\end{Soutput}
 \begin{figure}
 
 {\centering \includegraphics[width=1\linewidth]{spyrison-cook_files/figure-latex/step3-1} 
@@ -479,7 +511,7 @@ animation & play\_tour\_path & composite function animating the specified tour p
 animation & play\_manual\_tour & composite function animating the specified manual tour\\
  &  & \\
 specialty & print\_manip\_space & table of the rotated basis and manip space\\
-specialty & view\_frame & display the reference axes of a given basis\\
+specialty & oblique\_frame & display the reference axes of a given basis\\
 specialty & view\_manip\_space & illustrative display of any manip space\\
 \bottomrule
 \end{tabular}
@@ -530,14 +562,14 @@ site, or directly visible in an html formatted document.
 \hypertarget{making-illustrations}{%
 \subsubsection{Making illustrations}\label{making-illustrations}}
 
-The function \texttt{view\_frame} can be used to show a projection of
+The function \texttt{oblique\_frame} can be used to show a projection of
 the basis, or with the data overlaid. For example, the plots in Figures
 \ref{fig:step0} and \ref{fig:step3} were made with code similar to this:
 
 \begin{Schunk}
 \begin{Sinput}
 ## View a basis and projected data 
-view_frame(basis = f_basis, 
+oblique_frame(basis = f_basis, 
               data = f_data,
               color = f_clas,
               shape = f_clas)
