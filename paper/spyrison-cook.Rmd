@@ -37,7 +37,8 @@ knitr::opts_chunk$set(
   warning    = FALSE,
   error      = FALSE,
   cache      = FALSE,
-  cache.lazy = FALSE
+  cache.lazy = FALSE,
+  fig.retina = 3
 )
 
 
@@ -331,7 +332,7 @@ Initialize the coordinate basis vector as a zero vector, $\textbf{e}$, of length
 <!-- What the manip space provides -->
 The manip space provides a 3D projection from $p$-dimensional space, where the coefficient of the manip var can range completely between [0, 1]. This 3D space serves as the medium to rotate the projection basis relative to the selected manipulation variable. Figure \ref{fig:step2} illustrates this 3D manip space with the manip var highlighted. This representation is produced by calling the \code{view\_manip\_space()} function. This diagram is purely used to help explain the algorithm.
 
-```{r step2, echo=F, out.width='70%',                                                fig.cap="Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
+```{r step2, echo=F, out.width='50%', fig.width=3, fig.height=3,  fig.cap="Illustration of a 3D manip space, this space is rotated effectively changing the contribution of the manip variable, aede2 in the example data. The blue circle and variable map lies on the projection plane. The red circle, orthogonal to the projection plane, illustrates the manipulation space and how the manip var can be controlled and how this affects the variable contribution back onto the projection plane. The other variables are omitted from the manipulation dimension for simplicity. Picturing the other variables in that dimension reveals the intuition that rotating one variable performs a constrained rotation on the others. This is illustrated with the \\code{view\\_manip\\_space()} function."}
 view_manip_space2(basis = f_bas, manip_var = f_mvar, lab = colnames(f_dat))
 ```
 
@@ -407,7 +408,7 @@ Rotations in 3D can be defined by the axes they pivot on. Rotation within the pr
 The steps outlined above can be used to create any arbitrary rotation in the manip space. To use these for sensitivity analysis, the radial rotation is built into an animation where the manip var is rotated fully into the projection, completely out, and then back to the initial value. This involves allowing $\phi$ to vary between $0$ and $\pi/2$, call the steps $\phi_i$. 
 
 
-```{r step3, echo=F, warning=F, out.width='100%',                                     fig.cap="Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
+```{r step3, echo=F, warning=F, out.width='100%', fig.width=8, fig.height=2, fig.cap="Snapshots of a radial manual tour manipulating aede2: (1) original projection, (2) full contribution, (3) zero contribution, (4) back to original. "}
 f_angle <- .29
 f_mtour <- manual_tour(f_bas, manip_var = f_mvar, angle = f_angle)
 if(dim(f_mtour)[3] != 15) message(
@@ -450,9 +451,9 @@ The operation of a manual tour is defined on the projection bases. Only when the
 <!-- Animation on flea data -->
 Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The projection axes are displayed on the top half, which corresponds to the projected data in the bottom half. When aede2 is removed from the projection, the purple cluster overlaps with the green cluster. This suggests that aede2 is important for distinguishing between these species. 
 
-Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
+Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/flea_radialtour_mvar5.gif}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
-```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in',                 fig.cap="Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\\_manualtour\\_mvar5/."}
+```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection."}
 ## Figure
 array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_clas)
 
@@ -605,9 +606,9 @@ The data has a hierarchical structure with top-level clusters; DIS, VBP, and jet
 The jet cluster resides in a smaller dimensionality than the full set of experiments with four principal components explaining 95% of the variation in the cluster [@cook_dynamical_2018]. The data within this 4D embedding is further subsetted, to ATLAS7old and ATLAS7new, to focus on two groups that occupy different parts of the subspace. Radial manual tours controlling contributions from PC4 and PC3 are shown in Figures \ref{fig:JetClusterGood} and  \ref{fig:JetClusterBad}, respectively. The difference in shape can be interpreted as the experiments probing different phase-spaces. Back-transforming the principal components to the original variables can be done for a more detailed interpretation.
 
 <!-- discussion of findings and which is more insightful -->
-When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}) the difference between the two groups is removed, indicating that it is important for distinguishing experiments. However, removing PC3 from the projection (Figure \ref{fig:JetClusterBad}) does not affect the structure, indicating it is not important for distinguishing experiments. Animations for the remaining PCs can be viewed at the following links: [PC1](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/), and [PC4](https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/). It can be seen that only PC4 is important for viewing the difference in these two experiments.
+When PC4 is removed from the projection (Figure \ref{fig:JetClusterGood}) the difference between the two groups is removed, indicating that it is important for distinguishing experiments. However, removing PC3 from the projection (Figure \ref{fig:JetClusterBad}) does not affect the structure, indicating it is not important for distinguishing experiments. Animations for the remaining PCs can be viewed at the following links: [PC1](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc1.gif), [PC2](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc2.gif), [PC3](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc3.gif), and [PC4](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc4.gif). It can be seen that only PC4 is important for viewing the difference in these two experiments.
 
-```{r JetClusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',        fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc4/."}
+```{r JetClusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments."}
 # Jet cluster, Fig 7 of cook_dynamical_2018, subset to ATLAS7old and ATLAS7new
 load("./data/JetCluster_sub.rda")
 load("./data/JetCluster_basis.rda")
@@ -644,7 +645,7 @@ if (FALSE){
 # 4, *best
 ```
 
-```{r JetClusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',         fig.cap="Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\\_manualtour\\_pc3/."}
+```{r JetClusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments."}
 # Jet cluster, Fig 7 of cook_dynalical_2018, subset to ATLAS7old and ATLAS7new
 jet_mvar  <- 3
 jet_mtour <- manual_tour(basis = jet_bas, manip_var = jet_mvar, angle = jet_ang)
@@ -661,9 +662,9 @@ array2ggfacets(tour_array = jet_mtour, data = jet_dat,
 Following @cook_dynamical_2018, to explore the DIS cluster, PCA is recomputed and the first six principal components, explaining 48% of the full sample variation, are used. The contributions of PC6 and PC2 are explored in Figures \ref{fig:DISclusterGood} and  \ref{fig:DISclusterBad}, respectively. Three experiments are examined: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange).
 
 <!-- comparison of the DIS cluster -->
-Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/), [PC2](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/), [PC3](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/), [PC4](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/), [PC5](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/), and [PC6](https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/).
+Both PC2 and PC6 contribute to the projection similarly. When PC6 is rotated into the projection, variation in the DIS HERA1+2 is greatly reduced. When PC2 is removed from the projection, dimuon SIDIS becomes more clearly distinct. Even though both variables contribute similarly to the original projection, their contributions have quite different effects on the structure of each cluster, and the distinction between clusters. Animations of all of the principal components can be viewed from the links: [PC1](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc1.gif), [PC2](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc2.gif), [PC3](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc3.gif), [PC4](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc4.gif), [PC5](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc5.gif), and [PC6](https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc6.gif).
 
-```{r DISclusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in',        fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc6/."}
+```{r DISclusterGood, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6."}
 
 ##DIS cluster, fig 8 of cook_dynamical_2018
 load("./data/grDIScenter.rda")
@@ -702,7 +703,7 @@ if (FALSE){
 # 6, best*purple and plane
 ```
 
-```{r DISclusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in',         fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\\_manualtour\\_pc2/."}
+```{r DISclusterBad, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important."}
 ##DIS cluster, fig 8 of cook_dynamical_2018
 DIS_mvar  <- 2
 DIS_mtour <- manual_tour(basis = DIS_bas, manip_var = DIS_mvar, angle = DIS_ang)
@@ -744,7 +745,7 @@ Having a graphical user interface would be useful for making it easier and more 
 
 # Acknowledgments
 
-This article was created in R, using \CRANpkg{knitr} [@xie_knitr_2020] and \CRANpkg{rmarkdown} [@allaire_rmarkdown_2020], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
+This article was created in R, using \CRANpkg{knitr} [@xie_knitr_2020] and \CRANpkg{rmarkdown} [@allaire_rmarkdown_2020], with code generating the examples inline. The source files for this article be found at [github.com/nspyrison/spinifex_paper/](https://github.com/nspyrison/spinifex_paper/). The animated gifs can also be viewed at this site, and also in the supplementary material for this paper. The source code for the \pkg{spinifex} package can be found at [github.com/nspyrison/spinifex/](https://github.com/nspyrison/spinifex/).
 
 
 # Bibliography

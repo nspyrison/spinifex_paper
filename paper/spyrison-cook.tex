@@ -1,7 +1,7 @@
 % !TeX root = RJwrapper.tex
 \title{spinifex: An R Package for Creating a Manual Tour of Low-dimensional
 Projections of Multivariate Data}
-\author{by Nicholas Spyrison, Dianne Cook}
+\author{by Nicholas Spyrison and Dianne Cook}
 
 \maketitle
 
@@ -229,7 +229,7 @@ help explain the algorithm.
 \begin{Schunk}
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{spyrison-cook_files/figure-latex/step2-1} 
+{\centering \includegraphics[width=0.5\linewidth]{spyrison-cook_files/figure-latex/step2-1} 
 
 }
 
@@ -358,7 +358,7 @@ call the steps \(\phi_i\).
 #>     }
 #>     e
 #> }
-#> <bytecode: 0x000000001d298b08>
+#> <bytecode: 0x7fcdaa8d99c8>
 #> <environment: namespace:ggplot2>
 \end{Soutput}
 \begin{figure}
@@ -423,8 +423,8 @@ between these species.
 
 Tours are typically viewed as an animation. The animation of this tour
 can be viewed online at
-\url{https://nspyrison.netlify.com/thesis/flea_manualtour_mvar5/}. The
-page may take a moment to load. Animations can be produced using the
+\url{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/flea_radialtour_mvar5.gif}.
+The page may take a moment to load. Animations can be produced using the
 function \code{play\_manual\_tour()}.
 
 \begin{Schunk}
@@ -434,7 +434,7 @@ function \code{play\_manual\_tour()}.
 
 }
 
-\caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection. An animation can be viewed at https://nspyrison.netlify.com/thesis/flea\_manualtour\_mvar5/.}\label{fig:step4}
+\caption[Radial manual tour manipulating aede2 of standardized flea data]{Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection.}\label{fig:step4}
 \end{figure}
 \end{Schunk}
 
@@ -639,11 +639,11 @@ However, removing PC3 from the projection (Figure
 \ref{fig:JetClusterBad}) does not affect the structure, indicating it is
 not important for distinguishing experiments. Animations for the
 remaining PCs can be viewed at the following links:
-\href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc1/}{PC1},
-\href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc2/}{PC2},
-\href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc3/}{PC3},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc1.gif}{PC1},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc2.gif}{PC2},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc3.gif}{PC3},
 and
-\href{https://nspyrison.netlify.com/thesis/jetcluster_manualtour_pc4/}{PC4}.
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/jetcluster_manualtour_pc4.gif}{PC4}.
 It can be seen that only PC4 is important for viewing the difference in
 these two experiments.
 
@@ -654,7 +654,7 @@ these two experiments.
 
 }
 
-\caption[Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc4/.}\label{fig:JetClusterGood}
+\caption[Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC4 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange). When PC4 is removed from the projection (frame 10) there is little difference between the groups, suggesting that PC4 is important for distinguishing the experiments.}\label{fig:JetClusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -665,7 +665,7 @@ these two experiments.
 
 }
 
-\caption[Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments. The animation can be viewed at https://nspyrison.netlify.com/thesis/jetcluster\_manualtour\_pc3/.}\label{fig:JetClusterBad}
+\caption[Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type]{Snapshots of a radial manual tour of PC3 within the jet cluster, with color indicating experiment type: ATLAS7new (green) and ATLAS7old (orange).  When the contribution from PC3 is changed there is little change to the structure of the two groups, suggesting that PC3 is not important for distinguishing the experiments.}\label{fig:JetClusterBad}
 \end{figure}
 \end{Schunk}
 
@@ -687,13 +687,13 @@ to the original projection, their contributions have quite different
 effects on the structure of each cluster, and the distinction between
 clusters. Animations of all of the principal components can be viewed
 from the links:
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc1/}{PC1},
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc2/}{PC2},
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc3/}{PC3},
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc4/}{PC4},
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc5/}{PC5},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc1.gif}{PC1},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc2.gif}{PC2},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc3.gif}{PC3},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc4.gif}{PC4},
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc5.gif}{PC5},
 and
-\href{https://nspyrison.netlify.com/thesis/discluster_manualtour_pc6/}{PC6}.
+\href{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/discluster_manualtour_pc6.gif}{PC6}.
 
 \begin{Schunk}
 \begin{figure}
@@ -702,7 +702,7 @@ and
 
 }
 
-\caption[Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc6/.}\label{fig:DISclusterGood}
+\caption[Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC6 has on the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). DIS HERA1+2 is distributed in a cross-shaped plane, charm SIDIS occupies the center of this cross, and dimuon SIDIS is a linear cluster crossing DIS HERA1+2. As the contribution of PC6 is increased, DIS HERA1+2 becomes almost singular in one direction (frame 5), indicating that this experiment has very little variability in the direction of PC6.}\label{fig:DISclusterGood}
 \end{figure}
 \end{Schunk}
 
@@ -713,7 +713,7 @@ and
 
 }
 
-\caption[Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important. The animation can be viewed at https://nspyrison.netlify.com/thesis/discluster\_manualtour\_pc2/.}\label{fig:DISclusterBad}
+\caption[Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type]{Snapshots of a radial manual tour exploring the sensitivity PC2 to the structure of the DIS cluster, with color indicating experiment type: DIS HERA1+2 (green), dimuon SIDIS (purple), and charm SIDIS (orange). As contribution from PC2 is decreased, dimuon SIDIS becomes more distinguishable from the other two clusters (frames 10-14), indicating that in its absence PC2 is important.}\label{fig:DISclusterBad}
 \end{figure}
 \end{Schunk}
 
@@ -769,22 +769,30 @@ This article was created in R, using \CRANpkg{knitr}
 \citep{allaire_rmarkdown_2020}, with code generating the examples
 inline. The source files for this article be found at
 \href{https://github.com/nspyrison/spinifex_paper/}{github.com/nspyrison/spinifex\_paper/}.
-The source code for the \pkg{spinifex} package can be found at
+The animated gifs can also be viewed at this site, and also in the
+supplementary material for this paper. The source code for the
+\pkg{spinifex} package can be found at
 \href{https://github.com/nspyrison/spinifex/}{github.com/nspyrison/spinifex/}.
 
 \bibliography{spyrison-cook.bib}
 
 \address{%
 Nicholas Spyrison\\
-Monash University\\
+Monash University\\%
 Faculty of Information Technology\\
+%
+%
+%
+\\\href{mailto:nicholas.spyrison@monash.edu}{\nolinkurl{nicholas.spyrison@monash.edu}}
 }
-\href{mailto:nicholas.spyrison@monash.edu}{\nolinkurl{nicholas.spyrison@monash.edu}}
 
 \address{%
 Dianne Cook\\
-Monash University\\
+Monash University\\%
 Department of Econometrics and Business Statistics\\
+%
+%
+%
+\\\href{mailto:dicook@monash.edu}{\nolinkurl{dicook@monash.edu}}
 }
-\href{mailto:dicook@monash.edu}{\nolinkurl{dicook@monash.edu}}
 
