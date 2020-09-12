@@ -453,7 +453,7 @@ Figure \ref{fig:step4} illustrates a manual tour sequence having 15 steps. The p
 
 Tours are typically viewed as an animation. The animation of this tour can be viewed online at \url{https://github.com/nspyrison/spinifex_paper/blob/master/paper/gifs/flea_radialtour_mvar5.gif}. The page may take a moment to load. Animations can be produced using the function \code{play\_manual\_tour()}.
 
-```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in', fig.cap="Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection."}
+```{r step4, echo=F, warning=F, out.height='7in', out.width='5.83in', out.width="100%", fig.cap="Radial manual tour manipulating aede2 of standardized flea data. The axis for aede2 increases in contribution to the projection, from its initial value to 1, decreasing to 0 and then returning to the initial value. This effects the separation between the purple and green clusters. This shows that aede2 is important for distinguishing the purple species, because the separation disappears when aede2 is not contributing to the projection."}
 ## Figure
 array2ggfacets(tour_array = f_mtour, data = f_dat, m_var = f_mvar, class = f_clas)
 
