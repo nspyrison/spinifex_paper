@@ -4,5 +4,5 @@ output: html_document
 ---
 
 ```{r, echo=FALSE, fig.cap="Radial manual tour of PC1 for the DIS cluster data. Radial tour for this component is not featured in the paper."}
-knitr::include_graphics("../gifs/discluster_radialtour_pc1.gif")
+knitr::include_graphics("../gifs/discluster_manualtour_pc1.gif")
 ```
